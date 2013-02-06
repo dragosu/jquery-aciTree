@@ -1,0 +1,33 @@
+
+body {
+    margin:0;
+    padding:10px;
+    color: #000;
+}
+body * {
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:12px;
+}
+#tree {
+    width:300px;
+    height:400px;
+    overflow:auto;
+    padding:10px;
+    border:1px solid #ccc;
+    float:left;
+    margin:0 20px 20px 0;
+}
+.aciTree.selected {
+    background-color:#FFE8FF;
+}
+.aciTreeItem.selected {
+    background-color:#FFE8FF;
+}
+.form {
+    width:400px;
+    float:left;
+    border:1px solid #ccc;
+}
+form {
+    padding:10px 20px 10px 20px;
+}

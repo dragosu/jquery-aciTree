@@ -1,0 +1,174 @@
+@charset "utf-8";
+
+.aciTree.aciTreeLoad {
+    background:url(../image/load-root.gif) center center no-repeat;
+}
+.aciTree .aciTreeUl {
+    list-style:none;
+    margin:0;
+    padding:0;
+    clear:both;
+}
+.aciTree .aciTreeLi {
+    display:block;
+    line-height:20px;
+    overflow:show;
+    clear:both;
+}
+.aciTree .aciTreeLi .aciTreeSpace, .aciTree .aciTreeLi .aciTreeButton, .aciTree .aciTreeLi .aciTreeIcon, .aciTree .aciTreeLi .aciTreeItem {
+    display:block;
+    height:20px;
+    line-height:20px;
+    font-size:11px;
+    float:left;
+}
+.aciTree .aciTreeLi .aciTreeSpace {
+    width:15px;
+}
+.aciTree .aciTreeLi .aciTreeSpace.aciTreeBranch {
+    background:url(../image/tree.png) -128px 0 repeat-y;
+}
+.aciTree .aciTreeLi .aciTreeItem {
+    margin-left:2px;
+}
+
+/* default - item in the middle */
+
+.aciTree .aciTreeLi .aciTreeButton {
+    width:16px;
+    background:url(../image/tree.png) 0 -20px no-repeat;
+}
+.aciTree .aciTreeLi.aciTreeFolderMaybe>.aciTreeButton {
+    background-position:-16px -20px;
+}
+.aciTree .aciTreeLi.aciTreeFolderMaybe>.aciTreeButton:hover {
+    background-position:-32px -20px;
+}
+.aciTree .aciTreeLi.aciTreeFolder>.aciTreeButton {
+    background-position:-48px -20px;
+}
+.aciTree .aciTreeLi.aciTreeFolder>.aciTreeButton:hover {
+    background-position:-64px -20px;
+}
+.aciTree .aciTreeLi.aciTreeFolder.aciTreeOpen>.aciTreeButton {
+    background-position:-80px -20px;
+}
+.aciTree .aciTreeLi.aciTreeFolder.aciTreeOpen>.aciTreeButton:hover {
+    background-position:-96px -20px;
+}
+
+/* if it's the first item in list */
+
+.aciTree>.aciTreeUl:first-child>.aciTreeLi:first-child>.aciTreeButton {
+    background-position:0 -40px;
+}
+.aciTree>.aciTreeUl:first-child>.aciTreeLi.aciTreeFolderMaybe:first-child>.aciTreeButton {
+    background-position:-16px -40px;
+}
+.aciTree>.aciTreeUl:first-child>.aciTreeLi.aciTreeFolderMaybe:first-child>.aciTreeButton:hover {
+    background-position:-32px -40px;
+}
+.aciTree>.aciTreeUl:first-child>.aciTreeLi.aciTreeFolder:first-child>.aciTreeButton {
+    background-position:-48px -40px;
+}
+.aciTree>.aciTreeUl:first-child>.aciTreeLi.aciTreeFolder:first-child>.aciTreeButton:hover {
+    background-position:-64px -40px;
+}
+.aciTree>.aciTreeUl:first-child>.aciTreeLi.aciTreeFolder.aciTreeOpen:first-child>.aciTreeButton {
+    background-position:-80px -40px;
+}
+.aciTree>.aciTreeUl:first-child>.aciTreeLi.aciTreeFolder.aciTreeOpen:first-child>.aciTreeButton:hover {
+    background-position:-96px -40px;
+}
+
+/* if there is only a root item */
+
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi .aciTreeButton {
+    background-position:0 0 !important;
+}
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi.aciTreeFolderMaybe>.aciTreeButton {
+    background-position:-16px 0 !important;
+}
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi.aciTreeFolderMaybe>.aciTreeButton:hover {
+    background-position:-32px 0 !important;
+}
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi.aciTreeFolder>.aciTreeButton {
+    background-position:-48px 0 !important;
+}
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi.aciTreeFolder>.aciTreeButton:hover {
+    background-position:-64px 0 !important;
+}
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi.aciTreeFolder.aciTreeOpen>.aciTreeButton {
+    background-position:-80px 0 !important;
+}
+.aciTree .aciTreeUl.aciSingle>.aciTreeLi.aciTreeFolder.aciTreeOpen>.aciTreeButton:hover {
+    background-position:-96px 0 !important;
+}
+
+/* if it's the last item in list */
+
+.aciTree .aciTreeLi:last-child>.aciTreeButton {
+    background-position:0 -60px;
+}
+.aciTree .aciTreeLi.aciTreeFolderMaybe:last-child>.aciTreeButton {
+    background-position:-16px -60px;
+}
+.aciTree .aciTreeLi.aciTreeFolderMaybe:last-child>.aciTreeButton:hover {
+    background-position:-32px -60px;
+}
+.aciTree .aciTreeLi.aciTreeFolder:last-child>.aciTreeButton {
+    background-position:-48px -60px;
+}
+.aciTree .aciTreeLi.aciTreeFolder:last-child>.aciTreeButton:hover {
+    background-position:-64px -60px;
+}
+.aciTree .aciTreeLi.aciTreeFolder.aciTreeOpen:last-child>.aciTreeButton {
+    background-position:-80px -60px;
+}
+.aciTree .aciTreeLi.aciTreeFolder.aciTreeOpen:last-child>.aciTreeButton:hover {
+    background-position:-96px -60px;
+}
+
+/* loading indicator */
+
+.aciTree .aciTreeButton>span {
+    display:none;
+    position:absolute;
+    width:16px;
+    height:16px;
+    left:-4px;
+    top:2px;
+    background:url(../image/load-node.gif) 0 0 no-repeat;
+}
+.aciTree .aciTreeButton.aciTreeLoad {
+    position:relative;
+    background:none !important;
+}
+.aciTree .aciTreeButton.aciTreeLoad>span {
+    display:block;
+}
+
+/* tree item icon (do not show by default) */
+
+.aciTree .aciTreeLi .aciTreeIcon {
+    width:0;
+    background:url(../image/tree.png) 0 0 no-repeat;
+}
+
+/* we get file/folder CSS class for the icon (in the demo) */
+
+.aciTree .aciTreeLi .aciTreeIcon {
+    width:16px;
+}
+.aciTree .aciTreeLi .aciTreeIcon.folder {
+    background-position:-112px 0;
+}
+.aciTree .aciTreeLi:hover>.aciTreeIcon.folder {
+    background-position:-112px -20px;
+}
+.aciTree .aciTreeLi .aciTreeIcon.file {
+    background-position:-112px -40px;
+}
+.aciTree .aciTreeLi:hover>.aciTreeIcon.file {
+    background-position:-112px -60px;
+}

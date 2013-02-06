@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="language" content="en" />
+        <meta name="robots" content="index, follow" />
+        <title>aciTree - Test suite - A tree view with jQuery</title>
+        <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
+        <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.js"></script>
+    </head>
+    <body>
+
+        <p>Here you have a simple implementation of a file system Tree. The items are real folders/files that are found under a specific path.<br />
+            The download contains a small server-side <i>PHP</i> implementation to get the <a href="php/aciTree.php?branch=" title="See the JSON data" target="_blank">tree structure</a> in the <i>JSON</i> format needed by the <b>aciTree</b>. <br />
+            In this demo the tree ROOT is loaded with a <i>AJAX</i> request on page load but - if wanted - the root data could be output to the <i>HTML</i> page directly and the
+            tree initialized with that root data. <br /> This means you can init the Tree without a initial <i>AJAX</i> request if you want. Also note that you can
+            force open a tree node with the 'open' property.<br /> This way you can implement server-side (maybe with and extra help from the cookies) a way to retain the
+            status of a node (open/closed).</p>
+
+        <p>There are some things to remember when using <b>aciTree</b>...</p>
+        <p>Folders are items that contain other items, they have childrens and they can be expanded.
+            Files are items that do not contain any childrens.<br />
+            Tree folders/files are not the same with a file system folder/file. A file system folder can
+            be just a tree file if that file system folder does not have any childrens (do not have any file system folders/files under it).</p>
+        <p>The item icon (if any) can be a single global <i>CSS</i> class name because the property 'icon' can be also a array with 3 elements (in this order):
+            <i>CSS</i> class name, background X position (in pixels), background Y position (in pixels).<br /> This way you can use a single class name with a single image
+            file that will contain all the item icons you need.<br />
+            In this demo there are only two icons: folder/file that refers to a file system folder/file.
+            <br />Practically the icon depends on the data the tree displays, the icon itself does not have any meaning from the <b>aciTree</b> point of view.</p>
+        <p>The item ID should always be a unique identifier for that item. In this demo, the item ID is the full path to the item, either file system folder or file. <br />
+            This way we know exactly what every item is - from the file system point of view.</p>
+        <p>Note: node loading it's made with a delay so you can see the loading animation. You can remove the delay from the <i>PHP</i> script ;) ...</p>
+
+        <p id="info">Hover over a tree item to show his info...</p>
+
+        <div id="tree" class="aciTree"></div>
+
+        <div class="form">
+            <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
+                <p>Expand: <label><input type="radio" name="expand" value="1" /> Yes</label>
+                    <label><input type="radio" name="expand" value="0" /> No</label></p>
+                <p>Collapse: <label><input type="radio" name="collapse" value="1" /> Yes</label>
+                    <label><input type="radio" name="collapse" value="0" /> No</label></p>
+                <p>Empty: <label><input type="radio" name="empty" value="1" /> Yes</label>
+                    <label><input type="radio" name="empty" value="0" /> No</label></p>
+                <p><input id="destroy" type="button" value="Destroy" />
+                    <input id="init" type="button" value="Init" /></p>
+                <p id="selected">Select a Tree item or the Tree itself!</p>
+                <p>Mode: <label><input type="radio" name="addMode" value="before" /> Add Before</label>
+                    <label><input type="radio" name="addMode" value="after" checked="checked" /> Add After</label></p>
+                <p><input id="addFile" type="button" value="Add File" />
+                    <input id="addFolder" type="button" value="Add Folder" />
+                    <input id="addChilds" type="button" value="Add Childrens" /></p>
+                <p><input id="empty" type="button" value="Empty Folder/Tree" />
+                    <input id="load" type="button" value="Load Folder/Tree" /></p>
+                <p><input id="setFile" type="button" value="Set as File" />
+                    <input id="setFolder" type="button" value="Set as Folder" />
+                    <input id="remove" type="button" value="Remove" /></p>
+                <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
+                        <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
+                <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
+                <input id="toggle" type="button" value="Toggle" /></p>
+            </form>
+        </div>
+
+        <script language="javascript" type="text/javascript">
+
+            $(document).ready(function(){
+
+                // Tree API
+                var treeApi;
+
+                // if we want to init without one initial AJAX request :)
+                var rootData = [{"id":"\/Item 1","item":"Item 1 - From rootData","props":{"isFolder":true,"open":false,"icon":"folder","random":61},"items":[]},
+                    {"id":"\/Item 2","item":"Item 2","props":{"isFolder":true,"open":false,"icon":"folder","random":91},"items":[]},
+                    {"id":"\/Item 3","item":"Item 3","props":{"isFolder":false,"open":false,"icon":"folder","random":14},"items":[]},
+                    {"id":"\/Item 4","item":"Item 4","props":{"isFolder":false,"open":false,"icon":"folder","random":69},"items":[]},
+                    {"id":"\/Item 5","item":"Item 5","props":{"isFolder":true,"open":false,"icon":"folder","random":20},"items":[]},
+                    {"id":"\/Item 6","item":"Item 6","props":{"isFolder":false,"open":false,"icon":"folder","random":78},"items":[]},
+                    {"id":"\/Item 7","item":"Item 7","props":{"isFolder":true,"open":false,"icon":"folder","random":61},"items":[]},
+                    {"id":"\/Item 8","item":"Item 8","props":{"isFolder":true,"open":false,"icon":"folder","random":72},"items":[]},
+                    {"id":"\/document a.txt","item":"document a.txt","props":{"isFolder":false,"open":false,"icon":"file","random":64},"items":[]},
+                    {"id":"\/document b.txt","item":"document b.txt","props":{"isFolder":false,"open":false,"icon":"file","random":70},"items":[]},
+                    {"id":"\/document c.txt","item":"document c.txt","props":{"isFolder":false,"open":false,"icon":"file","random":30},"items":[]}];
+
+                // init the Tree
+                function initTree(){
+                    treeApi = $('#tree').aciTree({
+                        json: 'php/aciTree.php?branch=',
+                        // uncomment next line to init from 'rootData' instead of AJAX
+                        //root: rootData,
+                        callbacks: {
+                            item: function(tree, item, itemData, level){
+                                // a custom item implementation to show the level
+                                item.find('.aciTreeItem').html(itemData.item + ' (' + level + ')');
+                            }
+                        }
+                    }).aciTree('api');
+                }
+
+                // do it ;-)
+                initTree();
+
+                // a little debug info tool :)
+                function debug (item){
+                    var info = '';
+                    info += 'getId: [' + treeApi.getId(item) + ']\n';
+                    info += 'getText: "' + treeApi.getText(item) + '"\n';
+                    info += 'getLevel: ' + treeApi.getLevel(item) + '\n';
+                    info += 'isFile: ' + treeApi.isFile(item) + '\n';
+                    info += 'isFolder: ' + treeApi.isFolder(item) + '\n';
+                    info += 'wasLoad: ' + treeApi.wasLoad(item) + '\n';
+                    info += 'haveParent: ' + treeApi.haveParent(item) + '\n';
+                    info += 'getParent: [' + treeApi.getId(treeApi.getParent(item)) + ']\n';
+                    info += 'getPath: ';
+                    treeApi.getPath(item).each(function(){
+                        info += '[' + treeApi.getId($(this)) + '] ';
+                    });
+                    info += '\n';
+                    info += 'haveSiblings: ' + treeApi.haveSiblings(item) + ' #' + treeApi.siblings(item).length + '\n';
+                    info += 'havePrev: ' + treeApi.havePrev(item) + ' [' + treeApi.getId(treeApi.getPrev(item)) + ']\n';
+                    info += 'haveNext: ' + treeApi.haveNext(item) + ' [' + treeApi.getId(treeApi.getNext(item)) + ']\n';
+                    info += 'haveChildrens: ' + treeApi.haveChildrens(item) + ' #' + treeApi.childrens(item).length + '\n';
+                    return info;
+                }
+
+                // keep the last element
+                var _g_tree = null;
+
+                // output some info
+                function getDebug(element){
+                    if (_g_tree == element){
+                        return;
+                    }
+                    _g_tree = element;
+                    var item = treeApi.itemFrom(element);
+                    $('#info').html(debug(item).replace(/\n/g, '<br />'));
+                }
+
+                // refresh on item 'mouseover'
+                $('#tree').on('mouseover', '.aciTreeLi', function(e){
+                    getDebug(e.target);
+                    return false;
+                }).bind('mouseover', function(e){
+                    getDebug(e.target);
+                });
+
+                // get Tree init options
+                var options = $('#tree').aciTree('options');
+
+                // init FORM based on options
+                $('[name=expand][value=' + (options.expand ? 1 : 0) + ']').prop('checked', true);
+                $('[name=collapse][value=' + (options.collapse ? 1 : 0) + ']').prop('checked', true);
+                $('[name=empty][value=' + (options.empty ? 1 : 0) + ']').prop('checked', true);
+
+                // update options
+                $('[name=expand],[name=collapse],[name=empty]').click(function(){
+                    $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                });
+
+                // FORM button functions
+                $('#destroy').click(function(){
+                    $('#tree').aciTree('destroy');
+                });
+
+                $('#init').click(function(){
+                    initTree();
+                    // update options
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked').each(function(){
+                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                    });
+                });
+
+                // keep the last selected
+                var _g_sel = null;
+
+                // selected state for the Tree
+                $(document).on('click', '#tree', function(){
+                    $('#tree').find('.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    _g_sel = this;
+                });
+
+                // selected state for the Tree items
+                $('#tree').on('click', '.aciTreeItem', function(){
+                    $('#tree').removeClass('selected').find('.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    _g_sel = this;
+                    return false;
+                });
+
+                // few little helpers ->
+
+                function isTree(){
+                    return _g_sel && (_g_sel == $('#tree').get(0));
+                }
+
+                function isItem(){
+                    if (_g_sel){
+                        var item = treeApi.itemFrom(_g_sel);
+                        // itemFrom can return NULL or empty set
+                        if (item && item.length){
+                            return item;
+                        }
+                    }
+                    return null;
+                }
+
+                function warn(item){
+                    if (item){
+                        alert('Please select a Tree item (with a click)!');
+                    } else {
+                        alert('Please select a Tree item or the Tree itself (with a click)!');
+                    }
+                }
+
+                var fileIndex = 0;
+
+                // get new File item data
+                function newFile(){
+                    var itemData = {
+                        id: 'a_new_File_ID_' + fileIndex,
+                        item: 'File name ' + fileIndex,
+                        props: {
+                            isFolder: false,
+                            icon: 'file'
+                        }
+                    };
+                    fileIndex++;
+                    return itemData;
+                }
+
+                var folderIndex = 0;
+
+                // get new Folder item data
+                function newFolder(){
+                    var itemData = {
+                        id: 'a_new_Folder_ID_' + folderIndex,
+                        item: 'Folder name ' + folderIndex,
+                        props: {
+                            isFolder: null,
+                            open: false,
+                            icon: 'folder'
+                        }/*,
+                        items: []*/
+                    };
+                    folderIndex++;
+                    return itemData;
+                }
+
+                // a new Tree item or items (after or before a item)
+                function treeAddItem(item, itemData){
+                    var before = $('[name=addMode]:checked').val() == 'before';
+                    if (before){
+                        treeApi.addBefore(item.first(), itemData);
+                    } else {
+                        treeApi.addAfter(item.last(), itemData);
+                    }
+                }
+
+                // <- few little helpers
+
+                // do something with the selected item ;-)
+
+                $('#addFile').click(function(){
+                    if (isTree()){
+                        // the Tree is selected, just add a File on the first/last position
+                        var childs = treeApi.childrens();
+                        if (childs.length){
+                            // Tree already has some items on ROOT
+                            treeAddItem(childs, newFile());
+                        } else {
+                            // no Tree items on ROOT
+                            treeApi.addChildren(null, newFile());
+                        }
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, add a File before/after it
+                            treeAddItem(item, newFile());
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#addFolder').click(function(){
+                    if (isTree()){
+                        // the Tree is selected, just add a Folder on the first/last position
+                        var childs = treeApi.childrens();
+                        if (childs.length){
+                            // Tree already has some items on ROOT
+                            treeAddItem(childs, newFolder());
+                        } else {
+                            // no Tree items on ROOT
+                            treeApi.addChildren(null, newFolder());
+                        }
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, add a Folder before/after it
+                            treeAddItem(item, newFolder());
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#addChilds').click(function(){
+                    if (isTree()){
+                        // the Tree is selected, just add a Folder+File
+                        treeApi.addChildren(null, [newFolder(), newFile()]);
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, add a Folder+File
+                            // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
+                            treeApi.addChildren(item, [newFolder(), newFile()]);
+                            if (!treeApi.isFolder(item)){
+                                alert('Childrens can be added only on Tree Folders!');
+                            }
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#empty').click(function(){
+                    if (isTree()){
+                        // the Tree is selected, empty it all >:)
+                        treeApi.empty();
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, empty the Folder
+                            // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
+                            treeApi.empty(item);
+                            if (!treeApi.isFolder(item)){
+                                alert('Only folders can be set empty!');
+                            }
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#load').click(function(){
+                    if (isTree()){
+                        // the Tree is selected, load the ROOT
+                        if (treeApi.wasLoad()){
+                            alert('The ROOT was loaded already, nothing to do!');
+                        }
+                        treeApi.doLoad();
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, load the Folder
+                            // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
+                            if (treeApi.isFolder(item)){
+                                if (treeApi.wasLoad(item)){
+                                    alert('The Folder was loaded already, nothing to do!');
+                                }
+                            } else {
+                                alert('Only Tree Folders can be loaded!');
+                            }
+                            treeApi.doLoad(item, function(){ alert('Tree Folder load complete!'); });
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#setFile').click(function(){
+                    var item = isItem();
+                    if (item){
+                        // a Tree item is selected, set the Folder as a File
+                        // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
+                        if (!treeApi.isFolder(item)){
+                            alert('Only Tree Folders can be changed to a File!');
+                        }
+                        treeApi.setFile(item);
+                        // set the icon :)
+                        if (treeApi.isFile(item)){
+                            // if was set then change the icon
+                            treeApi.setIcon(item, 'file');
+                        }
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#setFolder').click(function(){
+                    var item = isItem();
+                    if (item){
+                        // a Tree item is selected, set the File as a Folder
+                        // note: this should be a Tree File (but no need to check, does nothing for a Tree Folder)
+                        if (!treeApi.isFile(item)){
+                            alert('Only Tree Files can be changed to a Folder!');
+                        }
+                        treeApi.setFolder(item);
+                        // set the icon :)
+                        if (treeApi.isFolder(item)){
+                            // if was set then change the icon
+                            treeApi.setIcon(item, 'folder');
+                        }
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#remove').click(function(){
+                    if (isTree()){
+                        // the Tree is selected, just remove all ROOT items
+                        treeApi.remove();
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, remove it
+                            treeApi.remove(item);
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#setIcon').change(function(){
+                    var item = isItem();
+                    if (item){
+                        // note: the Tree does not interpret the ICON in any way
+                        // if it looks like a Folder it does not mean it's a Folder (same goes for a Tree File)
+                        treeApi.setIcon(item, ($(this).val() == 'remove') ? null : $(this).val());
+                    } else {
+                        warn(true);
+                    }
+                    $(this).val('');
+                });
+
+                $('#open').click(function(){
+                    var item = isItem();
+                    if (item){
+                        // open the Folder (does nothing if it's not a Folder)
+                        treeApi.doOpen(item);
+                        if (!treeApi.isFolder(item)){
+                            alert('Only Tree Folders can be opened!');
+                        }
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#close').click(function(){
+                    var item = isItem();
+                    if (item){
+                        // open the Folder (does nothing if it's not a Folder)
+                        treeApi.doClose(item);
+                        if (!treeApi.isFolder(item)){
+                            alert('Only Tree Folders can be closed!');
+                        }
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#toggle').click(function(){
+                    var item = isItem();
+                    if (item){
+                        // open the Folder (does nothing if it's not a Folder)
+                        treeApi.toggle(item);
+                        if (!treeApi.isFolder(item)){
+                            alert('Only Tree Folders can be opened or closed!');
+                        }
+                    } else {
+                        warn(true);
+                    }
+                });
+
+            });
+
+        </script>
+
+    </body>
+</html>
