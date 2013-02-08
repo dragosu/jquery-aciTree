@@ -11,6 +11,18 @@ $fsTree = new FsTree(new Fs("$path/tree"));
 
 $branch = isset($_GET['branch']) ? $_GET['branch'] : null;
 
+// special case for 1k test ...
+if ((strpos($branch, 'a_new_File_ID') !== false) || (strpos($branch, 'a_new_Folder_ID') !== false)) {
+    // burn your CPU not the server with the 1k entries ... ;))
+    if (preg_match('@[0-9]+$@', $branch, $match) == 1) {
+        if ((int) $match[0] > 20) {
+            die('[]');
+        }
+    }
+    sleep(1);
+    die('[]');
+}
+
 if (strpos($branch, '..') !== false) {
     // path should not have a [..] ;-)
     $branch = 'undefined';

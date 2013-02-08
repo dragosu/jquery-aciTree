@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="language" content="en" />
         <meta name="robots" content="index, follow" />
-        <title>aciTree - Test suite - A tree view with jQuery</title>
+        <title>aciTree - Test suite - A tree view control with jQuery</title>
         <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
         <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
         <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -61,7 +61,11 @@
                 <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
                         <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
                 <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
-                <input id="toggle" type="button" value="Toggle" /></p>
+                    <input id="toggle" type="button" value="Toggle" /></p>
+                <p>Burn some CPU: <br/><br/><input id="addFile1k" type="button" value="Add 1k Files" />
+                    <input id="addFolder1k" type="button" value="Add 1k Folders" /></p>
+                <p>Using 'branch': <input id="branch_open" type="button" value="Open All" /> <input id="branch_close" type="button" value="Close All" />
+                    <input id="branch_toggle" type="button" value="Toggle All" /></p>
             </form>
         </div>
 
@@ -110,7 +114,7 @@
                     info += 'getText: "' + treeApi.getText(item) + '"\n';
                     info += 'getLevel: ' + treeApi.getLevel(item) + '\n';
                     info += 'isFile: ' + treeApi.isFile(item) + '\n';
-                    info += 'isFolder: ' + treeApi.isFolder(item) + '\n';
+                    info += 'isFolder: ' + treeApi.isFolder(item) + ' (open: ' + treeApi.isOpen(item) + ')\n';
                     info += 'wasLoad: ' + treeApi.wasLoad(item) + '\n';
                     info += 'haveParent: ' + treeApi.haveParent(item) + '\n';
                     info += 'getParent: [' + treeApi.getId(treeApi.getParent(item)) + ']\n';
@@ -123,11 +127,16 @@
                     info += 'havePrev: ' + treeApi.havePrev(item) + ' [' + treeApi.getId(treeApi.getPrev(item)) + ']\n';
                     info += 'haveNext: ' + treeApi.haveNext(item) + ' [' + treeApi.getId(treeApi.getNext(item)) + ']\n';
                     info += 'haveChildrens: ' + treeApi.haveChildrens(item) + ' #' + treeApi.childrens(item).length + '\n';
+                    info += 'getFirst [' + treeApi.getId(treeApi.getFirst(item)) + ']\n';
+                    info += 'getLast [' + treeApi.getId(treeApi.getLast(item)) + ']\n';
                     return info;
                 }
 
                 // keep the last element
                 var _g_tree = null;
+
+                // ensure info changes
+                window.setInterval(function(){ _g_tree = null; }, 500);
 
                 // output some info
                 function getDebug(element){
@@ -136,6 +145,9 @@
                     }
                     _g_tree = element;
                     var item = treeApi.itemFrom(element);
+                    if (!item.length){
+                        item = null;
+                    }
                     $('#info').html(debug(item).replace(/\n/g, '<br />'));
                 }
 
@@ -473,6 +485,141 @@
                         }
                     } else {
                         warn(true);
+                    }
+                });
+
+                // time to burn your CPU ;))
+
+                $('#addFile1k').click(function(){
+                    var list = [];
+                    for(var i = 0; i < 1000; i++){
+                        list[list.length] = newFile();
+                    }
+                    if (isTree()){
+                        // the Tree is selected, just add a File on the first/last position
+                        var childs = treeApi.childrens();
+                        if (childs.length){
+                            // Tree already has some items on ROOT
+                            treeAddItem(childs, list);
+                        } else {
+                            // no Tree items on ROOT
+                            treeApi.addChildren(null, list);
+                        }
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, add a File before/after it
+                            treeAddItem(item, list);
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                $('#addFolder1k').click(function(){
+                    var list = [];
+                    for(var i = 0; i < 1000; i++){
+                        list[list.length] = newFolder();
+                    }
+                    if (isTree()){
+                        // the Tree is selected, just add a Folder on the first/last position
+                        var childs = treeApi.childrens();
+                        if (childs.length){
+                            // Tree already has some items on ROOT
+                            treeAddItem(childs, list);
+                        } else {
+                            // no Tree items on ROOT
+                            treeApi.addChildren(null, list);
+                        }
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // a Tree item is selected, add a Folder before/after it
+                            treeAddItem(item, list);
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                // custom stuff :) using 'branch'
+                // note that 'doOpen' and 'doClose' have the 'propagate' option
+                // but we do not use that here; this is just to show how a tree branch can be processed
+                // including starting from ROOT; in this way you can do your custom thing with more ease
+
+                // custom open magic happens here
+                var branch_open = function(tree, item){
+                    // open need more care as unloaded nodes can exist
+                    if (treeApi.wasLoad(item)){
+                        // if was load (and is a Folder) then open it
+                        treeApi.doOpen(item);
+                    } else {
+                        // if not loaded, doLoad
+                        treeApi.doLoad(item, function(){
+                            treeApi.doOpen(item);
+                            // continue from here
+                            treeApi.branch(item, branch_open);
+                        });
+                    }
+                };
+
+                $('#branch_open').click(function(){
+                    if (isTree()){
+                        treeApi.branch(null, branch_open);
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // neeed this cause 'branch' is processing all childs (item is not included)
+                            branch_open(null, item);
+                            treeApi.branch(item, branch_open);
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                // custom close magic happens here
+                var branch_close = function(tree, item){
+                    treeApi.doClose(item);
+                };
+
+                $('#branch_close').click(function(){
+                    if (isTree()){
+                        treeApi.branch(null, branch_close);
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // neeed this cause 'branch' is processing all childs (item is not included)
+                            branch_close(null, item);
+                            treeApi.branch(item, branch_close);
+                        } else {
+                            warn();
+                        }
+                    }
+                });
+
+                // custom toggle magic happens here
+                var branch_toggle = function(tree, item){
+                    // a combination of open/close so we use the code already written ;)
+                    if (treeApi.isOpen(item)){
+                        branch_close(tree, item);
+                    } else {
+                        branch_open(tree, item);
+                    }
+                };
+
+                $('#branch_toggle').click(function(){
+                    if (isTree()){
+                        treeApi.branch(null, branch_toggle);
+                    } else {
+                        var item = isItem();
+                        if (item){
+                            // neeed this cause 'branch' is processing all childs (item is not included)
+                            branch_toggle(null, item);
+                            treeApi.branch(item, branch_toggle);
+                        } else {
+                            warn();
+                        }
                     }
                 });
 

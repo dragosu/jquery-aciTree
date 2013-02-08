@@ -1,5 +1,5 @@
 
-aciTree - Tree view with jQuery
+aciTree - Tree view control with jQuery
 
 Features:
 
@@ -30,12 +30,12 @@ Simple usage:
 $('body').ready(function(){
 
     $('#tree').aciTree({
-        json: 'php/aciTree.php?branch='
+        json: 'path/script?branch='
     });
 
 });
 
-aciTree jQuery Plugin v1.0
+aciTree jQuery Plugin v1.2
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -43,4 +43,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 
 Require jQuery Library http://jquery.com
 
-Date: Mon Feb 04 21:15 2013 +0200
+Date: Fri Feb 08 18:20 2013 +0200
