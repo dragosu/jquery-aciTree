@@ -1,6 +1,7 @@
 <?php
 
 // a sample class to show file system based aciTree
+// note: a simple file system helper class is at the end of this file
 
 class FsTree extends Tree {
 
@@ -63,6 +64,8 @@ class FsTree extends Tree {
 }
 
 // a little file system helper :)
+// for getting file system folders/files
+// and for limiting the listings to the base folder
 
 class Fs {
 

@@ -1,5 +1,5 @@
 
-aciTree - Tree view control with jQuery
+aciTree - A treeview control with jQuery
 
 Features:
 
@@ -23,7 +23,7 @@ Features:
 
 - the use of a callback function so you can customize the content of each item
   (by default a text value is set - the item name; by using this callback you
-  can add additional items - such as: a form element of type checkbox, etc).
+  can add additional elements - such as: a form element of type checkbox, etc).
 
 Simple usage:
 
@@ -35,12 +35,12 @@ $('body').ready(function(){
 
 });
 
-aciTree jQuery Plugin v1.2
+aciTree jQuery Plugin v2.0.0
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
 Dual licensed under the MIT or GPL Version 2 licenses.
 
-Require jQuery Library http://jquery.com
+Require jQuery Library >= v1.7.1 http://jquery.com
 
-Date: Fri Feb 08 18:20 2013 +0200
+Date: Thu Feb 28 14:20 2013 +0200

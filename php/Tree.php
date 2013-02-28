@@ -1,6 +1,8 @@
 <?php
 
 // the base class to return data in JSON for aciTree
+// as you can see, keep it simple it's the best way to do things :D
+// note: you'll need PHP >= 5.2 to run this
 
 abstract class Tree {
 
@@ -27,15 +29,20 @@ abstract class Tree {
     private function _json($parentId, Array &$json, $children) {
         $branch = $this->branch($parentId);
         foreach ($branch as $id => $item) {
+            $props = $this->itemProps($id);
+            $items = array();
+            if ($children) {
+                $this->_json($id, $items, $children);
+                if (count($items) == 0) {
+                    $props['isFolder'] = false;
+                }
+            }
             $json[] = array(
                 'id' => $id,
                 'item' => $item,
-                'props' => $this->itemProps($id),
-                'items' => array()
+                'props' => $props,
+                'items' => $items
             );
-            if ($children) {
-                $this->_json($id, $json[count($json) - 1]['items'], $children);
-            }
         }
     }
 

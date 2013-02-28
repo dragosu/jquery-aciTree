@@ -1,0 +1,37 @@
+{
+    "name": "aciTree",
+    "title": "A customizable treeview control",
+    "description": "A customizable treeview control",
+    "keywords": [
+    "treeview",
+    "tree",
+    "ui",
+    "ajax"
+    ],
+    "version": "2.0.0",
+    "author": {
+        "name": "Dragos Ursu",
+        "email":"winebetterthanbeer@acoderinsights.ro",
+        "url": "https://github.com/dragosu"
+    },
+    "maintainers": [{
+        "name": "Dragos Ursu",
+        "email":"winebetterthanbeer@acoderinsights.ro",
+        "url": "https://github.com/dragosu"
+    }],
+    "licenses": [{
+        "type": "MIT",
+        "url": "http://acoderinsights.ro/source/aciTree/mit-licence.txt"
+    },{
+        "type": "GPLv2",
+        "url": "http://acoderinsights.ro/source/aciTree/gpl-v2-licence.txt"
+    }],
+    "homepage": "http://acoderinsights.ro",
+    "demo": "http://acoderinsights.ro/source/aciTree/aciTree.html",
+    "download": "http://acoderinsights.ro/source/zip/aciTree.zip",
+    "docs": "http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery",
+    "bugs": "https://github.com/dragosu/jquery-aciTree/issues",
+    "dependencies": {
+        "jquery": ">=1.7.1"
+    }
+}

@@ -4,7 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="language" content="en" />
         <meta name="robots" content="index, follow" />
-        <title>aciTree - Test suite - A tree view control with jQuery</title>
+        <title>aciTree demo - A treeview control with jQuery</title>
+        <meta name="description" content="A demo to show you how aciTree can be used, check the plugin page to see all the functions exposed by the API" />
+        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery" />
         <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
         <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
         <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -12,61 +14,93 @@
     </head>
     <body>
 
-        <p>Here you have a simple implementation of a file system Tree. The items are real folders/files that are found under a specific path.<br />
-            The download contains a small server-side <i>PHP</i> implementation to get the <a href="php/aciTree.php?branch=" title="See the JSON data" target="_blank">tree structure</a> in the <i>JSON</i> format needed by the <b>aciTree</b>. <br />
-            In this demo the tree ROOT is loaded with a <i>AJAX</i> request on page load but - if wanted - the root data could be output to the <i>HTML</i> page directly and the
-            tree initialized with that root data. <br /> This means you can init the Tree without a initial <i>AJAX</i> request if you want. Also note that you can
-            force open a tree node with the 'open' property.<br /> This way you can implement server-side (maybe with and extra help from the cookies) a way to retain the
-            status of a node (open/closed).</p>
+        <div>
 
-        <p>There are some things to remember when using <b>aciTree</b>...</p>
-        <p>Folders are items that contain other items, they have childrens and they can be expanded.
-            Files are items that do not contain any childrens.<br />
-            Tree folders/files are not the same with a file system folder/file. A file system folder can
-            be just a tree file if that file system folder does not have any childrens (do not have any file system folders/files under it).</p>
-        <p>The item icon (if any) can be a single global <i>CSS</i> class name because the property 'icon' can be also a array with 3 elements (in this order):
-            <i>CSS</i> class name, background X position (in pixels), background Y position (in pixels).<br /> This way you can use a single class name with a single image
-            file that will contain all the item icons you need.<br />
-            In this demo there are only two icons: folder/file that refers to a file system folder/file.
-            <br />Practically the icon depends on the data the tree displays, the icon itself does not have any meaning from the <b>aciTree</b> point of view.</p>
-        <p>The item ID should always be a unique identifier for that item. In this demo, the item ID is the full path to the item, either file system folder or file. <br />
-            This way we know exactly what every item is - from the file system point of view.</p>
-        <p>Note: node loading it's made with a delay so you can see the loading animation. You can remove the delay from the <i>PHP</i> script ;) ...</p>
+            <p>Here you have a simple implementation of a file system tree. The items are real folders/files that are found under a specific path.<br />
+                The download contains a small server-side <i>PHP</i> implementation to get the <a href="php/aciTree.php?branch=" title="See the JSON data" target="_blank">tree structure</a> in the <i>JSON</i> format needed by the <b>aciTree</b>. <br />
+                In this demo the tree ROOT is loaded with a <i>AJAX</i> request on page load but - if wanted - the root data could be output to the <i>HTML</i> page directly and the
+                tree initialized with that root data. <br /> This means you can init the tree without a initial <i>AJAX</i> request if you want. Also note that you can
+                force open a tree node with the 'open' property.<br /> This way you can implement server-side (maybe with and extra help from the cookies) a way to retain the
+                status of a node (open/closed).</p>
 
-        <p id="info">Hover over a tree item to show his info...</p>
+            <p>There are some things to remember when using <b>aciTree</b>...</p>
+            <p>Folders are items that contain other items, they have childrens and they can be expanded.
+                Files are items that do not contain any childrens.<br />
+                Tree folders/files are not the same with a file system folder/file. A file system folder can
+                be just a tree file if that file system folder does not have any childrens (do not have any file system folders/files under it).</p>
+            <p>The item icon (if any) can be a single global <i>CSS</i> class name because the property 'icon' can be also an array with 3 elements (in this order):
+                <i>CSS</i> class name, background X position (in pixels), background Y position (in pixels).<br /> This way you can use a single class name with a single image
+                file that will contain all the icons you need.<br />
+                In this demo there are only two icons: folder/file that refers to a file system folder/file.
+                <br />Practically the icon depends on the data the tree displays, the icon itself does not have any meaning from the <b>aciTree</b> point of view.</p>
+            <p>The item ID should always be a unique identifier for that item. In this demo, the item ID is the full path to the item, either file system folder or file. <br />
+                This way we know exactly what every item is - from the file system point of view.</p>
+            <p>Note: in this demo the node loading it's made with a delay so you can see the loading animation. If you want you can remove the delay from the <i>PHP</i> script ;) ...</p>
 
-        <div id="tree" class="aciTree"></div>
+            <p id="info">Hover over a tree item to show his info ...</p>
+            <p id="info2"></p>
 
-        <div class="form">
-            <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
-                <p>Expand: <label><input type="radio" name="expand" value="1" /> Yes</label>
-                    <label><input type="radio" name="expand" value="0" /> No</label></p>
-                <p>Collapse: <label><input type="radio" name="collapse" value="1" /> Yes</label>
-                    <label><input type="radio" name="collapse" value="0" /> No</label></p>
-                <p>Empty: <label><input type="radio" name="empty" value="1" /> Yes</label>
-                    <label><input type="radio" name="empty" value="0" /> No</label></p>
-                <p><input id="destroy" type="button" value="Destroy" />
-                    <input id="init" type="button" value="Init" /></p>
-                <p id="selected">Select a Tree item or the Tree itself!</p>
-                <p>Mode: <label><input type="radio" name="addMode" value="before" /> Add Before</label>
-                    <label><input type="radio" name="addMode" value="after" checked="checked" /> Add After</label></p>
-                <p><input id="addFile" type="button" value="Add File" />
-                    <input id="addFolder" type="button" value="Add Folder" />
-                    <input id="addChilds" type="button" value="Add Childrens" /></p>
-                <p><input id="empty" type="button" value="Empty Folder/Tree" />
-                    <input id="load" type="button" value="Load Folder/Tree" /></p>
-                <p><input id="setFile" type="button" value="Set as File" />
-                    <input id="setFolder" type="button" value="Set as Folder" />
-                    <input id="remove" type="button" value="Remove" /></p>
-                <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
-                        <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
-                <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
-                    <input id="toggle" type="button" value="Toggle" /></p>
-                <p>Burn some CPU: <br/><br/><input id="addFile1k" type="button" value="Add 1k Files" />
-                    <input id="addFolder1k" type="button" value="Add 1k Folders" /></p>
-                <p>Using 'branch': <input id="branch_open" type="button" value="Open All" /> <input id="branch_close" type="button" value="Close All" />
-                    <input id="branch_toggle" type="button" value="Toggle All" /></p>
-            </form>
+            <div id="tree" class="aciTree"><div>Anything here or just remove</div></div>
+
+            <div class="form">
+                <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
+                    <table cellspacing="0" cellpadding="10" border="0"><tr><td width="50%">
+                                <p>Show Branches: <label><input type="radio" name="branches" value="1" /> Yes</label>
+                                    <label><input type="radio" name="branches" value="0" /> No</label></p>
+                                <p>Use Animations: <label><input type="radio" name="animate" value="1" /> Yes</label>
+                                    <label><input type="radio" name="animate" value="0" /> No</label></p>
+                                <p>Expand All: <label><input type="radio" name="expand" value="1" /> Yes</label>
+                                    <label><input type="radio" name="expand" value="0" /> No</label></p>
+                                <p>Collapse All: <label><input type="radio" name="collapse" value="1" /> Yes</label>
+                                    <label><input type="radio" name="collapse" value="0" /> No</label></p>
+                                <p>Unique on Open: <label><input type="radio" name="unique" value="1" /> Yes</label>
+                                    <label><input type="radio" name="unique" value="0" /> No</label></p>
+                                <p>Empty on Close: <label><input type="radio" name="empty" value="1" /> Yes</label>
+                                    <label><input type="radio" name="empty" value="0" /> No</label></p>
+                                <p><input id="destroy" type="button" value="Destroy" />
+                                    <input id="init" type="button" value="Init with AJAX" />
+                                    <input id="init_data" type="button" value="Init from Data" /></p>
+                                <p><input id="init_huge" type="button" value="Init Huge" />
+                                    <input id="clear_log" type="button" value="Clear Log" /></p>
+                                <p id="selected">Select a Tree item or the Tree itself!</p>
+                                <p>Mode: <label><input type="radio" name="addMode" value="before" /> Add Before</label>
+                                    <label><input type="radio" name="addMode" value="after" checked="checked" /> Add After</label></p>
+                                <p><input id="addFile" type="button" value="Add File" />
+                                    <input id="addFolder" type="button" value="Add Folder" />
+                                    <input id="addChilds" type="button" value="Add Childrens" /></p>
+                                <p><input id="unload" type="button" value="Unload Folder/Tree" />
+                                    <input id="load" type="button" value="Load Folder/Tree" /></p>
+                                <p><input id="setFile" type="button" value="Set as File" />
+                                    <input id="setFolder" type="button" value="Set as Folder" />
+                                    <input id="remove" type="button" value="Remove" /></p>
+                                <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
+                                        <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
+                                <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
+                                    <input id="toggle" type="button" value="Toggle" /></p>
+                            </td><td>
+                                <p>Burn some CPU: <br/><br/><input id="addFile1k" type="button" value="Add 1k Files" />
+                                    <input id="addFolder1k" type="button" value="Add 1k Folders" /></p>
+                                <p>Using 'branch': <input id="branch_open" type="button" value="Open All" /> <input id="branch_close" type="button" value="Close All" />
+                                    <input id="branch_toggle" type="button" value="Toggle All" /></p>
+                                <p>Search ID: <input type="text" name="item_id" value="/Item 1/document 1.txt" size="23" />
+                                    <input id="set_visible" type="button" value="Set Visible" /></p>
+                                <p>Search Params: <label><input type="checkbox" name="search_path" value="1" /> Use Path</label>
+                                    <label><input type="checkbox" name="search_load" value="1" /> Use Load</label></p>
+                                <p><label>Item Content:</label>
+                                    <textarea name="item_cnt">a long item text haha this is a looooong text to be set for a item<br />with a brake...<br />more lines</textarea>
+                                    <input id="set_cnt" type="button" value="Set Content" /></p>
+                                <p>Using 'update': <input id="update_file" type="button" value="Update as File" />
+                                    <input id="update_folder" type="button" value="Update as Folder" /></p>
+                                <p>Move Item: <input id="move_up" type="button" value="Up" /> <input id="move_down" type="button" value="Down" />
+                                    <input id="move_first" type="button" value="First Position" /> <input id="move_last" type="button" value="Last Position" /></p>
+                                <p>Swap Item (by ID): <input type="text" name="swap1" value="/document b.txt" /> with
+                                    <input type="text" name="swap2" value="/Item 3" /> <input id="swap" type="button" value="Swap" /></p>
+                            </td></tr></table>
+                </form>
+            </div>
+
+            <div class="log"></div>
+
         </div>
 
         <script language="javascript" type="text/javascript">
@@ -77,32 +111,60 @@
                 var treeApi;
 
                 // if we want to init without one initial AJAX request :)
-                var rootData = [{"id":"\/Item 1","item":"Item 1 - From rootData","props":{"isFolder":true,"open":false,"icon":"folder","random":61},"items":[]},
-                    {"id":"\/Item 2","item":"Item 2","props":{"isFolder":true,"open":false,"icon":"folder","random":91},"items":[]},
-                    {"id":"\/Item 3","item":"Item 3","props":{"isFolder":false,"open":false,"icon":"folder","random":14},"items":[]},
-                    {"id":"\/Item 4","item":"Item 4","props":{"isFolder":false,"open":false,"icon":"folder","random":69},"items":[]},
-                    {"id":"\/Item 5","item":"Item 5","props":{"isFolder":true,"open":false,"icon":"folder","random":20},"items":[]},
-                    {"id":"\/Item 6","item":"Item 6","props":{"isFolder":false,"open":false,"icon":"folder","random":78},"items":[]},
-                    {"id":"\/Item 7","item":"Item 7","props":{"isFolder":true,"open":false,"icon":"folder","random":61},"items":[]},
-                    {"id":"\/Item 8","item":"Item 8","props":{"isFolder":true,"open":false,"icon":"folder","random":72},"items":[]},
-                    {"id":"\/document a.txt","item":"document a.txt","props":{"isFolder":false,"open":false,"icon":"file","random":64},"items":[]},
-                    {"id":"\/document b.txt","item":"document b.txt","props":{"isFolder":false,"open":false,"icon":"file","random":70},"items":[]},
-                    {"id":"\/document c.txt","item":"document c.txt","props":{"isFolder":false,"open":false,"icon":"file","random":30},"items":[]}];
+                var rootData = [{"id":"\/Item 1","item":"Item 1 - From rootData","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 2","item":"Item 2 - very long item text<br />with a brake","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 3","item":"Item 3","props":{"isFolder":false,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 4","item":"Item 4","props":{"isFolder":false,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 5","item":"Item 5","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 6","item":"Item 6","props":{"isFolder":false,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 7","item":"Item 7","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/Item 8","item":"Item 8","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
+                    {"id":"\/document a.txt","item":"document a.txt","props":{"isFolder":false,"open":false,"icon":"file"},"items":[]},
+                    {"id":"\/document b.txt","item":"document b.txt","props":{"isFolder":false,"open":false,"icon":"file"},"items":[]},
+                    {"id":"\/document c.txt","item":"document c.txt","props":{"isFolder":false,"open":false,"icon":"file"},"items":[]}];
 
                 // init the Tree
-                function initTree(){
+                function initTree(type){
                     treeApi = $('#tree').aciTree({
-                        json: 'php/aciTree.php?branch=',
-                        // uncomment next line to init from 'rootData' instead of AJAX
-                        //root: rootData,
+                        jsonUrl: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch=',
+                        rootData: (type == 'data') ? rootData : null,
                         callbacks: {
-                            item: function(tree, item, itemData, level){
-                                // a custom item implementation to show the level
-                                item.find('.aciTreeItem').html(itemData.item + ' (' + level + ')');
+                            item: function(api, item, itemData, level){
+                                // a custom item implementation to show the tree level
+                                api.setItem(item, itemData.item + ' (' + level + ')');
                             }
                         }
                     }).aciTree('api');
+                    // enable/disable branches
+                    $('#tree').aciTree('option', 'branches', type != 'huge');
                 }
+
+                // show tree events
+                $('#tree').on('acitree', function(e, api, item, data){
+                    switch (data.event){
+                        case 'idset':
+                            $('.log').append('<p>' + data.event + ' [' + api.getId(item) + '] old ID: [' + data.oldId + ']</p>');
+                            break;
+                        case 'itemset':
+                            $('.log').append('<p>' + data.event + ' [' + api.getId(item) + '] old text: [' + data.oldText + ']</p>');
+                            break;
+                        case 'swapped':
+                            $('.log').append('<p>' + data.event + ' [' + api.getId(data.item1) + '] <=> [' + api.getId(data.item2) + ']</p>');
+                            break;
+                        case 'movedup':
+                        case 'moveddown':
+                        case 'movedfirst':
+                        case 'movedlast':
+                            $('.log').append('<p>' + data.event + ' [' + api.getId(item) + '] old index: [' + data.oldIndex + ']</p>');
+                            break;
+                        default:
+                            if (api.isItem(item)){
+                                $('.log').append('<p>' + data.event + ' [' + api.getId(item) + ']</p>');
+                            } else {
+                                $('.log').append('<p>' + data.event + ' [tree]</p>');
+                            }
+                    }
+                });
 
                 // do it ;-)
                 initTree();
@@ -113,12 +175,13 @@
                     info += 'getId: [' + treeApi.getId(item) + ']\n';
                     info += 'getText: "' + treeApi.getText(item) + '"\n';
                     info += 'getLevel: ' + treeApi.getLevel(item) + '\n';
+                    info += 'getIndex: ' + treeApi.getIndex(item) + '\n';
                     info += 'isFile: ' + treeApi.isFile(item) + '\n';
                     info += 'isFolder: ' + treeApi.isFolder(item) + ' (open: ' + treeApi.isOpen(item) + ')\n';
                     info += 'wasLoad: ' + treeApi.wasLoad(item) + '\n';
                     info += 'haveParent: ' + treeApi.haveParent(item) + '\n';
                     info += 'getParent: [' + treeApi.getId(treeApi.getParent(item)) + ']\n';
-                    info += 'getPath: ';
+                    info += 'getPath: [root] ';
                     treeApi.getPath(item).each(function(){
                         info += '[' + treeApi.getId($(this)) + '] ';
                     });
@@ -129,6 +192,7 @@
                     info += 'haveChildrens: ' + treeApi.haveChildrens(item) + ' #' + treeApi.childrens(item).length + '\n';
                     info += 'getFirst [' + treeApi.getId(treeApi.getFirst(item)) + ']\n';
                     info += 'getLast [' + treeApi.getId(treeApi.getLast(item)) + ']\n';
+                    info += 'childrens: total #' + treeApi.childrens(item, true).length + '\n';
                     return info;
                 }
 
@@ -163,16 +227,52 @@
                 var options = $('#tree').aciTree('options');
 
                 // init FORM based on options
+                $('[name=branches][value=' + ($('#tree').hasClass('aciTreeNoBranches') ? 0 : 1) + ']').prop('checked', true);
+                $('[name=animate][value=' + (options.show ? 1 : 0) + ']').prop('checked', true);
                 $('[name=expand][value=' + (options.expand ? 1 : 0) + ']').prop('checked', true);
                 $('[name=collapse][value=' + (options.collapse ? 1 : 0) + ']').prop('checked', true);
                 $('[name=empty][value=' + (options.empty ? 1 : 0) + ']').prop('checked', true);
+                $('[name=unique][value=' + (options.unique ? 1 : 0) + ']').prop('checked', true);
 
                 // update options
-                $('[name=expand],[name=collapse],[name=empty]').click(function(){
+
+                $('[name=animate]').click(function(){
+                    if ($(this).val() == 1){
+                        treeApi.option('show', {
+                            props: {
+                                'height': 'show'
+                            },
+                            duration: 'medium',
+                            easing: 'linear'
+                        });
+                        treeApi.option('hide', {
+                            props: {
+                                'height': 'hide'
+                            },
+                            duration: 'medium',
+                            easing: 'linear'
+                        });
+                        treeApi.option('view', {
+                            duration: 'medium',
+                            easing: 'linear'
+                        });
+                    } else {
+                        treeApi.option('show', null);
+                        treeApi.option('hide', null);
+                        treeApi.option('view', null);
+                    }
+                });
+
+                $('[name=branches]').click(function(){
+                    $('#tree').toggleClass('aciTreeNoBranches', $(this).val() == 0);
+                });
+
+                $('[name=expand],[name=collapse],[name=empty],[name=unique]').click(function(){
                     $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
                 });
 
                 // FORM button functions
+
                 $('#destroy').click(function(){
                     $('#tree').aciTree('destroy');
                 });
@@ -180,9 +280,29 @@
                 $('#init').click(function(){
                     initTree();
                     // update options
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked').each(function(){
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked').each(function(){
                         $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
                     });
+                });
+
+                $('#init_data').click(function(){
+                    initTree('data');
+                    // update options
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked').each(function(){
+                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                    });
+                });
+
+                $('#init_huge').click(function(){
+                    initTree('huge');
+                    // update options
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked').each(function(){
+                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                    });
+                });
+
+                $('#clear_log').click(function(){
+                    $('.log').html('');
                 });
 
                 // keep the last selected
@@ -266,9 +386,13 @@
                 function treeAddItem(item, itemData){
                     var before = $('[name=addMode]:checked').val() == 'before';
                     if (before){
-                        treeApi.addBefore(item.first(), itemData);
+                        treeApi.before(item.first(), {
+                            itemData: itemData
+                        });
                     } else {
-                        treeApi.addAfter(item.last(), itemData);
+                        treeApi.after(item.last(), {
+                            itemData: itemData
+                        });
                     }
                 }
 
@@ -285,7 +409,9 @@
                             treeAddItem(childs, newFile());
                         } else {
                             // no Tree items on ROOT
-                            treeApi.addChildren(null, newFile());
+                            treeApi.append(null, {
+                                itemData: newFile()
+                            });
                         }
                     } else {
                         var item = isItem();
@@ -307,7 +433,9 @@
                             treeAddItem(childs, newFolder());
                         } else {
                             // no Tree items on ROOT
-                            treeApi.addChildren(null, newFolder());
+                            treeApi.append(null, {
+                                itemData: newFolder()
+                            });
                         }
                     } else {
                         var item = isItem();
@@ -323,13 +451,15 @@
                 $('#addChilds').click(function(){
                     if (isTree()){
                         // the Tree is selected, just add a Folder+File
-                        treeApi.addChildren(null, [newFolder(), newFile()]);
+                        treeApi.append(null, [newFolder(), newFile()]);
                     } else {
                         var item = isItem();
                         if (item){
                             // a Tree item is selected, add a Folder+File
                             // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
-                            treeApi.addChildren(item, [newFolder(), newFile()]);
+                            treeApi.append(item, {
+                                itemData: [newFolder(), newFile()]
+                            });
                             if (!treeApi.isFolder(item)){
                                 alert('Childrens can be added only on Tree Folders!');
                             }
@@ -339,18 +469,18 @@
                     }
                 });
 
-                $('#empty').click(function(){
+                $('#unload').click(function(){
                     if (isTree()){
-                        // the Tree is selected, empty it all >:)
-                        treeApi.empty();
+                        // the Tree is selected, unload it all >:)
+                        treeApi.unload();
                     } else {
                         var item = isItem();
                         if (item){
-                            // a Tree item is selected, empty the Folder
+                            // a Tree item is selected, unload the Folder
                             // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
-                            treeApi.empty(item);
+                            treeApi.unload(item);
                             if (!treeApi.isFolder(item)){
-                                alert('Only folders can be set empty!');
+                                alert('Only folders can be unloaded!');
                             }
                         } else {
                             warn();
@@ -364,7 +494,7 @@
                         if (treeApi.wasLoad()){
                             alert('The ROOT was loaded already, nothing to do!');
                         }
-                        treeApi.doLoad();
+                        treeApi.ajaxLoad();
                     } else {
                         var item = isItem();
                         if (item){
@@ -377,7 +507,9 @@
                             } else {
                                 alert('Only Tree Folders can be loaded!');
                             }
-                            treeApi.doLoad(item, function(){ alert('Tree Folder load complete!'); });
+                            treeApi.ajaxLoad(item, {
+                                success: function(){ alert('Tree Folder load complete!'); }
+                            });
                         } else {
                             warn();
                         }
@@ -392,12 +524,12 @@
                         if (!treeApi.isFolder(item)){
                             alert('Only Tree Folders can be changed to a File!');
                         }
-                        treeApi.setFile(item);
-                        // set the icon :)
-                        if (treeApi.isFile(item)){
-                            // if was set then change the icon
-                            treeApi.setIcon(item, 'file');
-                        }
+                        treeApi.setFile(item, {
+                            success: function(){
+                                // if was set then change the icon
+                                treeApi.setIcon(item, 'file');
+                            }
+                        });
                     } else {
                         warn(true);
                     }
@@ -411,12 +543,12 @@
                         if (!treeApi.isFile(item)){
                             alert('Only Tree Files can be changed to a Folder!');
                         }
-                        treeApi.setFolder(item);
-                        // set the icon :)
-                        if (treeApi.isFolder(item)){
-                            // if was set then change the icon
-                            treeApi.setIcon(item, 'folder');
-                        }
+                        treeApi.setFolder(item, {
+                            success: function(){
+                                // if was set then change the icon
+                                treeApi.setIcon(item, 'folder');
+                            }
+                        });
                     } else {
                         warn(true);
                     }
@@ -425,7 +557,7 @@
                 $('#remove').click(function(){
                     if (isTree()){
                         // the Tree is selected, just remove all ROOT items
-                        treeApi.remove();
+                        treeApi.unload();
                     } else {
                         var item = isItem();
                         if (item){
@@ -453,7 +585,9 @@
                     var item = isItem();
                     if (item){
                         // open the Folder (does nothing if it's not a Folder)
-                        treeApi.doOpen(item);
+                        treeApi.open(item, {
+                            expand: treeApi.options().expand
+                        });
                         if (!treeApi.isFolder(item)){
                             alert('Only Tree Folders can be opened!');
                         }
@@ -466,7 +600,9 @@
                     var item = isItem();
                     if (item){
                         // open the Folder (does nothing if it's not a Folder)
-                        treeApi.doClose(item);
+                        treeApi.close(item, {
+                            collapse: treeApi.options().collapse
+                        });
                         if (!treeApi.isFolder(item)){
                             alert('Only Tree Folders can be closed!');
                         }
@@ -479,7 +615,10 @@
                     var item = isItem();
                     if (item){
                         // open the Folder (does nothing if it's not a Folder)
-                        treeApi.toggle(item);
+                        treeApi.toggle(item, {
+                            expand: treeApi.options().expand,
+                            collapse: treeApi.options().collapse
+                        });
                         if (!treeApi.isFolder(item)){
                             alert('Only Tree Folders can be opened or closed!');
                         }
@@ -503,7 +642,9 @@
                             treeAddItem(childs, list);
                         } else {
                             // no Tree items on ROOT
-                            treeApi.addChildren(null, list);
+                            treeApi.append(null, {
+                                itemData: list
+                            });
                         }
                     } else {
                         var item = isItem();
@@ -529,7 +670,9 @@
                             treeAddItem(childs, list);
                         } else {
                             // no Tree items on ROOT
-                            treeApi.addChildren(null, list);
+                            treeApi.append(null, {
+                                itemData: list
+                            });
                         }
                     } else {
                         var item = isItem();
@@ -542,36 +685,40 @@
                     }
                 });
 
-                // custom stuff :) using 'branch'
-                // note that 'doOpen' and 'doClose' have the 'propagate' option
-                // but we do not use that here; this is just to show how a tree branch can be processed
+                // custom stuff :) using 'branch' ...
+                // note that 'doOpen' and 'doClose' already have the 'propagate' option and they are optimized for large branches
+                // this is just to show how a tree branch can be processed
                 // including starting from ROOT; in this way you can do your custom thing with more ease
+                // note that 'branch' will load the nodes if 'load' is set to TRUE (we need to load a node before we can open it)
+
+                function checkBusy(){
+                    if (treeApi.isBusy()){
+                        alert("The treeview is busy right now.\nPlease wait while it's finishing his thing :)");
+                        return true;
+                    }
+                    return false;
+                }
 
                 // custom open magic happens here
-                var branch_open = function(tree, item){
-                    // open need more care as unloaded nodes can exist
-                    if (treeApi.wasLoad(item)){
-                        // if was load (and is a Folder) then open it
-                        treeApi.doOpen(item);
-                    } else {
-                        // if not loaded, doLoad
-                        treeApi.doLoad(item, function(){
-                            treeApi.doOpen(item);
-                            // continue from here
-                            treeApi.branch(item, branch_open);
-                        });
+                var branch_open = function(api, item){
+                    if (api.isFolder(item)){
+                        // check if is a folder just to avoid error notification
+                        api.open(item);
                     }
                 };
 
                 $('#branch_open').click(function(){
+                    if (checkBusy()){
+                        return;
+                    }
                     if (isTree()){
-                        treeApi.branch(null, branch_open);
+                        treeApi.branch(null, branch_open, true);
                     } else {
                         var item = isItem();
                         if (item){
-                            // neeed this cause 'branch' is processing all childs (item is not included)
-                            branch_open(null, item);
-                            treeApi.branch(item, branch_open);
+                            // need this cause 'branch' is processing only childs (item is not included)
+                            treeApi.open(item);
+                            treeApi.branch(item, branch_open, true);
                         } else {
                             warn();
                         }
@@ -579,18 +726,24 @@
                 });
 
                 // custom close magic happens here
-                var branch_close = function(tree, item){
-                    treeApi.doClose(item);
+                var branch_close = function(api, item){
+                    if (api.isFolder(item)){
+                        // check if is a folder just to avoid error notification
+                        api.close(item);
+                    }
                 };
 
                 $('#branch_close').click(function(){
+                    if (checkBusy()){
+                        return;
+                    }
                     if (isTree()){
                         treeApi.branch(null, branch_close);
                     } else {
                         var item = isItem();
                         if (item){
-                            // neeed this cause 'branch' is processing all childs (item is not included)
-                            branch_close(null, item);
+                            // need this cause 'branch' is processing only childs (item is not included)
+                            treeApi.close(item);
                             treeApi.branch(item, branch_close);
                         } else {
                             warn();
@@ -599,27 +752,179 @@
                 });
 
                 // custom toggle magic happens here
-                var branch_toggle = function(tree, item){
-                    // a combination of open/close so we use the code already written ;)
-                    if (treeApi.isOpen(item)){
-                        branch_close(tree, item);
-                    } else {
-                        branch_open(tree, item);
+                var branch_toggle = function(api, item){
+                    if (api.isFolder(item)){
+                        // check if is a folder just to avoid error notification
+                        api.toggle(item);
                     }
                 };
 
                 $('#branch_toggle').click(function(){
+                    if (checkBusy()){
+                        return;
+                    }
                     if (isTree()){
-                        treeApi.branch(null, branch_toggle);
+                        treeApi.branch(null, branch_toggle, true);
                     } else {
                         var item = isItem();
                         if (item){
-                            // neeed this cause 'branch' is processing all childs (item is not included)
-                            branch_toggle(null, item);
-                            treeApi.branch(item, branch_toggle);
+                            // need this cause 'branch' is processing only childs (item is not included)
+                            treeApi.toggle(item);
+                            treeApi.branch(item, branch_toggle, true);
                         } else {
                             warn();
                         }
+                    }
+                });
+
+                // search by ID and make item visible
+
+                function wasFound(id, item){
+                    var path = '[root] ';
+                    treeApi.getPath(item).each(function(){
+                        path += '[' + treeApi.getId($(this)) + '] ';
+                    });
+                    // set item visible :)
+                    treeApi.setVisible(item, {
+                        success: function(){
+                            alert('The ID [' + id + '] has been found!\nThe path is: ' + path);
+                        }
+                    });
+                }
+
+                function notFound(id){
+                    alert('The ID [' + id + '] has not been found!');
+                }
+
+                $('#set_visible').click(function(){
+                    var id = $('[name=item_id]').val();
+                    var path = $('[name=search_path]').is(':checked');
+                    var load = $('[name=search_load]').is(':checked');
+                    if (path && load){
+                        // we need to use callbacks with 'load' cause it's async
+                        treeApi.searchId(id, path, load, {
+                            success: function(api, item){
+                                wasFound(id, item);
+                            },
+                            fail: function(api, item){
+                                notFound(id);
+                            }
+                        });
+                    } else {
+                        var found = treeApi.searchId(id, path);
+                        if (found.length){
+                            wasFound(id, found);
+                        } else {
+                            notFound(id);
+                        }
+                    }
+                });
+
+                // set item content
+
+                $('#set_cnt').click(function(){
+                    var cnt = $('[name=item_cnt]').val();
+                    if (cnt.length){
+                        var item = isItem();
+                        if (item){
+                            treeApi.setItem(item, cnt);
+                        } else {
+                            warn(true);
+                        }
+                    } else {
+                        alert('Please enter some content do set the item to!');
+                    }
+                });
+
+                // update items
+
+                $('#update_file').click(function(){
+                    var item = isItem();
+                    if (item){
+                        treeApi.update(item, {
+                            itemData: {
+                                id: 'a_new_file_id',
+                                item: 'usign [update] to set a item as a file',
+                                props: {
+                                    icon: 'file'
+                                }
+                            }
+                        });
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#update_folder').click(function(){
+                    var item = isItem();
+                    if (item){
+                        treeApi.update(item, {
+                            itemData: {
+                                id: 'a_new_folder_id',
+                                item: 'usign [update] to set a item as a folder',
+                                props: {
+                                    isFolder: true,
+                                    icon: 'folder'
+                                },
+                                items: rootData // using rootData to init the folder
+                            }
+                        });
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                // move items
+
+                $('#move_up').click(function(){
+                    var item = isItem();
+                    if (item){
+                        treeApi.moveUp(item);
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#move_down').click(function(){
+                    var item = isItem();
+                    if (item){
+                        treeApi.moveDown(item);
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#move_first').click(function(){
+                    var item = isItem();
+                    if (item){
+                        treeApi.moveFirst(item);
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                $('#move_last').click(function(){
+                    var item = isItem();
+                    if (item){
+                        treeApi.moveLast(item);
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                // swap items by ID (if found)
+
+                $('#swap').click(function(){
+                    var swap1 = $('[name=swap1]').val();
+                    var swap2 = $('[name=swap2]').val();
+                    var item1 = treeApi.searchId(swap1);
+                    var item2 = treeApi.searchId(swap2);
+                    if (!item1.length){
+                        alert('First item ID not found!');
+                    } else if (!item2.length){
+                        alert('Second item ID not found!');
+                    } else {
+                        treeApi.swap(item1, item2);
                     }
                 });
 
