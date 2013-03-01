@@ -44,7 +44,7 @@
 
             <div class="form">
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
-                    <table cellspacing="0" cellpadding="10" border="0"><tr><td width="50%">
+                    <table cellspacing="0" cellpadding="10" border="0"><tr><td width="300">
                                 <p>Show Branches: <label><input type="radio" name="branches" value="1" /> Yes</label>
                                     <label><input type="radio" name="branches" value="0" /> No</label></p>
                                 <p>Use Animations: <label><input type="radio" name="animate" value="1" /> Yes</label>
@@ -58,9 +58,9 @@
                                 <p>Empty on Close: <label><input type="radio" name="empty" value="1" /> Yes</label>
                                     <label><input type="radio" name="empty" value="0" /> No</label></p>
                                 <p><input id="destroy" type="button" value="Destroy" />
-                                    <input id="init" type="button" value="Init with AJAX" />
-                                    <input id="init_data" type="button" value="Init from Data" /></p>
-                                <p><input id="init_huge" type="button" value="Init Huge" />
+                                    <input id="init" type="button" value="Init with AJAX" /></p>
+                                    <p><input id="init_data" type="button" value="Init from Data" />
+                                <input id="init_huge" type="button" value="Init Huge" />
                                     <input id="clear_log" type="button" value="Clear Log" /></p>
                                 <p id="selected">Select a Tree item or the Tree itself!</p>
                                 <p>Mode: <label><input type="radio" name="addMode" value="before" /> Add Before</label>
@@ -78,7 +78,7 @@
                                 <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
                                     <input id="toggle" type="button" value="Toggle" /></p>
                             </td><td>
-                                <p>Burn some CPU: <br/><br/><input id="addFile1k" type="button" value="Add 1k Files" />
+                                <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files" />
                                     <input id="addFolder1k" type="button" value="Add 1k Folders" /></p>
                                 <p>Using 'branch': <input id="branch_open" type="button" value="Open All" /> <input id="branch_close" type="button" value="Close All" />
                                     <input id="branch_toggle" type="button" value="Toggle All" /></p>
@@ -93,19 +93,19 @@
                                     <input id="update_folder" type="button" value="Update as Folder" /></p>
                                 <p>Move Item: <input id="move_up" type="button" value="Up" /> <input id="move_down" type="button" value="Down" />
                                     <input id="move_first" type="button" value="First Position" /> <input id="move_last" type="button" value="Last Position" /></p>
-                                <p>Swap Item (by ID): <input type="text" name="swap1" value="/document b.txt" /> with
+                                <p>Swap Item (by ID): <input type="text" name="swap1" value="/document b.txt" /> <br /> with
                                     <input type="text" name="swap2" value="/Item 3" /> <input id="swap" type="button" value="Swap" /></p>
                             </td></tr></table>
                 </form>
             </div>
 
-            <div class="log"></div>
+            <div class="log">Tree Log...</div>
 
         </div>
 
         <script language="javascript" type="text/javascript">
 
-            $(document).ready(function(){
+            $(function(){
 
                 // Tree API
                 var treeApi;

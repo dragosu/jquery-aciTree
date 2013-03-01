@@ -35,7 +35,7 @@ form {
     padding:0 10px 0 10px;
 }
 .form {
-    width:700px;
+    width:770px;
     float:left;
     border:1px solid #ccc;
 }
@@ -47,7 +47,7 @@ label {
     height:400px;
     float:left;
     border:1px solid #ccc;
-    margin:0 0 0 20px;
+    margin:20px 0 0 20px;
     padding:10px;
     overflow-y: scroll;
 }

@@ -3,8 +3,8 @@ aciTree - A treeview control with jQuery
 
 Features:
 
-- supports an unlimited number of file items (items that have no childrens) and
-  folder items (items that can have one or more childrens);
+- supports an unlimited number of 'file' items (items that have no childrens)
+  and 'folder' items (items that can have one or more childrens);
 
 - unlimited number of levels, those can be easily loaded with AJAX (the archive
   contains a small PHP implementation as an example);
@@ -22,15 +22,15 @@ Features:
   removing items, changing ICON images etc;
 
 - the use of a callback function so you can customize the content of each item
-  (by default a text value is set - the item name; by using this callback you
+  (by default a text value is set - the item name; by using the callback you
   can add additional elements - such as: a form element of type checkbox, etc).
 
 Simple usage:
 
-$('body').ready(function(){
+$(function(){
 
     $('#tree').aciTree({
-        json: 'path/script?branch='
+        jsonUrl: 'path/script?branch='
     });
 
 });
