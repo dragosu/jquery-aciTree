@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="language" content="en" />
+        <meta name="robots" content="index, follow" />
+        <title>aciTree checkbox demo - A treeview control with jQuery</title>
+        <meta name="description" content="A demo to show you how aciTree can be used with checkboxes, check the plugin page to see all the functions exposed by the API" />
+        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery" />
+        <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
+        <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.js"></script>
+    </head>
+    <body>
+
+        <div>
+
+            <p>A little checkbox demo using the callback 'item'. We just add the checkbox to all created items and <br />
+                listen to the 'loaded' event to make sure we check/uncheck them - with our custom code.</p>
+            <p>We'll use opacity to fade the checkbox out when not all childrens are checked (using this to emulate a tri-state checkbox).</p>
+
+            <div id="tree" class="aciTree"><div>Anything here or just remove</div></div>
+
+            <script language="javascript" type="text/javascript">
+
+                $(function(){
+
+                    // listen for 'loaded' tree event
+                    // when a node will be loaded - we ensure the childrens will be set
+                    // in the same state (checked/unchecked) as the parent (the loaded node)
+                    $('#tree').on('acitree', function(e, api, item, data){
+                        switch (data.event){
+                            case 'loaded':
+                                // childs loaded, ensure checked/unchecked state
+                                updateChildCheckboxes(api, item);
+                                break;
+                        }
+                    });
+
+                    // bind onClick for checkboxes (to update them)
+                    $('#tree').on('click', '.check', function(){
+                        var api = $('#tree').aciTree('api');
+                        updateCheckboxes(api, api.itemFrom(this));
+                    });
+
+                    // init the tree
+                    // with 'item' callback (to add the checkbox element)
+                    $('#tree').aciTree({
+                        jsonUrl: 'php/aciTree.php?branch=',
+                        callbacks: {
+                            item: function(api, item, itemData, level){
+                                // a custom item implementation to show a checkbox
+                                // the initial state could be read from 'itemData.props.custom-property' ...
+                                var id = itemData.id.replace(/[^a-z0-9-]/ig, '');
+                                api.setItem(item, '<label for="check-' + id + '"><input id="check-' + id + '" class="check" type="checkbox" value="1" />' + itemData.item + '</label>');
+                            }
+                        }
+                    });
+
+                    // do the magic: update child checkboxes (when a node is loaded)
+                    // 'item' is the parent item
+                    function updateChildCheckboxes(api, item){
+                        // item will be NULL for the ROOT...
+                        if (item){
+                            // update childrens
+                            var state = item.find('.check:first').removeClass('tristate').is(':checked');
+                            item.find('.check:gt(0)').prop('checked', state).removeClass('tristate');
+                        }
+                    }
+
+                    // do the magic: update checkboxes (when a checkbox state is changed)
+                    // 'item' is the changed item
+                    function updateCheckboxes(api, item){
+                        // update childrens
+                        updateChildCheckboxes(api, item);
+                        // update parent checkboxes
+                        api.getPath(item, true).each(function(){
+                            // list child ones
+                            var list = $(this).find('.check:gt(0)');
+                            var checked = list.filter(':checked').length;
+                            if (checked){
+                                // there is at least a child checkbox checked
+                                $(this).find('.check:first').prop('checked', true).toggleClass('tristate', checked != list.length);
+                            } else {
+                                // there is no child checkbox checked
+                                $(this).find('.check:first').prop('checked', false).removeClass('tristate');
+                            }
+                        });
+                    }
+
+                });
+
+            </script>
+
+        </div>
+
+    </body>
+</html>

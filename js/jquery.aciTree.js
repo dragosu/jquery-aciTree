@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v2.0.0
+ * aciTree jQuery Plugin v2.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -8,7 +8,7 @@
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
  *
- * Date: Thu Feb 28 14:20 2013 +0200
+ * Date: Sun Mar 02 14:20 2013 +0200
  */
 
 /*
@@ -699,14 +699,16 @@
             }
         };
 
-        // get item path
-        var getPath = function(item){
+        // get item path (starting from top parent)
+        // when 'reverse' is TRUE returns the path in reverse order
+        // (top parent on last position)
+        var getPath = function(item, reverse){
             if (item){
                 var path = function(item){
                     var list = [];
                     var li = item.parent().parent();
                     if (li.hasClass('aciTreeLi')){
-                        list = list.concat(path(li), li.get(0));
+                        list = reverse ? list.concat(li.get(0), path(li)) : list.concat(path(li), li.get(0));
                     }
                     return list;
                 };

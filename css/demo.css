@@ -51,3 +51,10 @@ label {
     padding:10px;
     overflow-y: scroll;
 }
+.check {
+    margin:0 4px 0 4px;
+    vertical-align:middle;
+}
+.check.tristate {
+    opacity:0.6;
+}

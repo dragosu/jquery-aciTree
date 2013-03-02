@@ -35,7 +35,9 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v2.0.0
+Check out the demos, now with a checkbox & radio-button implementation!
+
+aciTree jQuery Plugin v2.1.0
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -43,4 +45,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 
 Require jQuery Library >= v1.7.1 http://jquery.com
 
-Date: Thu Feb 28 14:20 2013 +0200
+Date: Sun Mar 02 15:20 2013 +0200

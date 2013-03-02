@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="language" content="en" />
+        <meta name="robots" content="index, follow" />
+        <title>aciTree radio-button demo - A treeview control with jQuery</title>
+        <meta name="description" content="A demo to show you how aciTree can be used with radio-buttons, check the plugin page to see all the functions exposed by the API" />
+        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery" />
+        <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
+        <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.js"></script>
+    </head>
+    <body>
+
+        <div>
+
+            <p>A little radio-button demo using the callback 'item'. We just add the radio-button to all created items and <br />
+                listen to the 'loaded' event to make sure we check/uncheck them - with our custom code.</p>
+
+            <div id="tree" class="aciTree"><div>Anything here or just remove</div></div>
+
+            <script language="javascript" type="text/javascript">
+
+                $(function(){
+
+                    // listen for 'loaded' & 'added' tree event
+                    $('#tree').on('acitree', function(e, api, item, data){
+                        switch (data.event){
+                            case 'loaded':
+                                // childs loaded, ensure checked/unchecked state
+                                updateChildRadios(api, item);
+                                break;
+                            case 'added':
+                                // set the name of the radio based on parent ID
+                                // the 'item' callback it's called before the LI get inserted in the DOM
+                                // so .getParent will not work, that's why we use the 'added' event to update the name
+                                var name = api.getId(api.getParent(item));
+                                item.find('.check:first').attr('name', 'radio-' + (name ? name.replace(/[^a-z0-9-]/ig, '') : 'root'));
+                                break;
+                        }
+                    });
+
+                    // bind onClick for radio-buttons (to update them)
+                    $('#tree').on('click', '.check', function(){
+                        var api = $('#tree').aciTree('api');
+                        updateRadios(api, api.itemFrom(this));
+                    });
+
+                    // init the tree
+                    $('#tree').aciTree({
+                        jsonUrl: 'php/aciTree.php?branch=',
+                        callbacks: {
+                            item: function(api, item, itemData, level){
+                                // a custom item implementation to show a radio-button
+                                // the initial state could be read from 'itemData.props.custom-property' ...
+                                var id = itemData.id.replace(/[^a-z0-9-]/ig, '');
+                                api.setItem(item, '<label for="radio-' + id + '"><input id="radio-' + id + '" class="check" type="radio" value="1" />' + itemData.item + '</label>');
+                            }
+                        }
+                    });
+
+                    // do the magic: update child radios (when a node is loaded)
+                    // 'item' is the parent item
+                    function updateChildRadios(api, item){
+                        // item will be NULL for the ROOT...
+                        if (item){
+                            // update childrens
+                            var state = item.find('.check:first').is(':checked');
+                            if (state){
+                                var found = false;
+                                api.childrens(item).each(function(){
+                                    if ($(this).find('.check:first').is(':checked')){
+                                        found = true;
+                                        return false;
+                                    }
+                                });
+                                if (!found){
+                                    // no one checked, check the first one
+                                    var first = api.getFirst(item);
+                                    first.find('.check:first').prop('checked', true);
+                                    updateChildRadios(api, first);
+                                }
+                            }
+                        }
+                    }
+
+                    // do the magic: update radio-buttons (when a radio-button state is changed)
+                    // 'item' is the changed item
+                    function updateRadios(api, item){
+                        // update childrens
+                        updateChildRadios(api, item);
+                        // uncheck siblings & siblings > childrens
+                        api.siblings(item).each(function(){
+                            $(this).find('.check').prop('checked', false);
+                        });
+                        // update parent radios
+                        api.getPath(item, true).each(function(){
+                            $(this).find('.check:first').prop('checked', true);
+                            updateRadios(api, $(this));
+                            return false;
+                        });
+                    }
+
+                });
+
+            </script>
+
+        </div>
+
+    </body>
+</html>
