@@ -10,7 +10,10 @@
         <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
         <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
         <script type="text/javascript" src="js/jquery.min.js"></script>
-        <script type="text/javascript" src="js/jquery.aciTree.js"></script>
+        <script type="text/javascript" src="js/jquery.aciPlugin.min.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.utils.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.selectable.js"></script>
     </head>
     <body>
 
@@ -43,7 +46,7 @@
             <p id="info">Hover over a tree item to show his info ...</p>
             <p id="info2"></p>
 
-            <div id="tree" class="aciTree"><div>Anything here or just remove</div></div>
+            <div id="tree" class="aciTree" tabIndex="0"><div>Anything here or just remove</div></div>
 
             <div class="form">
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
@@ -60,12 +63,16 @@
                                     <label><input type="radio" name="unique" value="0" /> No</label></p>
                                 <p>Empty on Close: <label><input type="radio" name="empty" value="1" /> Yes</label>
                                     <label><input type="radio" name="empty" value="0" /> No</label></p>
+                                <p>Selectable: <label><input type="radio" name="selectable" value="1" /> Yes</label>
+                                    <label><input type="radio" name="selectable" value="0" /> No</label></p>
+                                <p>Text Selection: <label><input type="radio" name="textSelection" value="1" /> Enabled</label>
+                                    <label><input type="radio" name="textSelection" value="0" /> Disabled</label></p>
                                 <p><input id="destroy" type="button" value="Destroy" />
                                     <input id="init" type="button" value="Init with AJAX" /></p>
-                                    <p><input id="init_data" type="button" value="Init from Data" />
-                                <input id="init_huge" type="button" value="Init Huge" />
+                                <p><input id="init_data" type="button" value="Init from Data" />
+                                    <input id="init_huge" type="button" value="Init Huge" />
                                     <input id="clear_log" type="button" value="Clear Log" /></p>
-                                <p id="selected">Select a Tree item or the Tree itself!</p>
+                                <p id="selected">Select a Tree item or the Tree itself (<span style="color:red">note</span>)!</p>
                                 <p>Mode: <label><input type="radio" name="addMode" value="before" /> Add Before</label>
                                     <label><input type="radio" name="addMode" value="after" checked="checked" /> Add After</label></p>
                                 <p><input id="addFile" type="button" value="Add File" />
@@ -76,11 +83,11 @@
                                 <p><input id="setFile" type="button" value="Set as File" />
                                     <input id="setFolder" type="button" value="Set as Folder" />
                                     <input id="remove" type="button" value="Remove" /></p>
+                            </td><td>
                                 <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
                                         <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
                                 <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
                                     <input id="toggle" type="button" value="Toggle" /></p>
-                            </td><td>
                                 <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files" />
                                     <input id="addFolder1k" type="button" value="Add 1k Folders" /></p>
                                 <p>Using 'branch': <input id="branch_open" type="button" value="Open All" /> <input id="branch_close" type="button" value="Close All" />
@@ -103,6 +110,10 @@
             </div>
 
             <div class="log">Tree Log...</div>
+
+            <p style="clear:both"><br /><span style="color:red">Note</span>: the selected pink item does not have anything to do with the <i>selectable</i> option, it's there just to be able to 'select' the
+            entire tree (not only a item).<br />All item base functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item when the
+            selectable option is used).</p>
 
         </div>
 
@@ -138,8 +149,6 @@
                             }
                         }
                     }).aciTree('api');
-                    // enable/disable branches
-                    $('#tree').aciTree('option', 'branches', type != 'huge');
                 }
 
                 // show tree events
@@ -189,13 +198,16 @@
                         info += '[' + treeApi.getId($(this)) + '] ';
                     });
                     info += '\n';
-                    info += 'haveSiblings: ' + treeApi.haveSiblings(item) + ' #' + treeApi.siblings(item).length + '\n';
+                    info += 'haveSiblings: ' + treeApi.haveSiblings(item) + ' count: #' + treeApi.siblings(item).length + '\n';
                     info += 'havePrev: ' + treeApi.havePrev(item) + ' [' + treeApi.getId(treeApi.getPrev(item)) + ']\n';
                     info += 'haveNext: ' + treeApi.haveNext(item) + ' [' + treeApi.getId(treeApi.getNext(item)) + ']\n';
-                    info += 'haveChildrens: ' + treeApi.haveChildrens(item) + ' #' + treeApi.childrens(item).length + '\n';
+                    var childs = treeApi.childrens(item);
+                    info += 'haveChildrens: ' + treeApi.haveChildrens(item) + ' count: #' + childs.length +
+                        ' folders: #' + treeApi.folders(childs).length + ' (open: #' + treeApi.folders(childs, true).length +
+                        ' closed: #' + treeApi.folders(childs, false).length + ') files: #' + treeApi.files(childs).length + '\n';
                     info += 'getFirst [' + treeApi.getId(treeApi.getFirst(item)) + ']\n';
                     info += 'getLast [' + treeApi.getId(treeApi.getLast(item)) + ']\n';
-                    info += 'childrens: total #' + treeApi.childrens(item, true).length + '\n';
+                    info += 'childrens: total: #' + treeApi.childrens(item, true).length + '\n';
                     return info;
                 }
 
@@ -236,6 +248,8 @@
                 $('[name=collapse][value=' + (options.collapse ? 1 : 0) + ']').prop('checked', true);
                 $('[name=empty][value=' + (options.empty ? 1 : 0) + ']').prop('checked', true);
                 $('[name=unique][value=' + (options.unique ? 1 : 0) + ']').prop('checked', true);
+                $('[name=selectable][value=' + (options.selectable ? 1 : 0) + ']').prop('checked', true);
+                $('[name=textSelection][value=' + (options.textSelection ? 1 : 0) + ']').prop('checked', true);
 
                 // update options
 
@@ -270,7 +284,7 @@
                     $('#tree').toggleClass('aciTreeNoBranches', $(this).val() == 0);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique]').click(function(){
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=textSelection]').click(function(){
                     $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
                 });
 
@@ -280,28 +294,29 @@
                     $('#tree').aciTree('destroy');
                 });
 
+                // update init options based on inputs
+                function updateOptions(){
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=textSelection]:checked').each(function(){
+                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                    });
+                }
+
                 $('#init').click(function(){
                     initTree();
                     // update options
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked').each(function(){
-                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
-                    });
+                    updateOptions();
                 });
 
                 $('#init_data').click(function(){
                     initTree('data');
                     // update options
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked').each(function(){
-                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
-                    });
+                    updateOptions();
                 });
 
                 $('#init_huge').click(function(){
                     initTree('huge');
                     // update options
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked').each(function(){
-                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
-                    });
+                    updateOptions();
                 });
 
                 $('#clear_log').click(function(){

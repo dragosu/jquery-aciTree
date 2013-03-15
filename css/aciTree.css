@@ -1,5 +1,14 @@
 @charset "utf-8";
 
+/*
+ * aciTree jQuery Plugin
+ * http://acoderinsights.ro
+ *
+ */
+
+.aciTree:focus {
+    outline: none;
+}
 .aciTree.aciTreeLoad {
     background:url(../image/load-root.gif) center center no-repeat;
 }
@@ -31,10 +40,24 @@
     vertical-align:top;
 }
 .aciTree .aciTreeItem {
-    margin-left:2px;
+    padding:0 2px 0 2px;
+    margin:1px;
     height:auto;
     max-width:85%;
     white-space:normal;
+    cursor:pointer;
+}
+.aciTree .aciTreeSelected>.aciTreeItem {
+    margin:0;
+    background-color:#E8E8E8;
+    border:1px dashed #D9D9D9;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;
+}
+.aciTree:focus .aciTreeSelected>.aciTreeItem {
+    background-color:#d0e5fe;
+    border:1px dashed #84acdd;
 }
 
 /* default - item in the middle */
@@ -102,7 +125,7 @@
 }
 .aciTree .aciTreeLoad>.aciTreeButton {
     position:relative;
-	/* uncomment next line to hide the button while loading */
+    /* uncomment next line to hide the button while loading */
     /*background:none !important;*/
 }
 .aciTree .aciTreeLoad>.aciTreeButton>div {

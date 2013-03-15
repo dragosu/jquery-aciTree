@@ -35,14 +35,15 @@ $(function(){
 
 });
 
-Check out the demos, now with a checkbox & radio-button implementation!
+Check out the demos, now with item selection support and keyboard navigation!
 
-aciTree jQuery Plugin v2.1.0
+aciTree jQuery Plugin v2.2.0
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
 Dual licensed under the MIT or GPL Version 2 licenses.
 
 Require jQuery Library >= v1.7.1 http://jquery.com
++ aciPlugin >= v1.1.0 https://github.com/dragosu/jquery-aciPlugin
 
-Date: Sun Mar 02 15:20 2013 +0200
+Date: Thu Mar 14 20:10 2013 +0200

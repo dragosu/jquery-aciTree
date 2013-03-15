@@ -26,10 +26,10 @@ body * {
     line-height:20px;
 }
 .aciTree.selected {
-    background-color:#FFE8FF;
+    background-color:#FFDFFF;
 }
 .aciTreeItem.selected {
-    background-color:#FFE8FF;
+    background-color:#FFDFFF;
 }
 form {
     padding:0 10px 0 10px;
@@ -40,7 +40,7 @@ form {
     border:1px solid #ccc;
 }
 label {
-    vertical-align:top;
+    vertical-align:middle;
 }
 .log {
     width:400px;

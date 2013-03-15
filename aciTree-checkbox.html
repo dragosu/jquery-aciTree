@@ -10,7 +10,8 @@
         <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
         <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
         <script type="text/javascript" src="js/jquery.min.js"></script>
-        <script type="text/javascript" src="js/jquery.aciTree.js"></script>
+        <script type="text/javascript" src="js/jquery.aciPlugin.min.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
     </head>
     <body>
 
@@ -21,6 +22,9 @@
             <p>We'll use opacity to fade the checkbox out when not all childrens are checked (using this to emulate a tri-state checkbox).</p>
 
             <div id="tree" class="aciTree"><div>Anything here or just remove</div></div>
+
+            <p style="clear:both"><span style="color:red">Note</span>: currently the radio/checkbox does not work well with the 'selectable' option.
+                <br />I'll try to get around this problem soon. Stay tuned! :)</p>
 
             <script language="javascript" type="text/javascript">
 
@@ -48,6 +52,7 @@
                     // with 'item' callback (to add the checkbox element)
                     $('#tree').aciTree({
                         jsonUrl: 'php/aciTree.php?branch=',
+                        checkbox: true,
                         callbacks: {
                             item: function(api, item, itemData, level){
                                 // a custom item implementation to show a checkbox
