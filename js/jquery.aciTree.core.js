@@ -1,15 +1,15 @@
 
 /*
- * aciTree jQuery Plugin v2.2.0
+ * aciTree jQuery Plugin v3.0.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Thu Mar 14 20:10 2013 +0200
+ * Date: Fri Mar 22 19:10 2013 +0200
  */
 
 /*
@@ -48,13 +48,13 @@
  * One note about a item: a item is always the LI element with the class 'aciTreeLi'.
  * The childrens of a node are all added under a UL element with the class 'aciTreeUl'.
  *
- * All API functions will work with only the first item in the set. If you need to process more at once then you'll need to loop between all of them yourself.
+ * All API functions expect only one item. If you need to process more at once then you'll need to loop between all of them yourself.
  *
  * The 'options' parameter for all API functions (when there is one) it's a object with the properties (not all are required or used):
  *
  * {
- *   success: function (api, item, data) -> callback to be called on success
- *   fail: function (api, item, data) -> callback to be called on fail
+ *   success: function (item, data) -> callback to be called on success (you can access plugin API with 'this' keyword inside the callback)
+ *   fail: function (item, data) -> callback to be called on fail (you can access plugin API with 'this' keyword inside the callback)
  *   expand: true/false -> propagate on open/toggle
  *   collapse: true/false -> propagate on close/toggle
  *   unique: true/false -> close other branches (on open/toggle)?
@@ -104,7 +104,8 @@
             easing: 'linear'
         },
         callbacks: {
-            // item : function(api, item, itemData, level)
+            // item : function(item, itemData, level)
+            // you can access plugin API with 'this' keyword inside the callback
             item: null                  // called when a new item is added, by default the item text is added to the DOM
         }
     };
@@ -116,37 +117,51 @@
         __extend: function(){
             // add extra data
             $.extend(this._instance, {
-                locked: false,
-                // the load queue
-                _loadQueue: new this._queue(this._instance.options.threads, false, this._instance.options.queueDelay),
+                locked: false
+            });
+            $.extend(this._private, {
+                loadQueue: new this._queue(this._instance.options.threads, false, this._instance.options.queueDelay),
                 // timeouts for the loader
-                _loaderHide: null,
-                _loaderInterval: null
+                loaderHide: null,
+                loaderInterval: null,
+                // busy delay count
+                delayBusy: 0
             });
         },
 
         init: function(){
             var _this = this;
-            if (_this.wasInit()){
-                _this._trigger(null, 'wasinit');
+            if (this.wasInit()){
+                this._trigger(null, 'wasinit');
                 return false;
             }
-            if (_this.isLocked()){
-                _this._trigger(null, 'locked');
+            if (this.isLocked()){
+                this._trigger(null, 'locked');
                 return false;
             }
-            _this._instance.locked = true;
-            _this._instance.jQuery.on('click' + _this._instance.nameSpace, 'div.aciTreeButton', function(e){
-                var item = $(e.target).parent();
+            this._instance.locked = true;
+            this._instance.jQuery.bind('mousedown' + this._instance.nameSpace, function(e){
+                var element = $(e.target);
+                if (element.is('.aciTreeButton,.aciTreeLoad,.aciTreeLi,.aciTreeIcon')){
+                    _this._instance.jQuery.focus();
+                    // prevent selection
+                    e.preventDefault();
+                }
+            }).on('click' + this._instance.nameSpace, '.aciTreeButton', function(e){
+                var item = _this.itemFrom(e.target);
+                if (_this.isBusy(item)){
+                    // skip when busy
+                    return;
+                }
                 _this.toggle(item, {
                     collapse: _this._instance.options.collapse,
                     expand: _this._instance.options.expand,
                     unique: _this._instance.options.unique
                 });
             });
-            _this._init();
-            // we keep the _super reference because this method can exit before 'success' or 'fail' will be run
-            var _super = _this._super;
+            this._initHook();
+            // we keep the _super reference
+            var _super = this._super;
             var success = function(){
                 // call the parent
                 _super.apply(_this);
@@ -159,14 +174,14 @@
                 _this._instance.locked = false;
                 _this._trigger(null, 'initfail');
             };
-            if (_this._instance.options.rootData){
-                _this.initFrom(null, {
+            if (this._instance.options.rootData){
+                this.loadFrom(null, {
                     success: success,
                     fail: fail,
-                    itemData: _this._instance.options.rootData
+                    itemData: this._instance.options.rootData
                 });
-            } else if (_this._instance.options.jsonUrl){
-                _this.ajaxLoad(null, {
+            } else if (this._instance.options.jsonUrl){
+                this.ajaxLoad(null, {
                     success: success,
                     fail: fail
                 });
@@ -176,8 +191,8 @@
             return true;
         },
 
-        _init: function(){
-        // override this to do extra init when extending
+        _initHook: function(){
+        // override this to do extra init
         },
 
         // check locked state
@@ -275,10 +290,11 @@
 
         // options object (need to be in this form for all API functions
         // that have a 'options' parameter, not all properties are required)
-        _options: function(object, success, fail){
+        _options: function(object, success, fail, notify){
             var options = $.extend({
                 success: null, // success callback
                 fail: null, // fail callback
+                notify: null, // notify callback (internal use for when already in the requested state)
                 expand: false, // propagate (on open)
                 collapse: false, // propagate (on close)
                 unique: false, // keep a single branch open (on open)
@@ -305,6 +321,27 @@
                     options.fail = fail;
                 }
             }
+            if (notify){
+                if (object && object.notify) {
+                    options.notify = function(){
+                        notify();
+                        object.notify();
+                    };
+                } else {
+                    if (!options.notify && object && object.success) {
+                        options.notify = function(){
+                            notify();
+                            object.success();
+                        };
+                    } else {
+                        options.notify = notify;
+                    }
+                }
+            } else {
+                if (!options.notify && object && object.success) {
+                    options.notify = object.success;
+                }
+            }
             return options;
         },
 
@@ -319,42 +356,73 @@
         // call on success
         _success: function(item, options, data){
             if (options && options.success){
-                options.success(this, item ? item.first() : null, data);
+                options.success.call(this, item ? item.first() : null, data);
             }
         },
 
         // call on fail
         _fail: function(item, options, data){
             if (options && options.fail){
-                options.fail(this, item ? item.first() : null, data);
+                options.fail.call(this, item ? item.first() : null, data);
             }
+        },
+
+        // call on notify (should be same as 'success' but called when already in the requested state)
+        _notify: function(item, options, data){
+            if (options && options.notify){
+                options.notify.call(this, item ? item.first() : null, data);
+            }
+        },
+
+        // delay callback on busy item
+        _delayBusy: function(item, callback){
+            var _this = this;
+            if ((this._private.delayBusy < 10) && this.isBusy(item)){
+                this._private.delayBusy++;
+                var _private = this._private;
+                setTimeout(function(){
+                    _this._delayBusy.call(_this, item, callback);
+                    _private.delayBusy--;
+                }, 10);
+                return;
+            }
+            callback();
         },
 
         // process item loading with AJAX
         ajaxLoad: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
-                _this._loading(item, false);
+            if (item && this.isBusy(item)){
+                this._delayBusy(item, function(){
+                    _this.ajaxLoad(item, options);
+                });
+                return;
+            }
+            options = this._options(options, function(){
+                _this._loading(item);
                 _this._trigger(item, 'loaded');
             }, function(){
-                _this._loading(item, false);
+                _this._loading(item);
                 _this._trigger(item, 'loadfail');
+            }, function(){
+                _this._loading(item);
+                _this._trigger(item, 'wasloaded');
             });
-            if (!item || _this.isFolder(item)){
-                _this._instance._loadQueue.push(function(complete){
+            if (!item || this.isFolder(item)){
+                this._private.loadQueue.push(function(complete){
+                    _this._loading(item, true);
                     if (_this.wasLoad(item)){
-                        _this._success(item, options);
+                        _this._notify(item, options);
                         complete();
                         return;
                     }
-                    _this._loading(item, true);
                     $.get(_this._instance.options.jsonUrl + (item ? _this.getId(item) : ''), function(itemList){
                         if (itemList && (itemList instanceof Array) && itemList.length){
                             var process = function(){
                                 if (_this.wasLoad(item)){
                                     _this.unload(item, {
                                         success: function(){
-                                            _this._branch(item, itemList);
+                                            _this._createBranch(item, itemList);
                                             _this._success(item, options);
                                             complete();
                                         },
@@ -365,24 +433,32 @@
                                         unanimated: options.unanimated
                                     });
                                 } else {
-                                    _this._branch(item, itemList);
+                                    _this._createBranch(item, itemList);
                                     _this._success(item, options);
                                     complete();
                                 }
                             };
-                            _this.setFolder(item, {
-                                success: process,
-                                fail: process
-                            });
+                            if (_this.isFolder(item)){
+                                process();
+                            } else {
+                                _this.setFolder(item, {
+                                    success: process,
+                                    fail: process
+                                });
+                            }
                         } else {
                             var process = function(){
                                 _this._fail(item, options);
                                 complete();
                             };
-                            _this.setFile(item, {
-                                success: process,
-                                fail: process
-                            });
+                            if (_this.isFile(item)){
+                                process();
+                            } else {
+                                _this.setFile(item, {
+                                    success: process,
+                                    fail: process
+                                });
+                            }
                         }
                     }, 'json').fail(function(){
                         _this._fail(item, options);
@@ -390,135 +466,154 @@
                     });
                 }, true).run();
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
-        // process item init from options.itemData
-        initFrom: function(item, options){
+        // process item loading from options.itemData
+        loadFrom: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
-                _this._loading(item, false);
+            if (item && this.isBusy(item)){
+                this._delayBusy(item, function(){
+                    _this.loadFrom(item, options);
+                });
+                return;
+            }
+            options = this._options(options, function(){
+                _this._loading(item);
                 _this._trigger(item, 'loaded');
             }, function(){
-                _this._loading(item, false);
+                _this._loading(item);
                 _this._trigger(item, 'loadfail');
+            }, function(){
+                _this._loading(item);
+                _this._trigger(item, 'wasloaded');
             });
-            if (!item || _this.isFolder(item)){
-                if (_this.wasLoad(item)){
-                    _this._success(item, options);
+            if (!item || this.isFolder(item)){
+                this._loading(item, true);
+                if (this.wasLoad(item)){
+                    this._notify(item, options);
                     return;
                 }
-                _this._loading(item, true);
                 if (options.itemData && (options.itemData instanceof Array) && options.itemData.length){
                     var process = function(){
                         if (_this.wasLoad(item)){
                             _this.unload(item, {
                                 success: function(){
-                                    _this._branch(item, options.itemData);
+                                    _this._createBranch(item, options.itemData);
                                     _this._success(item, options);
                                 },
                                 fail: options.fail,
                                 unanimated: options.unanimated
                             });
                         } else {
-                            _this._branch(item, options.itemData);
+                            _this._createBranch(item, options.itemData);
                             _this._success(item, options);
                         }
                     };
-                    _this.setFolder(item, {
-                        success: process,
-                        fail: process
-                    });
+                    if (this.isFolder(item)){
+                        process();
+                    } else {
+                        this.setFolder(item, {
+                            success: process,
+                            fail: process
+                        });
+                    }
                 } else {
-                    _this.setFile(item, {
-                        success: options.fail,
-                        fail: options.fail
-                    });
+                    if (this.isFile(item)){
+                        this._fail(item, options);
+                    } else {
+                        this.setFile(item, {
+                            success: options.fail,
+                            fail: options.fail
+                        });
+                    }
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
         // unload item
         unload: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
+                _this._loading(item);
                 _this._trigger(item, 'unloaded');
             }, function(){
+                _this._loading(item);
                 _this._trigger(item, 'unloadfail');
+            }, function(){
+                _this._loading(item);
+                _this._trigger(item, 'notloaded');
             });
-            if (!item || _this.isFolder(item)){
-                _this._loading(item, true);
-                _this.childrens(item, true).each(function(){
+            if (!item || this.isFolder(item)){
+                this._loading(item, true);
+                if (!this.wasLoad(item)){
+                    _this._notify(item, options);
+                    return;
+                }
+                this.childrens(item, true).each(function(){
                     var item = $(this);
                     if (_this.isFolder(item)){
-                        _this._trigger(item, 'closed');
-                        _this._trigger(item, 'unloaded');
+                        if (_this.isOpen(item)){
+                            _this._trigger(item, 'closed');
+                        }
+                        if (_this.wasLoad(item)){
+                            _this._trigger(item, 'unloaded');
+                        }
                     }
                     _this._trigger(item, 'removed');
                 });
                 if (item){
-                    if (_this.isOpen(item)){
-                        _this.close(item, {
+                    if (this.isOpen(item)){
+                        this.close(item, {
                             success: function(){
-                                _this._loading(item);
-                                _this._ensure(item);
+                                item.first().children('.aciTreeUl').remove();
                                 _this._success(item, options);
                             },
-                            fail: function(){
-                                _this._loading(item);
-                                _this._fail(item, options);
-                            },
+                            fail: options.fail,
                             unanimated: options.unanimated
                         });
                     } else {
-                        _this._loading(item);
-                        _this._ensure(item);
-                        _this._success(item, options);
+                        item.first().children('.aciTreeUl').remove();
+                        this._success(item, options);
                     }
                 } else {
-                    _this._animate(item, false, !_this._instance.options.animateRoot || options.unanimated, function(){
-                        _this._loading(item);
-                        _this._ensure(item);
+                    this._animate(item, false, !this._instance.options.animateRoot || options.unanimated, function(){
+                        _this._instance.jQuery.children('.aciTreeUl').remove();
                         _this._success(item, options);
                     });
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
         // remove item
         remove: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'removed');
             }, function(){
                 _this._trigger(item, 'removefail');
             });
-            if (_this.isItem(item)){
-                if (_this.isFolder(item)){
-                    if (_this.wasLoad(item)){
-                        _this.unload(item, {
-                            success: function(){
-                                _this._success(item, options);
-                                item.remove();
-                            },
-                            fail: options.fail,
-                            unanimated: options.unanimated
-                        });
-                    } else {
-                        _this._success(item, options);
-                        item.remove();
-                    }
+            if (this.isItem(item)){
+                if (this.isFolder(item) && this.wasLoad(item)){
+                    this.unload(item, {
+                        success: function(){
+                            _this._success(item, options);
+                            item.first().remove();
+                        },
+                        fail: options.fail,
+                        unanimated: options.unanimated
+                    });
                 } else {
-                    _this._success(item, options);
-                    item.remove();
+                    this._success(item, options);
+                    item.first().remove();
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
@@ -526,64 +621,61 @@
         _openChilds: function(item, options){
             var _this = this;
             if (options.expand){
-                var queue = new _this._queue(_this._instance.options.threads, true, _this._instance.options.queueDelay);
-                _this.childrens(item).each(function(){
+                var queue = new this._queue(this._instance.options.threads, true, this._instance.options.queueDelay);
+                this.folders(this.childrens(item), false).each(function(){
                     var item = $(this);
-                    if (_this.isFolder(item)){
-                        if (_this.isOpen(item)){
-                            _this._trigger(item, 'opened');
-                        } else {
-                            queue.push(function(complete){
-                                _this.open(item, {
-                                    success: complete,
-                                    fail: complete,
-                                    expand: true,
-                                    unanimated: options.unanimated
-                                });
-                            }, true);
-                        }
-                    }
+                    queue.push(function(complete){
+                        _this.open(item, {
+                            success: complete,
+                            fail: complete,
+                            expand: true,
+                            unanimated: options.unanimated
+                        });
+                    }, true);
                 });
                 queue.complete(function(){
                     _this._success(item, options);
                 }).run(true);
             } else {
-                _this._success(item, options);
+                this._success(item, options);
             }
         },
 
         // process item open
         _openItem: function(item, options){
             var _this = this;
-            if (!options.unanimated && !_this.isVisible(item)){
+            if (!options.unanimated && !this.isVisible(item)){
                 options.unanimated = true;
             }
             if (options.unique){
-                _this.closeOthers(item);
+                this.closeOthers(item);
                 options.unique = false;
             }
-            item.addClass('aciTreeOpen');
-            _this._animate(item, true, options.unanimated, function(){
+            item.first().addClass('aciTreeOpen');
+            this._animate(item, true, options.unanimated, function(){
                 _this._openChilds(item, options);
             });
         },
 
-        // open a folder item and the childs if requested
+        // open item and his childs if requested
         open: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'opened');
             }, function(){
                 _this._trigger(item, 'openfail');
+            }, function(){
+                _this._trigger(item, 'wasopened');
             });
-            if (_this.isFolder(item)){
-                if (_this.isOpen(item)){
-                    _this._openChilds(item, options);
+            if (this.isFolder(item)){
+                if (this.isOpen(item)){
+                    options.success = options.notify;
+                    this._openChilds(item, options);
                 } else {
-                    if (_this.wasLoad(item)){
-                        _this._openItem(item, options);
+                    if (this.wasLoad(item)){
+                        this._openItem(item, options);
                     } else {
-                        _this.ajaxLoad(item, {
+                        this.ajaxLoad(item, {
                             success: function(){
                                 _this._openItem(item, options);
                             },
@@ -592,84 +684,81 @@
                     }
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
         // close item childrens
         _closeChilds: function(item, options){
             var _this = this;
-            if (_this._instance.options.empty){
+            if (this._instance.options.empty){
                 options.unanimated = true;
-                _this.unload(item, options);
+                this.unload(item, options);
             } else if (options.collapse){
-                var queue = new _this._queue(_this._instance.options.threads, true, _this._instance.options.queueDelay);
-                _this.childrens(item).each(function(){
+                var queue = new this._queue(this._instance.options.threads, true, this._instance.options.queueDelay);
+                this.folders(this.childrens(item), true).each(function(){
                     var item = $(this);
-                    if (_this.isFolder(item)){
-                        if (_this.isOpen(item)){
-                            queue.push(function(complete){
-                                _this.close(item, {
-                                    success: complete,
-                                    fail: complete,
-                                    collapse: true,
-                                    unanimated: true
-                                });
-                            }, true);
-                        } else {
-                            _this._trigger(item, 'closed');
-                        }
-                    }
+                    queue.push(function(complete){
+                        _this.close(item, {
+                            success: complete,
+                            fail: complete,
+                            collapse: true,
+                            unanimated: true
+                        });
+                    }, true);
                 });
                 queue.complete(function(){
                     _this._success(item, options);
                 }).run(true);
             } else {
-                _this._success(item, options);
+                this._success(item, options);
             }
         },
 
         // process item close
         _closeItem: function(item, options){
             var _this = this;
-            if (!options.unanimated && !_this.isVisible(item)){
+            if (!options.unanimated && !this.isVisible(item)){
                 options.unanimated = true;
             }
-            item.removeClass('aciTreeOpen');
-            _this._animate(item, false, options.unanimated, function(){
+            item.first().removeClass('aciTreeOpen');
+            this._animate(item, false, options.unanimated, function(){
                 _this._closeChilds(item, options);
             });
         },
 
-        // close a folder item and the childs if requested
+        // close item and his childs if requested
         close: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'closed');
             }, function(){
                 _this._trigger(item, 'closefail');
+            }, function(){
+                _this._trigger(item, 'wasclosed');
             });
-            if (_this.isFolder(item)){
-                if (_this.isOpen(item)){
-                    _this._closeItem(item, options);
-                } else if (_this.wasLoad(item)){
-                    _this._closeChilds(item, options);
+            if (this.isFolder(item)){
+                if (this.isOpen(item)){
+                    this._closeItem(item, options);
+                } else if (this.wasLoad(item)){
+                    options.success = options.notify;
+                    this._closeChilds(item, options);
                 } else {
-                    _this._success(item, options);
+                    this._notify(item, options);
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
         // keep just one branch open
         closeOthers: function(item, options){
             var _this = this;
-            options = _this._options(options);
-            if (_this.isItem(item)){
-                var queue = new _this._queue(_this._instance.options.threads, true, _this._instance.options.queueDelay);
-                var exclude = item.add(_this.getPath(item)).add(_this.childrens(item, true));
-                _this.childrens(null, true).filter('.aciTreeOpen').not(exclude).each(function(){
+            options = this._options(options);
+            if (this.isItem(item)){
+                var queue = new this._queue(this._instance.options.threads, true, this._instance.options.queueDelay);
+                var exclude = item.first().add(this.path(item)).add(this.childrens(item, true));
+                this.folders(this.childrens(null, true), true).not(exclude).each(function(){
                     var item = $(this);
                     queue.push(function(complete){
                         _this.close(item, {
@@ -683,53 +772,52 @@
                     _this._success(item, options);
                 }).run(true);
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
         // toggle item
         toggle: function(item, options){
-            if (this.isOpen(item)){
-                this.close(item, options);
+            var _this = this;
+            options = this._options(options, function(){
+                _this._trigger(item, 'toggled');
+            }, function(){
+                _this._trigger(item, 'togglefail');
+            });
+            if (this.isFolder(item)){
+                if (this.isOpen(item)){
+                    this.close(item, options);
+                } else {
+                    this.open(item, options);
+                }
             } else {
-                this.open(item, options);
+                this._fail(item, options);
             }
         },
 
         // get item path (starting from top parent)
         // when 'reverse' is TRUE returns the path in reverse order
-        // (top parent on last position)
-        getPath: function(item, reverse){
+        path: function(item, reverse){
             if (item){
-                var path = function(item){
-                    var list = [];
-                    var li = item.parent().parent();
-                    if (li.hasClass('aciTreeLi')){
-                        list = reverse ? list.concat(li.get(0), path(li)) : list.concat(path(li), li.get(0));
-                    }
-                    return list;
-                };
-                return $(path(item.first()));
+                var path = item.first().parentsUntil(this._instance.jQuery, '.aciTreeLi');
+                return reverse ? path : $(path.get().reverse());
             }
             return $([]);
         },
 
-        // check if item is in view
+        // test if item is in view
         isVisible: function(item){
-            var _this = this;
-            var state = true;
-            _this.getPath(item).each(function(){
-                if (!_this.isOpen($(this))){
-                    state = false;
+            if (item){
+                if (this.folders(this.path(item), false).length){
+                    // at least a closed parent
                     return false;
-                }
-            });
-            if (state && _this.isItem(item)){
-                var rect = _this._instance.jQuery.get(0).getBoundingClientRect();
-                var size = item.first().find('>div.aciTreeItem');
+                };
+                var rect = this._instance.jQuery.get(0).getBoundingClientRect();
+                var size = item.first().children('.aciTreeItem');
                 var test = size.get(0).getBoundingClientRect();
                 var height = size.outerHeight(true);
                 if ((test.bottom - height < rect.top) || (test.top + height > rect.bottom) || (test.right < rect.left) || (test.left > rect.right)){
+                    // is out of view
                     return false;
                 }
                 return true;
@@ -740,35 +828,30 @@
         // open path to item
         openPath: function(item, options){
             var _this = this;
-            options = _this._options(options);
-            var path = _this.getPath(item);
-            if (path.length){
-                var queue = new _this._queue(null, true, _this._instance.options.queueDelay);
-                path.each(function(){
+            options = this._options(options);
+            if (this.isItem(item)){
+                var queue = new this._queue(null, true, this._instance.options.queueDelay);
+                this.folders(this.path(item), false).each(function(){
                     var item = $(this);
-                    if (_this.isOpen(item)){
-                        _this._trigger(item, 'opened');
-                    } else {
-                        queue.push(function(complete){
-                            _this.open(item, {
-                                success: complete,
-                                fail: complete,
-                                unanimated: options.unanimated
-                            });
-                        }, true);
-                    }
+                    queue.push(function(complete){
+                        _this.open(item, {
+                            success: complete,
+                            fail: complete,
+                            unanimated: options.unanimated
+                        });
+                    }, true);
                 });
                 queue.complete(function(){
                     _this._success(item, options);
                 }).run();
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
-        // get speed for required size vs totalSize for animations
+        // get animation speed by element size
         _speedFraction: function(speed, totalSize, required){
-            if (required < totalSize){
+            if ((required < totalSize) && totalSize){
                 var numeric = parseInt(speed);
                 if (isNaN(numeric)){
                     switch (speed){
@@ -790,16 +873,20 @@
             return speed;
         },
 
-        // set item visible
+        // make item visible
         setVisible: function(item, options){
             var _this = this;
-            options = _this._options(options);
-            if (_this.isVisible(item)){
-                _this._success(item, options);
-            } else if (_this.isItem(item)){
-                var show = function(){
+            options = this._options(options, function(){
+                _this._trigger(item, 'visible');
+            }, null, function(){
+                _this._trigger(item, 'wasvisible');
+            });
+            if (this.isVisible(item)){
+                this._notify(item, options);
+            } else if (this.isItem(item)){
+                var process = function(){
                     var rect = _this._instance.jQuery.get(0).getBoundingClientRect();
-                    var size = item.first().find('>div.aciTreeItem');
+                    var size = item.first().children('.aciTreeItem');
                     var test = size.get(0).getBoundingClientRect();
                     var height = size.outerHeight(true);
                     if (test.bottom - height < rect.top){
@@ -838,46 +925,38 @@
                         _this._success(item, options);
                     }
                 };
-                if (_this.haveParent(item)){
-                    _this.openPath(item, {
-                        success: show,
+                if (this.hasParent(item)){
+                    this.openPath(item, {
+                        success: process,
                         fail: options.fail
                     });
                 } else {
-                    show();
+                    process();
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
-        // check if a item have parent
-        haveParent: function(item){
-            if (item){
-                var li = item.first().parent().parent();
-                return li.hasClass('aciTreeLi');
-            }
-            return false;
+        // test if item has parent
+        hasParent: function(item){
+            return item && (item.first().parent().parent('.aciTreeLi').length > 0);
         },
 
         // get item parent
-        getParent: function(item){
-            return item ? item.first().parent().parent().filter('li.aciTreeLi') : $([]);
+        parent: function(item){
+            return item ? item.first().parent().parent('.aciTreeLi') : $([]);
         },
 
         // get item top parent
-        getTopParent: function(item){
-            if (this.isItem(item)){
-                var path = this.getPath(item);
-                return path.length ? path.eq(0) : $([]);
-            }
-            return $([]);
+        topParent: function(item){
+            return this.path(item).eq(0);
         },
 
         // create tree branch
-        _branch: function(item, itemList){
+        _createBranch: function(item, itemList){
             if (item){
-                item.removeClass('aciTreeFolderMaybe').addClass('aciTreeFolder');
+                item.first().removeClass('aciTreeFolderMaybe').addClass('aciTreeFolder');
             }
             var items = this.append(item, {
                 itemData: itemList
@@ -886,7 +965,7 @@
             for(var i in itemList){
                 itemData = itemList[i];
                 if (itemData.items && (itemData.items instanceof Array) && itemData.items.length){
-                    this._branch(items.eq(i), itemData.items);
+                    this._createBranch(items.eq(i), itemData.items);
                 }
                 if (itemData.props && itemData.props.open){
                     this.open(items.eq(i));
@@ -894,18 +973,20 @@
             }
         },
 
-        // process item for display
-        _item: function(api, item, itemData, level){
+        // process item before inserting into the DOM
+        _itemHook: function(parent, item, itemData, level){
             if (this._instance.options.callbacks && this._instance.options.callbacks.item){
-                this._instance.options.callbacks.item(api, item, itemData, level);
-                return;
+                this._instance.options.callbacks.item.call(this, parent, item, itemData, level);
             }
-            this.setItem(item, itemData.item);
         },
 
-        // create item from data
-        _create: function(itemData, path, level){
-            var li = $('<li class="aciTreeLi"></li>').data('id' + this._instance.nameSpace, itemData.id);
+        // create LI from data
+        _createLi: function(itemData){
+            var li = $('<li class="aciTreeLi"></li>').data('itemData' + this._instance.nameSpace, {
+                id: itemData.id,
+                item: itemData.item,
+                props: itemData.props
+            });
             var html = '<div class="aciTreeButton"><div></div></div><div class="aciTreeItem">';
             if (itemData.props && itemData.props.icon){
                 if (itemData.props.icon instanceof Array){
@@ -915,96 +996,99 @@
                     html += '<div class="aciTreeIcon ' + itemData.props.icon + '"></div>';
                 }
             }
-            li.append(html + '</div>');
+            li.append(html + '<div class="aciTreeText">' + itemData.item + '</div></div>');
             if (itemData.props && (itemData.props.isFolder || (itemData.props.isFolder === null))){
                 li.addClass((itemData.props.isFolder || (itemData.items && itemData.items.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
             } else {
                 li.addClass('aciTreeFile');
             }
-            this._item(this, li, itemData, level);
             return li;
         },
 
-        // add one or more items
-        _insert: function(ul, before, after, itemData, path, level){
+        // create/add one or more items
+        _createItems: function(ul, before, after, itemData, level){
             if (itemData){
-                var items = [];
+                var parent;
+                if (ul){
+                    parent = this.itemFrom(ul);
+                } else if (before){
+                    parent = this.parent(before);
+                } else if (after){
+                    parent = this.parent(after);
+                }
+                var items = [], li
                 if (itemData instanceof Array){
                     for(var i in itemData){
-                        items[items.length] = this._create(itemData[i], path, level).get(0);
+                        li = this._createLi(itemData[i]);
+                        this._itemHook(parent, li, itemData[i], level);
+                        items[items.length] = li.get(0);
                     }
                 } else {
-                    items[items.length] = this._create(itemData, path, level).get(0);
+                    li = this._createLi(itemData);
+                    this._itemHook(parent, li, itemData, level);
+                    items[items.length] = li.get(0);
                 }
                 items = $(items);
                 if (ul){
                     ul.append(items);
                 } else if (before){
-                    before.before(items);
+                    before.first().before(items);
                 } else if (after){
-                    after.after(items);
+                    after.first().after(items);
                 }
                 return items;
             }
             return $([]);
         },
 
-        // ensure childrens container
-        _ensure: function(item, state){
-            if (!item){
-                item = this._instance.jQuery;
+        // ensure there is a UL container
+        _ensureUl: function(item){
+            var ul = item.first().children('.aciTreeUl');
+            if (!ul.length){
+                ul = $('<ul class="aciTreeUl" style="display:none"></ul>');
+                item.first().append(ul);
             }
-            var ul = item.find('>ul.aciTreeUl');
-            if (state)
-            {
-                if (!ul.length){
-                    ul = $('<ul class="aciTreeUl" style="display:none"></ul>');
-                    item.append(ul);
-                }
-                return ul;
-            }
-            ul.remove();
+            return ul;
         },
 
         // append one or more items to item
         append: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'appended');
             }, function(){
                 _this._trigger(item, 'appendfail');
             });
             if (item){
-                if (_this.isFolder(item)){
-                    item = item.first();
-                    var ul = _this._ensure(item, true);
-                    var list = _this._insert(ul, null, null, options.itemData, _this.getPath(item).add(item), _this.getLevel(item) + 1);
+                if (this.isFolder(item)){
+                    var ul = this._ensureUl(item);
+                    var list = this._createItems(ul, null, null, options.itemData, this.level(item) + 1);
                     if (list.length){
-                        item.addClass('aciTreeFolder').removeClass('aciTreeFolderMaybe');
+                        item.first().addClass('aciTreeFolder').removeClass('aciTreeFolderMaybe');
                         list.each(function(){
                             _this._trigger($(this), 'added');
                         });
-                    } else if (!_this.childrens(item).length){
+                    } else if (!this.hasChildrens(item)){
                         ul.remove();
                     }
-                    _this._success(item, options);
+                    this._success(item, options);
                     return list;
                 } else {
-                    _this._fail(item, options);
+                    this._fail(item, options);
                     return $([]);
                 }
             } else {
-                var ul = _this._ensure(_this._instance.jQuery, true);
-                var list = _this._insert(ul, null, null, options.itemData, null, 0);
+                var ul = this._ensureUl(this._instance.jQuery);
+                var list = this._createItems(ul, null, null, options.itemData, 0);
                 if (list.length){
-                    _this._animate(null, true, !_this._instance.options.animateRoot || options.unanimated);
+                    this._animate(null, true, !this._instance.options.animateRoot || options.unanimated);
                     list.each(function(){
                         _this._trigger($(this), 'added');
                     });
-                } else if (!_this.childrens().length){
+                } else if (!this.hasChildrens()){
                     ul.remove();
                 }
-                _this._success(item, options);
+                this._success(item, options);
                 return list;
             }
         },
@@ -1012,21 +1096,20 @@
         // insert one or more items before item
         before: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'before');
             }, function(){
                 _this._trigger(item, 'beforefail');
             });
-            if (_this.isItem(item)){
-                item = item.first();
-                var list = _this._insert(null, item, null, options.itemData, _this.getPath(item), _this.getLevel(item));
+            if (this.isItem(item)){
+                var list = this._createItems(null, item, null, options.itemData, this.level(item));
                 list.each(function(){
                     _this._trigger($(this), 'added');
                 });
-                _this._success(item, options);
+                this._success(item, options);
                 return list;
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
                 return $([]);
             }
         },
@@ -1034,21 +1117,20 @@
         // insert one or more items after item
         after: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'after');
             }, function(){
                 _this._trigger(item, 'afterfail');
             });
-            if (_this.isItem(item)){
-                item = item.first();
-                var list = _this._insert(null, null, item, options.itemData, _this.getPath(item), _this.getLevel(item));
+            if (this.isItem(item)){
+                var list = this._createItems(null, null, item, options.itemData, this.level(item));
                 list.each(function(){
                     _this._trigger($(this), 'added');
                 });
-                _this._success(item, options);
+                this._success(item, options);
                 return list;
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
                 return $([]);
             }
         },
@@ -1057,12 +1139,12 @@
         itemFrom: function(element){
             if (element){
                 var item = $(element).first();
-                if (item.hasClass('aciTree')){
+                if (item.get(0) == this._instance.jQuery.get(0)){
                     return $([]);
                 } else if (item.hasClass('aciTreeLi')){
                     return item;
                 } else {
-                    return item.parents('li.aciTreeLi:first');
+                    return item.parents('.aciTreeLi:first');
                 }
             }
             return $([]);
@@ -1074,41 +1156,44 @@
             if (!item){
                 item = this._instance.jQuery;
             }
-            return item.first().find(branch ? '>ul.aciTreeUl li.aciTreeLi' : '>ul.aciTreeUl>li.aciTreeLi');
+            return branch ? item.first().find('.aciTreeLi') : item.first().children('.aciTreeUl').children('.aciTreeLi');
         },
 
-        // filter only folders
+        // filter only folders from items
         // if state is set then filter only open/closed ones
         folders: function(items, state){
-            var list = items.filter('li.aciTreeFolder,li.aciTreeFolderMaybe');
             if (typeof state != 'undefined'){
-                list = state ? list.filter('.aciTreeOpen') : list.not('.aciTreeOpen');
+                if (state){
+                    return items.filter('.aciTreeOpen');
+                } else {
+                    return items.filter('.aciTreeFolder,.aciTreeFolderMaybe').not('.aciTreeOpen');
+                }
             }
-            return list;
+            return items.filter('.aciTreeFolder,.aciTreeFolderMaybe');
         },
 
-        // filter only files
+        // filter only files from items
         files: function(items){
-            return items.filter('li.aciTreeFile');
+            return items.filter('.aciTreeFile');
         },
 
-        // check if item is a folder
+        // test if item is a folder
         isFolder: function(item){
             return item && (item.first().hasClass('aciTreeFolder') || item.first().hasClass('aciTreeFolderMaybe'));
         },
 
-        // check if item is a file
+        // test if item is a file
         isFile: function(item){
             return item && item.first().hasClass('aciTreeFile');
         },
 
-        // check if item was loaded
+        // test if item was loaded
         wasLoad: function(item){
             if (!item){
-                return this._instance.jQuery.find('>ul.aciTreeUl').length > 0;
+                return this._instance.jQuery.children('.aciTreeUl').length > 0;
             }
             if (this.isFolder(item)){
-                return item.first().find('>ul.aciTreeUl').length > 0;
+                return item.first().children('.aciTreeUl').length > 0;
             }
             return true;
         },
@@ -1116,45 +1201,51 @@
         // set item as folder
         setFolder: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'folderset');
+            }, null, function(){
+                _this._trigger(item, 'wasfolder');
             });
-            if (_this.isItem(item)){
-                if (_this.isFile(item)){
+            if (this.isItem(item)){
+                if (this.isFile(item)){
                     item.first().removeClass('aciTreeFile').addClass('aciTreeFolder');
+                    this._success(item, options);
+                } else {
+                    this._notify(item, options);
                 }
-                _this._success(item, options);
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
         // set item as file
         setFile: function(item, options){
             var _this = this;
-            options = _this._options(options, function(){
+            options = this._options(options, function(){
                 _this._trigger(item, 'fileset');
+            }, null, function(){
+                _this._trigger(item, 'wasfile');
             });
-            if (_this.isItem(item)){
-                if (_this.isFolder(item)){
-                    if (_this.wasLoad(item)){
-                        _this.unload(item, {
-                            success: function(){
-                                item.first().removeClass('aciTreeFolder aciTreeFolderMaybe aciTreeOpen').addClass('aciTreeFile');
-                                _this._success(item, options);
-                            },
+            if (this.isItem(item)){
+                if (this.isFolder(item)){
+                    var process = function(){
+                        item.first().removeClass('aciTreeFolder aciTreeFolderMaybe aciTreeOpen').addClass('aciTreeFile');
+                        _this._success(item, options);
+                    };
+                    if (this.wasLoad(item)){
+                        this.unload(item, {
+                            success: process,
                             fail: options.fail,
                             unanimated: options.unanimated
                         });
                     } else {
-                        item.first().removeClass('aciTreeFolder aciTreeFolderMaybe aciTreeOpen').addClass('aciTreeFile');
-                        _this._success(item, options);
+                        process();
                     }
                 } else {
-                    _this._success(item, options);
+                    this._notify(item, options);
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
@@ -1162,9 +1253,10 @@
         // icon - CSS class name or Array [class name, background x position, background y position]
         setIcon: function(item, icon){
             if (this.isItem(item)){
-                item = item.first();
-                var html = item.find('>div.aciTreeItem');
-                var found = html.find('>div.aciTreeIcon');
+                var itemData = this.itemData(item);
+                var oldIcon = itemData.props.icon;
+                var html = item.first().children('.aciTreeItem');
+                var found = html.children('.aciTreeIcon');
                 if (found.length){
                     if (icon){
                         if (icon instanceof Array){
@@ -1172,8 +1264,16 @@
                         } else {
                             found.attr('class', 'aciTreeIcon ' + icon);
                         }
+                        itemData.props.icon = icon;
+                        this._trigger(item, 'iconset', {
+                            oldIcon: oldIcon
+                        });
                     } else {
                         found.remove();
+                        itemData.props.icon = null;
+                        this._trigger(item, 'iconremoved', {
+                            oldIcon: oldIcon
+                        });
                     }
                 } else if (icon){
                     if (icon instanceof Array){
@@ -1182,76 +1282,84 @@
                     } else {
                         html.prepend('<div class="aciTreeIcon ' + icon + '"></div>');
                     }
+                    itemData.props.icon = icon;
+                    this._trigger(item, 'iconset', {
+                        oldIcon: oldIcon
+                    });
+                } else {
+                    this._trigger(item, 'noticon');
                 }
                 return true;
             }
             return false;
         },
 
-        // set item content
-        setItem: function(item, content){
+        // set item text content
+        setText: function(item, content){
             if (this.isItem(item)){
-                item = item.first();
-                var old = this.getText(item);
-                var html = item.find('>div.aciTreeItem');
-                var icon = html.find('>div.aciTreeIcon').detach();
-                html.html(content).prepend(icon);
-                this._trigger(item, 'itemset', {
-                    oldText: old
+                var itemData = this.itemData(item);
+                var oldText = itemData.item;
+                item.first().children('.aciTreeItem').find('.aciTreeText').html(content);
+                itemData.item = content;
+                this._trigger(item, 'textset', {
+                    oldText: oldText
                 });
                 return true;
             }
             return false;
         },
 
-        // check if item is open
+        // test if item is open
         isOpen: function(item){
             return item && item.first().hasClass('aciTreeOpen');
         },
 
-        // check if item is closed
+        // test if item is closed
         isClosed: function(item){
             return !this.isOpen(item);
         },
 
-        // check if item have childrens
-        haveChildrens: function(item){
-            return this.childrens(item).length > 0;
+        // test if item has childrens
+        hasChildrens: function(item){
+            if (!item){
+                item = this._instance.jQuery;
+            }
+            return item.first().children('.aciTreeUl').children('.aciTreeLi:first').length > 0;
         },
 
-        // check if item have siblings
-        haveSiblings: function(item){
-            return item && (item.first().siblings('li.aciTreeLi:first').length > 0);
+        // test if item has siblings
+        hasSiblings: function(item){
+            return item && (item.first().siblings('.aciTreeLi:first').length > 0);
         },
 
-        // check if item have another before
-        havePrev: function(item){
-            return this.getPrev(item).length > 0;
+        // test if item has another before
+        hasPrev: function(item){
+            return this.prev(item).length > 0;
         },
 
-        // check if item have another after
-        haveNext: function(item){
-            return this.getNext(item).length > 0;
+        // test if item has another after
+        hasNext: function(item){
+            return this.next(item).length > 0;
         },
 
         // get item siblings
         siblings: function(item){
-            return item ? item.first().siblings('li.aciTreeLi') : $([]);
+            return item ? item.first().siblings('.aciTreeLi') : $([]);
         },
 
         // get previous item
-        getPrev: function(item){
-            return item ? item.first().prev('li.aciTreeLi') : $([]);
+        prev: function(item){
+            return item ? item.first().prev('.aciTreeLi') : $([]);
         },
 
         // get next item
-        getNext: function(item){
-            return item ? item.first().next('li.aciTreeLi') : $([]);
+        next: function(item){
+            return item ? item.first().next('.aciTreeLi') : $([]);
         },
 
         // get item level (starting from 0)
         // return -1 for invalid items
-        getLevel: function(item){
+        level: function(item){
             var level = -1;
             if (item){
                 item = item.first();
@@ -1263,18 +1371,25 @@
             return level;
         },
 
-        // get item ID (NULL if not found)
+        // get item ID
         getId: function(item){
-            return item ? item.first().data('id' + this._instance.nameSpace) : null;
+            var itemData = this.itemData(item);
+            return itemData ? itemData.id : null;
+        },
+
+        // get item data
+        itemData: function(item){
+            return item ? item.first().data('itemData' + this._instance.nameSpace) : null;
         },
 
         // set item ID
         setId: function(item, id){
-            if (id && this.isItem(item)){
-                var old = this.getId(item);
-                item.first().data('id' + this._instance.nameSpace, id);
+            if (this.isItem(item)){
+                var itemData = this.itemData(item);
+                var oldId = itemData.id;
+                itemData.id = id;
                 this._trigger(item, 'idset', {
-                    oldId: old
+                    oldId: oldId
                 });
                 return true;
             }
@@ -1283,19 +1398,16 @@
 
         // get item index starting from 0
         getIndex: function(item){
-            if (this.isItem(item)){
-                var parent = item.parent();
-                return parent.find('>li.aciTreeLi').index(item.first());
-            }
-            return null;
+            return item ? item.first().parent().children('.aciTreeLi').index(item.first()) : null;
         },
 
-        // get item text value (NULL if not found)
+        // get item text value
         getText: function(item){
-            return (item ? item.first().find('>div.aciTreeItem').text() : null);
+            var itemData = this.itemData(item);
+            return itemData ? itemData.item : null;
         },
 
-        // check if it's a valid item
+        // test if it's a valid item
         isItem: function(item){
             return item && item.first().hasClass('aciTreeLi');
         },
@@ -1308,7 +1420,7 @@
             if (!unanimated){
                 var type = state ? this._instance.options.show : this._instance.options.hide;
                 if (type) {
-                    var ul = item.first().find('>ul.aciTreeUl');
+                    var ul = item.first().children('.aciTreeUl');
                     if (ul.length){
                         ul.stop(true, true).animate(type.props, {
                             duration: type.duration,
@@ -1321,41 +1433,41 @@
                     return;
                 }
             }
-            item.first().find('>ul.aciTreeUl').stop(true, true).toggle(state);
+            item.first().children('.aciTreeUl').stop(true, true).toggle(state);
             if (callback){
                 callback();
             }
         },
 
         // get first child of item
-        getFirst: function(item){
+        first: function(item){
             if (!item){
                 item = this._instance.jQuery;
             }
-            return item.first().find('>ul.aciTreeUl>li.aciTreeLi:first');
+            return item.first().children('.aciTreeUl').children('.aciTreeLi:first');
         },
 
         // get last child of item
-        getLast: function(item){
+        last: function(item){
             if (!item){
                 item = this._instance.jQuery;
             }
-            return item.first().find('>ul.aciTreeUl>li.aciTreeLi:last');
+            return item.first().children('.aciTreeUl').children('.aciTreeLi:last');
         },
 
-        // return TRUE if item is loading
+        // test if item is loading
         isBusy: function(item){
             if (item){
                 return item.first().hasClass('aciTreeLoad');
             } else {
-                return !this._instance._loadQueue.empty();
+                return !this._private.loadQueue.empty();
             }
         },
 
         // set loading state
         _loading: function(item, state){
             if (item){
-                item.toggleClass('aciTreeLoad', state);
+                item.first().toggleClass('aciTreeLoad', state);
             } else if (state){
                 this._loader(state);
             }
@@ -1364,56 +1476,51 @@
         // show loader image
         _loader: function(show){
             var _this = this;
-            if (show || _this.isBusy()){
-                if (!_this._instance._loaderInterval){
-                    _this._instance._loaderInterval = setInterval(function(){
+            if (show || this.isBusy()){
+                if (!this._private.loaderInterval){
+                    this._private.loaderInterval = setInterval(function(){
                         _this._loader();
-                    }, _this._instance.options.loaderDelay);
+                    }, this._instance.options.loaderDelay);
                 }
-                _this._instance.jQuery.toggleClass('aciTreeLoad', true);
-                clearTimeout(_this._instance._loaderHide);
-                _this._instance._loaderHide = setTimeout(function(){
+                this._instance.jQuery.toggleClass('aciTreeLoad', true);
+                clearTimeout(this._private.loaderHide);
+                this._private.loaderHide = setTimeout(function(){
                     _this._instance.jQuery.toggleClass('aciTreeLoad', false);
-                }, _this._instance.options.loaderDelay * 2);
+                }, this._instance.options.loaderDelay * 2);
             }
         },
 
-        // check if parent have children
+        // test if parent has children
         isChildren: function(parent, children){
-            if (this.isItem(children)){
-                return (this.childrens(parent, true).filter(children.first()).length == 1);
+            if (!parent){
+                parent = this._instance.jQuery;
             }
-            return false;
+            return children && parent.has(children);
         },
 
-        // check if parent have immediate children
+        // test if parent has immediate children
         isImmediateChildren: function(parent, children){
-            if (this.isItem(children)){
-                var check = this.getParent(children);
-                if (check.length){
-                    return parent && (check.get(0) == parent.get(0));
-                } else {
-                    return !parent;
-                }
+            if (!parent){
+                parent = this._instance.jQuery;
             }
-            return false;
+            return children && parent.children('.aciTreeUl').children('.aciTreeLi').is(children);
         },
 
-        // check if items share the same parent
+        // test if items share the same parent
         sameParent: function(item1, item2){
-            if (this.isItem(item1) && this.isItem(item2)){
-                var parent1 = this.getParent(item1);
-                var parent2 = this.getParent(item2);
+            if (item1 && item2){
+                var parent1 = this.parent(item1);
+                var parent2 = this.parent(item2);
                 return (!parent1.length && !parent2.length) || (parent1.get(0) == parent2.get(0));
             }
             return false;
         },
 
-        // check if items share the same top parent
+        // test if items share the same top parent
         sameTopParent: function(item1, item2){
-            if (this.isItem(item1) && this.isItem(item2)){
-                var parent1 = this.getTopParent(item1);
-                var parent2 = this.getTopParent(item2);
+            if (item1 && item2){
+                var parent1 = this.topParent(item1);
+                var parent2 = this.topParent(item2);
                 return (!parent1.length && !parent2.length) || (parent1.get(0) == parent2.get(0));
             }
             return false;
@@ -1422,49 +1529,49 @@
         // destroy control
         destroy: function(){
             var _this = this;
-            if (_this.wasInit()){
-                if (_this.isLocked()){
-                    _this._trigger(null, 'locked');
-                    return false;
-                }
-                _this._instance.locked = true;
-                _this._instance.jQuery.toggleClass('aciTreeLoad', true);
-                _this._instance._branchQueue.destroy();
-                _this._instance._loadQueue.destroy();
-                // we keep the _super reference because this method can exit before 'success' or 'fail' will be run
-                var _super = _this._super;
-                _this.unload(null, {
-                    success: function(){
-                        clearTimeout(_this._instance._loaderHide);
-                        clearInterval(_this._instance._loaderInterval);
-                        _this._destroy();
-                        _this._instance.jQuery.off(_this._instance.nameSpace, 'div.aciTreeButton');
-                        _this._instance.jQuery.toggleClass('aciTreeLoad', false);
-                        _this._instance.locked = false;
-                        // call the parent
-                        _super.apply(_this);
-                        _this._trigger(null, 'destroyed');
-                    },
-                    fail: function(){
-                        _this._instance.jQuery.toggleClass('aciTreeLoad', false);
-                        _this._instance.locked = false;
-                        _this._trigger(null, 'destroyfail');
-                    }
-                });
-                return true;
+            if (!this.wasInit()){
+                this._trigger(null, 'notinit');
+                return false;
             }
-            _this._trigger(null, 'notinit');
-            return false;
+            if (this.isLocked()){
+                this._trigger(null, 'locked');
+                return false;
+            }
+            this._instance.locked = true;
+            this._instance.jQuery.toggleClass('aciTreeLoad', true);
+            this._private.loadQueue.destroy();
+            _this._destroyHook(false);
+            // we keep the _super reference
+            var _super = this._super;
+            this.unload(null, {
+                success: function(){
+                    clearTimeout(_this._private.loaderHide);
+                    clearInterval(_this._private.loaderInterval);
+                    _this._destroyHook(true);
+                    _this._instance.jQuery.unbind(_this._instance.nameSpace).off(_this._instance.nameSpace, '.aciTreeButton');
+                    _this._instance.jQuery.toggleClass('aciTreeLoad', false);
+                    _this._instance.locked = false;
+                    // call the parent
+                    _super.apply(_this);
+                    _this._trigger(null, 'destroyed');
+                },
+                fail: function(){
+                    _this._instance.jQuery.toggleClass('aciTreeLoad', false);
+                    _this._instance.locked = false;
+                    _this._trigger(null, 'destroyfail');
+                }
+            });
+            return true;
         },
 
-        _destroy: function(){
-        // override this to do extra destroy when extending
+        _destroyHook: function(unloaded){
+        // override this to do extra destroy before/after unload
         }
 
     };
 
     // extend the base aciPluginUi class and store into aciPluginClass.plugins
-    aciPluginClass.plugins.aciTree = aciPluginClass.aciPluginUi.extend(aciTree_core);
+    aciPluginClass.plugins.aciTree = aciPluginClass.aciPluginUi.extend(aciTree_core, 'aciTreeCore');
 
     // publish the plugin & the default options
     aciPluginClass.publish('aciTree', options);

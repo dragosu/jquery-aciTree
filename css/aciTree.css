@@ -4,9 +4,9 @@
  * aciTree jQuery Plugin
  * http://acoderinsights.ro
  *
- */
+*/
 
-.aciTree:focus {
+.aciTree {
     outline: none;
 }
 .aciTree.aciTreeLoad {
@@ -32,7 +32,7 @@
 .aciTree.aciTreeNoBranches .aciTreeUl, .aciTree.aciTreeNoBranches .aciTreeLi {
     background:none;
 }
-.aciTree .aciTreeButton, .aciTree .aciTreeIcon, .aciTree .aciTreeItem {
+.aciTree .aciTreeButton, .aciTree .aciTreeIcon, .aciTree .aciTreeItem, .aciTree .aciTreeText {
     display:inline-block;
     height:20px;
     line-height:20px;
@@ -47,6 +47,14 @@
     white-space:normal;
     cursor:pointer;
 }
+
+.aciTree .aciTreeText {
+     display:inline;
+     height:auto;
+}
+
+/* item selection */
+
 .aciTree .aciTreeSelected>.aciTreeItem {
     margin:0;
     background-color:#E8E8E8;
@@ -55,9 +63,26 @@
     -moz-border-radius:3px;
     border-radius:3px;
 }
-.aciTree:focus .aciTreeSelected>.aciTreeItem {
+.aciTree.aciTreeFocus .aciTreeSelected>.aciTreeItem {
     background-color:#d0e5fe;
     border:1px dashed #84acdd;
+}
+
+/* checkbox/radio tree */
+
+.aciTree .aciTreeCheckbox label, .aciTree .aciTreeRadio label {
+    cursor:pointer;
+}
+.aciTree .aciTreeCheckbox input[type=checkbox], .aciTree .aciTreeRadio input[type=radio] {
+    margin:4px 4px 0 4px;
+    padding:0;
+    vertical-align:top;
+}
+.aciTree .aciTreeSelected .aciTreeCheckbox input[type=checkbox], .aciTree .aciTreeSelected .aciTreeRadio input[type=radio] {
+    outline: none;
+}
+.aciTree .aciTreeCheckbox input[type=checkbox].aciTreeTristate {
+    opacity:0.6;
 }
 
 /* default - item in the middle */
@@ -135,27 +160,26 @@
 /* tree item icon (do not show by default) */
 
 .aciTree .aciTreeIcon {
-    width:0;
+    width:18px;
     background:url(../image/tree.png) 0 0 no-repeat;
 }
 .aciTree.aciTreeNoBranches .aciTreeIcon {
     background:url(../image/tree-no-branches.png) 0 0 no-repeat;
 }
 
-/* we get file/folder CSS class for the icon (in the demo) */
+/* demo file/folder icon class */
 
-.aciTree .aciTreeIcon {
-    width:18px;
-}
 .aciTree .aciTreeIcon.folder {
     background-position:-112px 0;
 }
 .aciTree .aciTreeLi:hover>.aciTreeItem>.aciTreeIcon.folder {
+    /* comment next line to keep the same icon on hover */
     background-position:-112px -20px;
 }
 .aciTree .aciTreeIcon.file {
     background-position:-112px -40px;
 }
 .aciTree .aciTreeLi:hover>.aciTreeItem>.aciTreeIcon.file {
+    /* comment next line to keep the same icon on hover */
     background-position:-112px -60px;
 }

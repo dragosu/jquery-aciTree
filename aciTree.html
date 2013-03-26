@@ -14,39 +14,25 @@
         <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.utils.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.selectable.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.checkbox.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.radio.js"></script>
     </head>
     <body>
 
         <div>
 
-            <p><a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">See a checkbox tree demo here</a></p>
-            <p><a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">See a radio-button tree demo here</a></p>
+            <p>Here you have a simple implementation of a file system tree (you can find a simple PHP implementation in the download).</p>
 
-            <p>Here you have a simple implementation of a file system tree. The items are real folders/files that are found under a specific path.<br />
-                The download contains a small server-side <i>PHP</i> implementation to get the <a href="php/aciTree.php?branch=" title="See the JSON data" target="_blank">tree structure</a> in the <i>JSON</i> format needed by the <b>aciTree</b>. <br />
-                In this demo the tree ROOT is loaded with a <i>AJAX</i> request on page load but - if wanted - the root data could be output to the <i>HTML</i> page directly and the
-                tree initialized with that root data. <br /> This means you can init the tree without a initial <i>AJAX</i> request if you want. Also note that you can
-                force open a tree node with the 'open' property.<br /> This way you can implement server-side (maybe with and extra help from the cookies) a way to retain the
-                status of a node (open/closed).</p>
+            <p>See a checkbox tree demo <a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">here</a></p>
+            <p>See a radio-button tree demo <a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">here</a></p>
 
-            <p>There are some things to remember when using <b>aciTree</b>...</p>
-            <p>Folders are items that contain other items, they have childrens and they can be expanded.
-                Files are items that do not contain any childrens.<br />
-                Tree folders/files are not the same with a file system folder/file. A file system folder can
-                be just a tree file if that file system folder does not have any childrens (do not have any file system folders/files under it).</p>
-            <p>The item icon (if any) can be a single global <i>CSS</i> class name because the property 'icon' can be also an array with 3 elements (in this order):
-                <i>CSS</i> class name, background X position (in pixels), background Y position (in pixels).<br /> This way you can use a single class name with a single image
-                file that will contain all the icons you need.<br />
-                In this demo there are only two icons: folder/file that refers to a file system folder/file.
-                <br />Practically the icon depends on the data the tree displays, the icon itself does not have any meaning from the <b>aciTree</b> point of view.</p>
-            <p>The item ID should always be a unique identifier for that item. In this demo, the item ID is the full path to the item, either file system folder or file. <br />
-                This way we know exactly what every item is - from the file system point of view.</p>
             <p>Note: in this demo the node loading it's made with a delay so you can see the loading animation. If you want you can remove the delay from the <i>PHP</i> script ;) ...</p>
 
             <p id="info">Hover over a tree item to show his info ...</p>
-            <p id="info2"></p>
 
-            <div id="tree" class="aciTree" tabIndex="0"><div>Anything here or just remove</div></div>
+            <div id="tree" class="aciTree"><div class="eyes"></div><div>
+                    <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/php/aciTree.php?branch=" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
+                    <br />Anything here or just remove</div></div>
 
             <div class="form">
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
@@ -67,6 +53,12 @@
                                     <label><input type="radio" name="selectable" value="0" /> No</label></p>
                                 <p>Text Selection: <label><input type="radio" name="textSelection" value="1" /> Enabled</label>
                                     <label><input type="radio" name="textSelection" value="0" /> Disabled</label></p>
+
+                                <p>Checkboxes: <label><input type="radio" name="checkbox" value="1" /> Yes</label>
+                                    <label><input type="radio" name="checkbox" value="0" /> No</label></p>
+                                <p>Radio Buttons: <label><input type="radio" name="radio" value="1" /> Yes</label>
+                                    <label><input type="radio" name="radio" value="0" /> No</label></p>
+
                                 <p><input id="destroy" type="button" value="Destroy" />
                                     <input id="init" type="button" value="Init with AJAX" /></p>
                                 <p><input id="init_data" type="button" value="Init from Data" />
@@ -86,6 +78,12 @@
                             </td><td>
                                 <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
                                         <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
+
+                                <p>Set Checkbox: <select id="setCheckbox"><option value="">-- choose --</option>
+                                        <option value="yes">Yes</option><option value="No">No</option></select></p>
+                                <p>Set Radio: <select id="setRadio"><option value="">-- choose --</option>
+                                        <option value="yes">Yes</option><option value="No">No</option></select></p>
+
                                 <p>Node: <input id="open" type="button" value="Open" /> <input id="close" type="button" value="Close" />
                                     <input id="toggle" type="button" value="Toggle" /></p>
                                 <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files" />
@@ -109,11 +107,12 @@
                 </form>
             </div>
 
-            <div class="log">Tree Log...</div>
+            <div class="log">Tree Log... <a class="clear_log" style="font-size:10px" href="#" title="Clear the LOG" target="_blank">clear log</a>
+                <div></div></div>
 
             <p style="clear:both"><br /><span style="color:red">Note</span>: the selected pink item does not have anything to do with the <i>selectable</i> option, it's there just to be able to 'select' the
-            entire tree (not only a item).<br />All item base functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item when the
-            selectable option is used).</p>
+                entire tree (not only a item).<br />All item based functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item - when the
+                selectable option is used).</p>
 
         </div>
 
@@ -143,37 +142,63 @@
                         jsonUrl: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch=',
                         rootData: (type == 'data') ? rootData : null,
                         callbacks: {
-                            item: function(api, item, itemData, level){
+                            item: function(parent, item, itemData, level){
                                 // a custom item implementation to show the tree level
-                                api.setItem(item, itemData.item + ' (' + level + ')');
+                                this.setText(item, itemData.item + ' (' + level + ')');
                             }
                         }
                     }).aciTree('api');
                 }
 
+                var log = $('.log div');
+
+                var eye = $('.eyes'), eyes = 0;
+
+                // a little animation :)
+                function showEyes(){
+                    if (eyes > 2){
+                        eyes = 0;
+                    }
+                    eye.css('background-position', '0 -' + (eyes * 48) + 'px');
+                }
+
+                $('#tree').scroll(function(){
+                    eye.css('top', $(this).scrollTop() + 'px');
+                });
+
                 // show tree events
                 $('#tree').on('acitree', function(e, api, item, data){
+                    if (api.isLocked()){
+                        // prevent write to log on init/destroy
+                        return;
+                    }
                     switch (data.event){
                         case 'idset':
-                            $('.log').append('<p>' + data.event + ' [' + api.getId(item) + '] old ID: [' + data.oldId + ']</p>');
+                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old ID: [' + data.oldId + ']</p>');
                             break;
                         case 'itemset':
-                            $('.log').append('<p>' + data.event + ' [' + api.getId(item) + '] old text: [' + data.oldText + ']</p>');
+                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old text: [' + data.oldText + ']</p>');
                             break;
                         case 'swapped':
-                            $('.log').append('<p>' + data.event + ' [' + api.getId(data.item1) + '] <=> [' + api.getId(data.item2) + ']</p>');
+                            log.prepend('<p>' + data.event + ' [' + api.getId(data.item1) + '] <=> [' + api.getId(data.item2) + ']</p>');
                             break;
                         case 'movedup':
                         case 'moveddown':
                         case 'movedfirst':
                         case 'movedlast':
-                            $('.log').append('<p>' + data.event + ' [' + api.getId(item) + '] old index: [' + data.oldIndex + ']</p>');
+                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old index: [' + data.oldIndex + ']</p>');
+                            // make it visible ;)
+                            api.setVisible(item);
                             break;
                         default:
-                            if (api.isItem(item)){
-                                $('.log').append('<p>' + data.event + ' [' + api.getId(item) + ']</p>');
+                            if (item){
+                                log.prepend('<p>' + data.event + ' [' + api.getId(item) + ']</p>');
                             } else {
-                                $('.log').append('<p>' + data.event + ' [tree]</p>');
+                                log.prepend('<p>' + data.event + ' [tree]</p>');
+                            }
+                            if (data.event == 'toggled'){
+                                eyes++;
+                                showEyes();
                             }
                     }
                 });
@@ -186,27 +211,27 @@
                     var info = '';
                     info += 'getId: [' + treeApi.getId(item) + ']\n';
                     info += 'getText: "' + treeApi.getText(item) + '"\n';
-                    info += 'getLevel: ' + treeApi.getLevel(item) + '\n';
+                    info += 'level: ' + treeApi.level(item) + '\n';
                     info += 'getIndex: ' + treeApi.getIndex(item) + '\n';
                     info += 'isFile: ' + treeApi.isFile(item) + '\n';
                     info += 'isFolder: ' + treeApi.isFolder(item) + ' (open: ' + treeApi.isOpen(item) + ')\n';
                     info += 'wasLoad: ' + treeApi.wasLoad(item) + '\n';
-                    info += 'haveParent: ' + treeApi.haveParent(item) + '\n';
-                    info += 'getParent: [' + treeApi.getId(treeApi.getParent(item)) + ']\n';
-                    info += 'getPath: [root] ';
-                    treeApi.getPath(item).each(function(){
+                    info += 'hasParent: ' + treeApi.hasParent(item) + '\n';
+                    info += 'parent: [' + treeApi.getId(treeApi.parent(item)) + ']\n';
+                    info += 'path: [root] ';
+                    treeApi.path(item).each(function(){
                         info += '[' + treeApi.getId($(this)) + '] ';
                     });
                     info += '\n';
-                    info += 'haveSiblings: ' + treeApi.haveSiblings(item) + ' count: #' + treeApi.siblings(item).length + '\n';
-                    info += 'havePrev: ' + treeApi.havePrev(item) + ' [' + treeApi.getId(treeApi.getPrev(item)) + ']\n';
-                    info += 'haveNext: ' + treeApi.haveNext(item) + ' [' + treeApi.getId(treeApi.getNext(item)) + ']\n';
+                    info += 'hasSiblings: ' + treeApi.hasSiblings(item) + ' count: #' + treeApi.siblings(item).length + '\n';
+                    info += 'hasPrev: ' + treeApi.hasPrev(item) + ' [' + treeApi.getId(treeApi.prev(item)) + ']\n';
+                    info += 'hasNext: ' + treeApi.hasNext(item) + ' [' + treeApi.getId(treeApi.next(item)) + ']\n';
                     var childs = treeApi.childrens(item);
-                    info += 'haveChildrens: ' + treeApi.haveChildrens(item) + ' count: #' + childs.length +
+                    info += 'hasChildrens: ' + treeApi.hasChildrens(item) + ' count: #' + childs.length +
                         ' folders: #' + treeApi.folders(childs).length + ' (open: #' + treeApi.folders(childs, true).length +
                         ' closed: #' + treeApi.folders(childs, false).length + ') files: #' + treeApi.files(childs).length + '\n';
-                    info += 'getFirst [' + treeApi.getId(treeApi.getFirst(item)) + ']\n';
-                    info += 'getLast [' + treeApi.getId(treeApi.getLast(item)) + ']\n';
+                    info += 'first [' + treeApi.getId(treeApi.first(item)) + ']\n';
+                    info += 'last [' + treeApi.getId(treeApi.last(item)) + ']\n';
                     info += 'childrens: total: #' + treeApi.childrens(item, true).length + '\n';
                     return info;
                 }
@@ -250,6 +275,10 @@
                 $('[name=unique][value=' + (options.unique ? 1 : 0) + ']').prop('checked', true);
                 $('[name=selectable][value=' + (options.selectable ? 1 : 0) + ']').prop('checked', true);
                 $('[name=textSelection][value=' + (options.textSelection ? 1 : 0) + ']').prop('checked', true);
+                $('[name=checkbox][value=' + (options.checkbox ? 1 : 0) + ']').prop('checked', true);
+                $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
+                $('#setCheckbox').attr('disabled', !options.checkbox);
+                $('#setRadio').attr('disabled', !options.radio);
 
                 // update options
 
@@ -284,7 +313,15 @@
                     $('#tree').toggleClass('aciTreeNoBranches', $(this).val() == 0);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=textSelection]').click(function(){
+                $('[name=checkbox]').click(function(){
+                    $('#setCheckbox').attr('disabled', $(this).val() != 1);
+                });
+
+                $('[name=radio]').click(function(){
+                    $('#setRadio').attr('disabled', $(this).val() != 1);
+                });
+
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=textSelection],[name=checkbox],[name=radio]').click(function(){
                     $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
                 });
 
@@ -296,31 +333,32 @@
 
                 // update init options based on inputs
                 function updateOptions(){
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=textSelection]:checked').each(function(){
-                        $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=textSelection]:checked,[name=checkbox]:checked,[name=radio]:checked').each(function(){
+                        $.fn.aciTree.defaults[$(this).prop('name')] = $(this).val() == 1;
                     });
                 }
 
                 $('#init').click(function(){
-                    initTree();
                     // update options
                     updateOptions();
+                    initTree();
                 });
 
                 $('#init_data').click(function(){
-                    initTree('data');
                     // update options
                     updateOptions();
+                    initTree('data');
                 });
 
                 $('#init_huge').click(function(){
-                    initTree('huge');
                     // update options
                     updateOptions();
+                    initTree('huge');
                 });
 
-                $('#clear_log').click(function(){
-                    $('.log').html('');
+                $('#clear_log,.clear_log').click(function(){
+                    $('.log div').html('');
+                    return false;
                 });
 
                 // keep the last selected
@@ -334,11 +372,11 @@
                 });
 
                 // selected state for the Tree items
-                $('#tree').on('click', '.aciTreeItem', function(){
+                $('#tree').on('click', '.aciTreeItem', function(e){
                     $('#tree').removeClass('selected').find('.selected').removeClass('selected');
                     $(this).addClass('selected');
                     _g_sel = this;
-                    return false;
+                    e.stopPropagation();
                 });
 
                 // few little helpers ->
@@ -545,7 +583,7 @@
                         treeApi.setFile(item, {
                             success: function(){
                                 // if was set then change the icon
-                                treeApi.setIcon(item, 'file');
+                                this.setIcon(item, 'file');
                             }
                         });
                     } else {
@@ -564,7 +602,7 @@
                         treeApi.setFolder(item, {
                             success: function(){
                                 // if was set then change the icon
-                                treeApi.setIcon(item, 'folder');
+                                this.setIcon(item, 'folder');
                             }
                         });
                     } else {
@@ -593,6 +631,38 @@
                         // note: the Tree does not interpret the ICON in any way
                         // if it looks like a Folder it does not mean it's a Folder (same goes for a Tree File)
                         treeApi.setIcon(item, ($(this).val() == 'remove') ? null : $(this).val());
+                    } else {
+                        warn(true);
+                    }
+                    $(this).val('');
+                });
+
+                $('#setCheckbox').change(function(){
+                    var item = isItem();
+                    if (item){
+                        if ($(this).val() == 'yes'){
+                            // make sure no radio
+                            treeApi.setRadio(item, false);
+                            treeApi.setCheckbox(item, true);
+                        } else {
+                            treeApi.setCheckbox(item, false);
+                        }
+                    } else {
+                        warn(true);
+                    }
+                    $(this).val('');
+                });
+
+                $('#setRadio').change(function(){
+                    var item = isItem();
+                    if (item){
+                        if ($(this).val() == 'yes'){
+                            // make sure no checkbox
+                            treeApi.setCheckbox(item, false);
+                            treeApi.setRadio(item, true);
+                        } else {
+                            treeApi.setRadio(item, false);
+                        }
                     } else {
                         warn(true);
                     }
@@ -799,7 +869,7 @@
 
                 function wasFound(id, item){
                     var path = '[root] ';
-                    treeApi.getPath(item).each(function(){
+                    treeApi.path(item).each(function(){
                         path += '[' + treeApi.getId($(this)) + '] ';
                     });
                     // set item visible :)
@@ -821,10 +891,10 @@
                     if (path && load){
                         // we need to use callbacks with 'load' cause it's async
                         treeApi.searchId(id, path, load, {
-                            success: function(api, item){
+                            success: function(item){
                                 wasFound(id, item);
                             },
-                            fail: function(api, item){
+                            fail: function(item){
                                 notFound(id);
                             }
                         });
@@ -845,7 +915,7 @@
                     if (cnt.length){
                         var item = isItem();
                         if (item){
-                            treeApi.setItem(item, cnt);
+                            treeApi.setText(item, cnt);
                         } else {
                             warn(true);
                         }

@@ -1,15 +1,15 @@
 
 /*
- * aciTree jQuery Plugin v2.2.0
+ * aciTree jQuery Plugin v3.0.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Thu Mar 14 20:10 2013 +0200
+ * Date: Fri Mar 22 19:10 2013 +0200
  */
 
 (function($){
@@ -18,12 +18,8 @@
 
     var options = {
         selectable: true,               // if TRUE then one item can be selected (and the tree navigation with the keyboard will be enabled)
-        // when selectable is used you should set the 'tabIndex' attribute >= 0 on the container if you want to be focusable with the keyboard (will be set to -1 by default)
-        textSelection: false,           // if FALSE then the tree item text can't be selected
-        callbacks: {
-            // selected : function(api, item, state)
-            selected: null              // called to draw item selection
-        }
+        // the 'tabIndex' attribute need to be >= 0 set on the container (by default will be set to 0)
+        textSelection: false            // if FALSE then the item text can't be selected
     };
 
     // aciTree selectable extension
@@ -34,34 +30,78 @@
 
         __extend: function(){
             // add extra data
-            this._instance.focus = false;
+            $.extend(this._instance, {
+                focus: false
+            });
+            $.extend(this._private, {
+                blurTimeout: null,
+                focus: null
+            });
             // call the parent
             this._super();
+        },
+
+        // check if has focus
+        hasFocus: function(){
+            return this._instance.focus;
+        },
+
+        // get focused element
+        _lastFocus: function(){
+            return (this._instance.focus && this._private.focus) ? this._private.focus : $([]);
+        },
+
+        // process onfocus
+        _focus: function(element){
+            clearTimeout(this._private.blurTimeout);
+            this._private.focus = element;
+            if (!this._instance.focus){
+                this._instance.focus = true;
+                this._instance.jQuery.addClass('aciTreeFocus');
+                this._trigger(null, 'focused');
+            }
+        },
+
+        // process onblur
+        _blur: function(){
+            var _this = this;
+            clearTimeout(this._private.blurTimeout);
+            this._private.blurTimeout = setTimeout(function(){
+                if (_this._instance.focus){
+                    _this._instance.focus = false;
+                    _this._instance.jQuery.removeClass('aciTreeFocus');
+                    _this._trigger(null, 'blurred');
+                }
+            }, 10);
         },
 
         // init selectable
         _initSelectable: function(){
             var _this = this;
-            if (typeof _this._instance.jQuery.attr('tabindex') == 'undefined'){
-                _this._instance.jQuery.attr('tabindex', -1);
+            if (typeof this._instance.jQuery.attr('tabindex') == 'undefined'){
+                this._instance.jQuery.attr('tabindex', 0);
             }
-            _this._instance.jQuery.bind('focus' + _this._private.nameSpace, function(){
-                _this._instance.focus = true;
-            }).bind('blur' + _this._private.nameSpace, function(){
-                _this._instance.focus = false;
-            }).bind('keydown' + _this._private.nameSpace, function(e){
+            this._instance.jQuery.bind('focusin' + this._private.nameSpace, function(e){
+                _this._focus($(e.target));
+            }).bind('focusout' + this._private.nameSpace, function(){
+                _this._blur();
+            }).bind('keydown' + this._private.nameSpace, function(e){
                 if (!_this._instance.focus){
                     // do not handle if we do not have focus
                     return;
                 }
-                var selected = _this.getSelected();
-                var select = $([]);
+                var selected = _this.selected();
+                if (selected.length && _this.isBusy(selected)){
+                    // skip when busy
+                    return false;
+                }
+                var item = $([]);
                 switch (e.which){
                     case 38: // up
-                        select = selected.length ? _this._prevOpen(selected) : _this.getFirst();
+                        item = selected.length ? _this._prevOpen(selected) : _this.first();
                         break;
                     case 40: // down
-                        select = selected.length ? _this._nextOpen(selected) : _this.getFirst();
+                        item = selected.length ? _this._nextOpen(selected) : _this.first();
                         break;
                     case 37: // left
                         if (selected.length){
@@ -72,10 +112,10 @@
                                     unique: _this._instance.options.unique
                                 });
                             } else {
-                                select = _this.getParent(selected);
+                                item = _this.parent(selected);
                             }
                         } else {
-                            select = _this.getFirst();
+                            item = _this.first();
                         }
                         break;
                     case 39: // right
@@ -87,23 +127,23 @@
                                     unique: _this._instance.options.unique
                                 });
                             } else {
-                                select = _this.getFirst(selected);
+                                item = _this.first(selected);
                             }
                         } else {
-                            select = _this.getFirst();
+                            item = _this.first();
                         }
                         break;
                     case 33: // pgup
-                        select = selected.length ? _this._prevPage(selected) : _this.getFirst();
+                        item = selected.length ? _this._prevPage(selected) : _this.first();
                         break;
                     case 34: // pgdown
-                        select = selected.length ? _this._nextPage(selected) : _this.getFirst();
+                        item = selected.length ? _this._nextPage(selected) : _this.first();
                         break;
                     case 36: // home
-                        select = _this.getFirst();
+                        item = _this.first();
                         break;
                     case 35: // end
-                        select = _this._lastOpen();
+                        item = _this._lastOpen();
                         break;
                     case 13: // enter
                         if (selected.length && _this.isFolder(selected) && _this.isClosed(selected)){
@@ -133,16 +173,28 @@
                         }
                         break;
                 }
-                if (select.length && (select.get(0) != selected.get(0))){
-                    _this._selected(_this, select, true);
-                    return false;
+                if (item.length){
+                    if (!_this.isSelected(item)){
+                        if (!_this.isVisible(item)){
+                            _this.setVisible(item);
+                        }
+                        _this.select(item, true);
+                        return false;
+                    } else if (!_this.isVisible(item)){
+                        _this.setVisible(item);
+                        return false;
+                    }
                 }
-            });
-            _this._instance.jQuery.on('click' + _this._private.nameSpace, 'div.aciTreeItem', function(e){
-                var item = $(e.target).parent();
-                _this._selected(_this, item, true);
-            }).on('dblclick' + _this._private.nameSpace, 'div.aciTreeItem', function(e){
-                var item = $(e.target).parent();
+            }).on('click' + this._private.nameSpace, '.aciTreeItem', function(e){
+                var item = _this.itemFrom(e.target);
+                if (!_this.isVisible(item)){
+                    _this.setVisible(item);
+                }
+                if (!_this.isSelected(item)){
+                    _this.select(item, true);
+                }
+            }).on('dblclick' + this._private.nameSpace, '.aciTreeItem', function(e){
+                var item = _this.itemFrom(e.target);
                 if (_this.isFolder(item)){
                     _this.toggle(item, {
                         collapse: _this._instance.options.collapse,
@@ -153,8 +205,8 @@
             });
         },
 
-        // override _init
-        _init: function(){
+        // override _initHook
+        _initHook: function(){
             if (this._instance.options.selectable){
                 this._initSelectable();
             }
@@ -162,13 +214,13 @@
             this._super();
         },
 
-        // override _item
-        _item: function(api, item, itemData, level){
+        // override _itemHook
+        _itemHook: function(parent, item, itemData, level){
             if (!this._instance.options.textSelection){
                 // make text unselectable
-                this._selectable(item.find('>div.aciTreeItem'));
+                this._selectable(item.children('.aciTreeItem'));
             }
-            this._super(api, item, itemData, level);
+            this._super(parent, item, itemData, level);
         },
 
         // make element (un)selectable
@@ -204,7 +256,7 @@
         _lastOpen: function(item){
             var _this = this;
             var opened = function(item){
-                var last = _this.getLast(item);
+                var last = _this.last(item);
                 if (_this.isOpen(last)){
                     return opened(last);
                 } else {
@@ -212,9 +264,9 @@
                 }
             };
             if (!item){
-                item = _this.getLast();
+                item = this.last();
             }
-            if (_this.isOpen(item)){
+            if (this.isOpen(item)){
                 return opened(item);
             } else {
                 return item;
@@ -223,11 +275,11 @@
 
         // get prev visible starting with item
         _prevOpen: function(item){
-            var prev = this.getPrev(item);
+            var prev = this.prev(item);
             if (prev.length){
                 return this._lastOpen(prev);
             } else {
-                var parent = this.getParent(item);
+                var parent = this.parent(item);
                 return parent.length ? parent : item;
             }
         },
@@ -236,9 +288,9 @@
         _nextOpen: function(item){
             var _this = this;
             var opened = function(item){
-                var parent = _this.getParent(item);
+                var parent = _this.parent(item);
                 if (parent.length){
-                    var next = _this.getNext(parent);
+                    var next = _this.next(parent);
                     if (next.length){
                         return next;
                     } else {
@@ -247,10 +299,10 @@
                 }
                 return null;
             };
-            if (_this.isOpen(item)){
-                return _this.getFirst(item);
+            if (this.isOpen(item)){
+                return this.first(item);
             } else {
-                var next = _this.getNext(item);
+                var next = this.next(item);
                 if (next.length){
                     return next;
                 } else {
@@ -262,11 +314,11 @@
 
         // get item height
         _itemHeight: function(item){
-            var size = item.first().find('>div.aciTreeItem');
+            var size = item.first().children('.aciTreeItem');
             return size.outerHeight(true);
         },
 
-        // get prev visible starting with item with a 'page' size
+        // get prev visible starting with item (with a 'page' size)
         _prevPage: function(item){
             var now = this._itemHeight(item);
             var space = this._instance.jQuery.height();
@@ -286,7 +338,7 @@
             return prev;
         },
 
-        // get next visible starting with item with a 'page' size
+        // get next visible starting with item (with a 'page' size)
         _nextPage: function(item){
             var now = this._itemHeight(item);
             var space = this._instance.jQuery.height();
@@ -306,37 +358,37 @@
             return next;
         },
 
-        // process item selection
-        _selected: function(api, item, state){
-            if (this._instance.options.callbacks && this._instance.options.callbacks.selected){
-                this._instance.options.callbacks.selected(api, item, state);
-                return;
-            }
-            this.select(item, state);
-            if (state){
-                this.setVisible(item);
-            }
+        _selectHook: function(item){
+        // override this to process after select, return FALSE to skip
         },
 
         // select/deselect item
         select: function(item, state){
             var _this = this;
-            var unselect = _this._instance.jQuery.find('li.aciTreeSelected');
+            var unselect = this._instance.jQuery.find('.aciTreeSelected');
             if (item && state){
                 unselect = unselect.not(item);
             }
+            var oldSelected = this.selected();
             unselect.removeClass('aciTreeSelected').each(function(){
                 _this._trigger($(this), 'unselected');
             });
-            if (_this.isItem(item) && state){
-                item.first().addClass('aciTreeSelected');
-                _this._trigger(item, 'selected');
+            if (state && this.isItem(item)){
+                if (this.isSelected(item)){
+                    this._trigger(item, 'wasselected');
+                } else {
+                    item.first().addClass('aciTreeSelected');
+                    this._trigger(item, 'selected', {
+                        oldSelected: oldSelected
+                    });
+                    this._selectHook(oldSelected);
+                }
             }
         },
 
         // get selected item
-        getSelected: function(){
-            return this._instance.jQuery.find('li.aciTreeSelected:first');
+        selected: function(){
+            return this._instance.jQuery.find('.aciTreeSelected:first');
         },
 
         // test if item is selected
@@ -347,48 +399,54 @@
         // override set option
         option: function(option, value){
             var _this = this;
-            if ((option == 'selectable') && (value != _this._instance.options.selectable)) {
-                if (value){
-                    _this._initSelectable();
-                } else {
-                    _this._doneSelectable();
+            if (this.wasInit() && !this.isLocked()){
+                if ((option == 'selectable') && (value != this._instance.options.selectable)) {
+                    if (value){
+                        this._initSelectable();
+                    } else {
+                        this._doneSelectable();
+                    }
                 }
-            }
-            if ((option == 'textSelection') && (value != _this._instance.options.textSelection)) {
-                if (value){
-                    _this._instance.jQuery.find('div.aciTreeItem').each(function(){
-                        _this._selectable($(this), true);
-                    });
-                } else {
-                    _this._instance.jQuery.find('div.aciTreeItem').each(function(){
-                        _this._selectable($(this));
-                    });
+                if ((option == 'textSelection') && (value != this._instance.options.textSelection)) {
+                    if (value){
+                        this._instance.jQuery.find('.aciTreeItem').each(function(){
+                            _this._selectable($(this), true);
+                        });
+                    } else {
+                        this._instance.jQuery.find('.aciTreeItem').each(function(){
+                            _this._selectable($(this));
+                        });
+                    }
                 }
             }
             // call the parent
-            _this._super(option, value);
+            this._super(option, value);
         },
 
         // done selectable
-        _doneSelectable: function(){
-            var selected = this.getSelected();
-            if (selected.length){
-                this._selected(this, selected, false);
+        _doneSelectable: function(destroy){
+            if (this._instance.jQuery.attr('tabindex') == '0'){
+                this._instance.jQuery.removeAttr('tabindex');
             }
-            this._instance.focus = false;
-            this._instance.jQuery.off('click' + this._private.nameSpace + ' dblclick' + this._private.nameSpace, 'div.aciTreeItem');
             this._instance.jQuery.unbind(this._private.nameSpace);
+            this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
+            this._instance.jQuery.removeClass('aciTreeFocus');
+            this._instance.focus = false;
+            if (!destroy){
+                var selected = this.selected();
+                if (selected.length){
+                    this.select(selected, false);
+                }
+            }
         },
 
-        // override _destroy
-        _destroy: function(){
-            var _this = this;
-            _this._doneSelectable();
-            _this._instance.jQuery.find('div.aciTreeItem').each(function(){
-                _this._selectable($(this), true);
-            });
+        // override _destroyHook
+        _destroyHook: function(unloaded){
+            if (unloaded){
+                this._doneSelectable(true);
+            }
             // call the parent
-            this._super();
+            this._super(unloaded);
         }
 
     };

@@ -1,15 +1,15 @@
 
 /*
- * aciTree jQuery Plugin v2.2.0
+ * aciTree jQuery Plugin v3.0.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Thu Mar 14 20:10 2013 +0200
+ * Date: Fri Mar 22 19:10 2013 +0200
  */
 
 (function($){
@@ -20,34 +20,39 @@
     var aciTree_utils = {
 
         __extend: function(){
-            // the branch queue
-            this._instance._branchQueue = new this._queue(null, true, this._instance.options.queueDelay);
+            $.extend(this._private, {
+                // the branch queue
+                branchQueue: new this._queue(null, true, this._instance.options.queueDelay)
+            });
             // call the parent
             this._super();
         },
 
         // update item (create tree branch if requested)
         // if options.itemData have the 'items' property set then
-        // will be like when calling 'initFrom' for the item
+        // will be like when calling 'loadFrom' for the item
         update: function(item, options){
             var _this = this;
-            options = _this._options(options);
-            if (_this.isItem(item)){
+            options = this._options(options, function(){
+                _this._trigger(item, 'updated');
+            }, function(){
+                _this._trigger(item, 'updatefail');
+            });
+            if (this.isItem(item)){
                 if (options.itemData.props && (options.itemData.props.isFolder || (options.itemData.props.isFolder === null))){
                     var process = function(){
                         _this.setId(item, options.itemData.id);
-                        _this.setItem(item, options.itemData.item);
+                        _this.setText(item, options.itemData.item);
                         if (options.itemData.props){
                             _this.setIcon(item, options.itemData.props.icon);
                         }
-                        item = item.first();
-                        item.removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.props.isFolder ||
+                        item.first().removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.props.isFolder ||
                             (options.itemData.items && options.itemData.items.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
                         if (options.itemData.items){
                             if (_this.wasLoad(item)){
                                 _this.unload(item, {
                                     success: function(){
-                                        _this.initFrom(item, {
+                                        _this.loadFrom(item, {
                                             success: options.success,
                                             fail: options.fail,
                                             itemData: options.itemData.items
@@ -57,7 +62,7 @@
                                     unanimated: options.unanimated
                                 });
                             } else {
-                                _this.initFrom(item, {
+                                _this.loadFrom(item, {
                                     success: options.success,
                                     fail: options.fail,
                                     itemData: options.itemData.items
@@ -67,44 +72,53 @@
                             _this._success(item, options);
                         }
                     };
-                    _this.setFolder(item, {
-                        success: process,
-                        fail: options.fail
-                    });
+                    if (this.isFolder(item)){
+                        process();
+                    } else {
+                        this.setFolder(item, {
+                            success: process,
+                            fail: options.fail
+                        });
+                    }
                 } else {
                     var process = function(){
                         _this.setId(item, options.itemData.id);
-                        _this.setItem(item, options.itemData.item);
+                        _this.setText(item, options.itemData.item);
                         if (options.itemData.props){
                             _this.setIcon(item, options.itemData.props.icon);
                         }
                     };
-                    _this.setFile(item, {
-                        success: process,
-                        fail: options.fail
-                    });
+                    if (this.isFile(item)){
+                        process();
+                    } else {
+                        this.setFile(item, {
+                            success: process,
+                            fail: options.fail
+                        });
+                    }
                 }
             } else {
-                _this._fail(item, options);
+                this._fail(item, options);
             }
         },
 
-        // callback call for each item childrens
+        // callback call for each children of item
         // when 'load' is TRUE will also try to load nodes
         branch: function(item, callback, load){
             var _this = this;
+            var _private = this._private;
             var process = function(item, callback, next){
-                var child = next ? _this.getNext(item) : _this.getFirst(item);
+                var child = next ? _this.next(item) : _this.first(item);
                 if (child.length){
                     if (_this.isFolder(child)){
                         if (_this.wasLoad(child)){
-                            _this._instance._branchQueue.push(function(){
+                            _private.branchQueue.push(function(){
                                 callback(_this, child);
                                 process(child, callback);
                                 process(child, callback, true);
                             }).run();
                         } else if (load) {
-                            _this._instance._branchQueue.push(function(complete){
+                            _private.branchQueue.push(function(complete){
                                 _this.ajaxLoad(child, {
                                     success: function(){
                                         callback(_this, child);
@@ -119,13 +133,13 @@
                                 });
                             }, true).run();
                         } else {
-                            _this._instance._branchQueue.push(function(){
+                            _private.branchQueue.push(function(){
                                 callback(_this, child);
                                 process(child, callback, true);
                             }).run();
                         }
                     } else {
-                        _this._instance._branchQueue.push(function(){
+                        _private.branchQueue.push(function(){
                             callback(_this, child);
                             process(child, callback, true);
                         }).run();
@@ -135,12 +149,12 @@
             process(item, callback);
         },
 
-        // override isBusy to check _branchQueue too
+        // override isBusy to check branchQueue too
         isBusy: function(item){
             if (item){
                 return this._super(item);
             } else {
-                return this._super(item) || !this._instance._branchQueue.empty();
+                return this._super(item) || !this._private.branchQueue.empty();
             }
         },
 
@@ -149,7 +163,7 @@
             if (this.isItem(item1) && this.isItem(item2) && !this.isChildren(item1, item2) && !this.isChildren(item2, item1) && (item1.get(0) != item2.get(0))){
                 item1 = item1.first();
                 item2 = item2.first();
-                var prev = this.getPrev(item1);
+                var prev = this.prev(item1);
                 if (prev.length){
                     if (item2.get(0) == prev.get(0)){
                         item2.before(item1);
@@ -158,7 +172,7 @@
                         item2.insertAfter(prev);
                     }
                 } else {
-                    var next = this.getNext(item1);
+                    var next = this.next(item1);
                     if (next.length){
                         if (item2.get(0) == next.get(0)){
                             item2.after(item1);
@@ -177,6 +191,8 @@
                     item2: item2
                 });
                 return true;
+            } else {
+                this._trigger(null, 'swapfail');
             }
             return false;
         },
@@ -184,13 +200,13 @@
         // move item up
         moveUp: function(item){
             if (this.isItem(item)){
-                var prev = this.getPrev(item);
-                var old = this.getIndex(item);
+                var prev = this.prev(item);
+                var oldIndex = this.getIndex(item);
                 if (prev.length){
                     prev.before(item.first());
                 }
                 this._trigger(item, 'movedup', {
-                    oldIndex: old
+                    oldIndex: oldIndex
                 });
                 return true;
             }
@@ -200,13 +216,13 @@
         // move item down
         moveDown: function(item){
             if (this.isItem(item)){
-                var next = this.getNext(item);
-                var old = this.getIndex(item);
+                var next = this.next(item);
+                var oldIndex = this.getIndex(item);
                 if (next.length){
                     next.after(item.first());
                 }
                 this._trigger(item, 'moveddown', {
-                    oldIndex: old
+                    oldIndex: oldIndex
                 });
                 return true;
             }
@@ -216,14 +232,14 @@
         // move item in first position
         moveFirst: function(item){
             if (this.isItem(item)){
-                var parent = this.getParent(item);
+                var parent = this.parent(item);
                 if (!parent.length){
                     parent = this._instance.jQuery;
                 }
-                var old = this.getIndex(item);
-                parent.find('>ul.aciTreeUl').prepend(item.first());
+                var oldIndex = this.getIndex(item);
+                parent.children('.aciTreeUl').prepend(item.first());
                 this._trigger(item, 'movedfirst', {
-                    oldIndex: old
+                    oldIndex: oldIndex
                 });
                 return true;
             }
@@ -233,14 +249,14 @@
         // move item in last position
         moveLast: function(item){
             if (this.isItem(item)){
-                var parent = this.getParent(item);
+                var parent = this.parent(item);
                 if (!parent.length){
                     parent = this._instance.jQuery;
                 }
-                var old = this.getIndex(item);
-                parent.find('>ul.aciTreeUl').append(item.first());
+                var oldIndex = this.getIndex(item);
+                parent.children('.aciTreeUl').append(item.first());
                 this._trigger(item, 'movedlast', {
-                    oldIndex: old
+                    oldIndex: oldIndex
                 });
                 return true;
             }
@@ -253,15 +269,13 @@
             var item, id, length, found, exact = false;
             for(var i = 0, size = items.length; i < size; i++){
                 item = items.eq(i);
-                id = item.data('id' + this._instance.nameSpace);
-                if (id){
-                    length = id.length;
-                    if (length){
-                        if (id == pathId.substr(0, length)){
-                            found = item;
-                            exact = pathId.length == length;
-                            break;
-                        }
+                id = String(this.getId(item));
+                length = id.length;
+                if (length){
+                    if (id == pathId.substr(0, length)){
+                        found = item;
+                        exact = pathId.length == length;
+                        break;
                     }
                 }
             }
@@ -289,7 +303,7 @@
         // if 'load' is TRUE will also try to load nodes (works only when 'path' is TRUE)
         searchId: function(id, path, load, options){
             var _this = this;
-            options = _this._options(options);
+            options = this._options(options);
             if (id){
                 if (path){
                     if (load){
@@ -317,34 +331,42 @@
                         process();
                         return $([]);
                     } else {
-                        var found = _this._search(null, id);
+                        var found = this._search(null, id);
                         if (found && found.exact){
-                            _this._success(found, options);
+                            this._success(found, options);
                             return found.item;
                         }
                     }
                 } else {
                     var list = [];
-                    var data = 'id' + _this._instance.nameSpace;
-                    _this._instance.jQuery.find('li.aciTreeLi').each(function(){
-                        if ($(this).data(data) == id){
+                    this._instance.jQuery.find('.aciTreeLi').each(function(){
+                        if (id == _this.getId($(this))){
                             list[list.length] = this;
                         }
                     });
                     if (list.length){
                         var found = $(list);
-                        _this._success(found, options, found);
-                        return found
+                        this._success(found, options, found);
+                        return found;
                     }
                 }
             }
-            _this._fail(null, options);
+            this._fail(null, options);
             return $([]);
+        },
+
+        // override _destroyHook
+        _destroyHook: function(unloaded){
+            if (!unloaded){
+                this._private.branchQueue.destroy();
+            }
+            // call the parent
+            this._super(unloaded);
         }
 
     };
 
     // extend the base aciTree class and add the utils stuff
-    aciPluginClass.plugins.aciTree = aciPluginClass.plugins.aciTree.extend(aciTree_utils);
+    aciPluginClass.plugins.aciTree = aciPluginClass.plugins.aciTree.extend(aciTree_utils, 'aciTreeUtils');
 
 })(jQuery);
