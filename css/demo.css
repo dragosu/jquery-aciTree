@@ -72,3 +72,12 @@ label {
     height:48px;
     background:url(../image/eyes.png) 0 0 no-repeat;
 }
+[dir=rtl] .eyes {
+    right:80%;
+}
+em {
+    font-size:9px;
+    color:#777;
+    padding:2px 0 2px 0;
+    display:block;
+}

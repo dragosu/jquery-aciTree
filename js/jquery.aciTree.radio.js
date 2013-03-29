@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.1
+ * aciTree jQuery Plugin v3.0.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Fri Mar 22 19:10 2013 +0200
+ * Date: Fri Mar 29 21:20 2013 +0200
  */
 
 /*
@@ -132,7 +132,7 @@
 
         // return the radio
         _radio: function(item){
-            return item.first().children('.aciTreeItem').find('input[type=radio]');
+            return item.first().children('.aciTreeLine').find('input[type=radio]');
         },
 
         // override _initHook
@@ -181,13 +181,13 @@
                 var parentId = this.getId(parent);
                 name = this._instance.options.radioName + '-' + (parentId ? String(parentId).replace(/[^a-z0-9_-]/ig, '') : 'root');
             }
-            item.first().addClass('aciTreeRadio').children('.aciTreeItem').find('.aciTreeText').wrap('<label></label>').before('<input type="radio" name="' +
+            item.first().addClass('aciTreeRadio').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="radio" name="' +
                 name + '" value="' + this.getId(item) + '"' + (itemData.props && itemData.props.checked ? ' checked="checked"' : '') + ' />');
         },
 
         // remove item radio
         _removeRadio: function(item){
-            var label = item.first().removeClass('aciTreeRadio').children('.aciTreeItem').find('label');
+            var label = item.first().removeClass('aciTreeRadio').children('.aciTreeLine').find('label');
             if (label.length){
                 label.find('*').not('.aciTreeText').remove();
                 label.find('.aciTreeText').unwrap();

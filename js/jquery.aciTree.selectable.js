@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.1
+ * aciTree jQuery Plugin v3.0.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Fri Mar 22 19:10 2013 +0200
+ * Date: Fri Mar 29 21:20 2013 +0200
  */
 
 (function($){
@@ -19,6 +19,7 @@
     var options = {
         selectable: true,               // if TRUE then one item can be selected (and the tree navigation with the keyboard will be enabled)
         // the 'tabIndex' attribute need to be >= 0 set on the container (by default will be set to 0)
+        fullRow: false,                 // if TRUE then the selection will be made on the entire row (the CSS need to reflect this)
         textSelection: false            // if FALSE then the item text can't be selected
     };
 
@@ -185,7 +186,15 @@
                         return false;
                     }
                 }
-            }).on('click' + this._private.nameSpace, '.aciTreeItem', function(e){
+            });
+            this._fullRow(this._instance.options.fullRow);
+        },
+
+        // change full row mode
+        _fullRow: function(state){
+            var _this = this;
+            this._instance.jQuery.off(this._private.nameSpace, '.aciTreeLine,.aciTreeItem').off(this._private.nameSpace, '.aciTreeItem');
+            this._instance.jQuery.on('click' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', function(e){
                 var item = _this.itemFrom(e.target);
                 if (!_this.isVisible(item)){
                     _this.setVisible(item);
@@ -193,7 +202,7 @@
                 if (!_this.isSelected(item)){
                     _this.select(item, true);
                 }
-            }).on('dblclick' + this._private.nameSpace, '.aciTreeItem', function(e){
+            }).on('dblclick' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', function(e){
                 var item = _this.itemFrom(e.target);
                 if (_this.isFolder(item)){
                     _this.toggle(item, {
@@ -201,6 +210,7 @@
                         expand: _this._instance.options.expand,
                         unique: _this._instance.options.unique
                     });
+                    return false;
                 }
             });
         },
@@ -218,7 +228,7 @@
         _itemHook: function(parent, item, itemData, level){
             if (!this._instance.options.textSelection){
                 // make text unselectable
-                this._selectable(item.children('.aciTreeItem'));
+                this._selectable(item.children('.aciTreeLine').find('.aciTreeItem'));
             }
             this._super(parent, item, itemData, level);
         },
@@ -314,7 +324,7 @@
 
         // get item height
         _itemHeight: function(item){
-            var size = item.first().children('.aciTreeItem');
+            var size = item.first().children('.aciTreeLine').find('.aciTreeItem');
             return size.outerHeight(true);
         },
 
@@ -406,6 +416,9 @@
                     } else {
                         this._doneSelectable();
                     }
+                }
+                if ((option == 'fullRow') && (value != this._instance.options.fullRow)) {
+                    this._fullRow(value);
                 }
                 if ((option == 'textSelection') && (value != this._instance.options.textSelection)) {
                     if (value){

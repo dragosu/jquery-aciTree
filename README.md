@@ -13,9 +13,8 @@ Features:
   navigation (the arrow keys, pageup/pagedown, home/end, enter, escape and
   space can be used);
 
-- is possible to change the form in which the tree is displayed (the included
-  example uses only 3 image files to indicate various states in which you can
-  find a node and for drawing the tree branches);
+- is possible to change the form in which the tree is displayed,
+  the items allows HTML formatting;
 
 - you can specify an ICON image for each item (background-position-x and
   background-position-y can be included so that you can use a single image
@@ -39,10 +38,9 @@ $(function(){
 
 });
 
-Check out the demos, now with item selection, checkbox, radio-button,
-and keyboard navigation support!
+Check out the demos, now with full item row selection and RTL support!
 
-aciTree jQuery Plugin v3.0.0-rc.1
+aciTree jQuery Plugin v3.0.0-rc.2
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -51,4 +49,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 Require jQuery Library >= v1.7.1 http://jquery.com
 + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
 
-Date: Fri Mar 22 19:10 2013 +0200
+Date: Fri Mar 29 21:20 2013 +0200

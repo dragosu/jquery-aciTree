@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.1
+ * aciTree jQuery Plugin v3.0.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Fri Mar 22 19:10 2013 +0200
+ * Date: Fri Mar 29 21:20 2013 +0200
  */
 
 /*
@@ -142,7 +142,7 @@
             this._instance.locked = true;
             this._instance.jQuery.bind('mousedown' + this._instance.nameSpace, function(e){
                 var element = $(e.target);
-                if (element.is('.aciTreeButton,.aciTreeLoad,.aciTreeLi,.aciTreeIcon')){
+                if (element.is('.aciTreeButton,.aciTreeLoad,.aciTreeEntry,.aciTreeIcon')){
                     _this._instance.jQuery.focus();
                     // prevent selection
                     e.preventDefault();
@@ -284,7 +284,7 @@
                             _self.run();
                         }
                     }
-                }, realtime ? 10 : delay);
+                }, realtime ? 5 : delay);
             };
         },
 
@@ -422,9 +422,10 @@
                                 if (_this.wasLoad(item)){
                                     _this.unload(item, {
                                         success: function(){
-                                            _this._createBranch(item, itemList);
-                                            _this._success(item, options);
-                                            complete();
+                                            _this._createBranch(item, itemList, function(){
+                                                _this._success(item, options);
+                                                complete();
+                                            });
                                         },
                                         fail: function(){
                                             _this._fail(item, options);
@@ -433,9 +434,10 @@
                                         unanimated: options.unanimated
                                     });
                                 } else {
-                                    _this._createBranch(item, itemList);
-                                    _this._success(item, options);
-                                    complete();
+                                    _this._createBranch(item, itemList, function(){
+                                        _this._success(item, options);
+                                        complete();
+                                    });
                                 }
                             };
                             if (_this.isFolder(item)){
@@ -500,15 +502,17 @@
                         if (_this.wasLoad(item)){
                             _this.unload(item, {
                                 success: function(){
-                                    _this._createBranch(item, options.itemData);
-                                    _this._success(item, options);
+                                    _this._createBranch(item, options.itemData, function(){
+                                        _this._success(item, options);
+                                    });
                                 },
                                 fail: options.fail,
                                 unanimated: options.unanimated
                             });
                         } else {
-                            _this._createBranch(item, options.itemData);
-                            _this._success(item, options);
+                            _this._createBranch(item, options.itemData, function(){
+                                _this._success(item, options);
+                            });
                         }
                     };
                     if (this.isFolder(item)){
@@ -569,19 +573,19 @@
                     if (this.isOpen(item)){
                         this.close(item, {
                             success: function(){
-                                item.first().children('.aciTreeUl').remove();
+                                _this._removeContainer(item);
                                 _this._success(item, options);
                             },
                             fail: options.fail,
                             unanimated: options.unanimated
                         });
                     } else {
-                        item.first().children('.aciTreeUl').remove();
+                        this._removeContainer(item);
                         this._success(item, options);
                     }
                 } else {
                     this._animate(item, false, !this._instance.options.animateRoot || options.unanimated, function(){
-                        _this._instance.jQuery.children('.aciTreeUl').remove();
+                        _this._removeContainer();
                         _this._success(item, options);
                     });
                 }
@@ -603,14 +607,14 @@
                     this.unload(item, {
                         success: function(){
                             _this._success(item, options);
-                            item.first().remove();
+                            _this._removeItem(item);
                         },
                         fail: options.fail,
                         unanimated: options.unanimated
                     });
                 } else {
                     this._success(item, options);
-                    item.first().remove();
+                    this._removeItem(item);
                 }
             } else {
                 this._fail(item, options);
@@ -621,7 +625,7 @@
         _openChilds: function(item, options){
             var _this = this;
             if (options.expand){
-                var queue = new this._queue(this._instance.options.threads, true, this._instance.options.queueDelay);
+                var queue = new this._queue(this._instance.options.threads, true);
                 this.folders(this.childrens(item), false).each(function(){
                     var item = $(this);
                     queue.push(function(complete){
@@ -695,7 +699,7 @@
                 options.unanimated = true;
                 this.unload(item, options);
             } else if (options.collapse){
-                var queue = new this._queue(this._instance.options.threads, true, this._instance.options.queueDelay);
+                var queue = new this._queue(this._instance.options.threads, true);
                 this.folders(this.childrens(item), true).each(function(){
                     var item = $(this);
                     queue.push(function(complete){
@@ -756,7 +760,7 @@
             var _this = this;
             options = this._options(options);
             if (this.isItem(item)){
-                var queue = new this._queue(this._instance.options.threads, true, this._instance.options.queueDelay);
+                var queue = new this._queue(this._instance.options.threads, true);
                 var exclude = item.first().add(this.path(item)).add(this.childrens(item, true));
                 this.folders(this.childrens(null, true), true).not(exclude).each(function(){
                     var item = $(this);
@@ -813,7 +817,7 @@
                     return false;
                 };
                 var rect = this._instance.jQuery.get(0).getBoundingClientRect();
-                var size = item.first().children('.aciTreeItem');
+                var size = item.first().children('.aciTreeLine').find('.aciTreeItem');
                 var test = size.get(0).getBoundingClientRect();
                 var height = size.outerHeight(true);
                 if ((test.bottom - height < rect.top) || (test.top + height > rect.bottom) || (test.right < rect.left) || (test.left > rect.right)){
@@ -830,7 +834,7 @@
             var _this = this;
             options = this._options(options);
             if (this.isItem(item)){
-                var queue = new this._queue(null, true, this._instance.options.queueDelay);
+                var queue = new this._queue(null, true);
                 this.folders(this.path(item), false).each(function(){
                     var item = $(this);
                     queue.push(function(complete){
@@ -886,7 +890,7 @@
             } else if (this.isItem(item)){
                 var process = function(){
                     var rect = _this._instance.jQuery.get(0).getBoundingClientRect();
-                    var size = item.first().children('.aciTreeItem');
+                    var size = item.first().children('.aciTreeLine').find('.aciTreeItem');
                     var test = size.get(0).getBoundingClientRect();
                     var height = size.outerHeight(true);
                     if (test.bottom - height < rect.top){
@@ -954,23 +958,40 @@
         },
 
         // create tree branch
-        _createBranch: function(item, itemList){
-            if (item){
-                item.first().removeClass('aciTreeFolderMaybe').addClass('aciTreeFolder');
-            }
-            var items = this.append(item, {
-                itemData: itemList
-            });
-            var itemData;
-            for(var i in itemList){
-                itemData = itemList[i];
-                if (itemData.items && (itemData.items instanceof Array) && itemData.items.length){
-                    this._createBranch(items.eq(i), itemData.items);
+        _createBranch: function(item, itemList, callback){
+            var _this = this;
+            var queue = new this._queue(this._instance.options.threads, true);
+            var process = function (item, itemList){
+                if (item){
+                    item.first().removeClass('aciTreeFolderMaybe').addClass('aciTreeFolder');
                 }
-                if (itemData.props && itemData.props.open){
-                    this.open(items.eq(i));
+                var items = _this.append(item, {
+                    itemData: itemList
+                });
+                var itemData;
+                for(var i in itemList){
+                    itemData = itemList[i];
+                    if (itemData.items && (itemData.items instanceof Array) && itemData.items.length){
+                        (function(item, itemData){
+                            queue.push(function(complete){
+                                process(item, itemData.items);
+                                if (itemData.props && itemData.props.open){
+                                    _this.open(item);
+                                }
+                                complete();
+                            }, true);
+                        })(items.eq(i), itemData);
+                    } else if (itemData.props && itemData.props.open){
+                        _this.open(items.eq(i));
+                    }
                 }
-            }
+            };
+            queue.push(function(complete){
+                process(item, itemList);
+                complete();
+            }, true).complete(function(){
+                callback();
+            }).run(true);
         },
 
         // process item before inserting into the DOM
@@ -980,29 +1001,39 @@
             }
         },
 
-        // create LI from data
-        _createLi: function(itemData){
-            var li = $('<li class="aciTreeLi"></li>').data('itemData' + this._instance.nameSpace, {
+        // create item from data
+        _createItem: function(itemData, level){
+            var item = $('<li class="aciTreeLi aciTreeLevel' + level + '"></li>').data('itemData' + this._instance.nameSpace, {
                 id: itemData.id,
                 item: itemData.item,
                 props: itemData.props
             });
-            var html = '<div class="aciTreeButton"><div></div></div><div class="aciTreeItem">';
+            var start = '<div class="aciTreeLine">', end = '';
+            for(var i = 0; i < level; i++){
+                start += '<div class="aciTreeBranch aciTreeLevel' + i + '">';
+                end += '</div>';
+            }
+            start += '<div class="aciTreeEntry"><div class="aciTreeButton"><div></div></div><div class="aciTreeItem">';
             if (itemData.props && itemData.props.icon){
                 if (itemData.props.icon instanceof Array){
-                    html += '<div class="aciTreeIcon ' + itemData.props.icon[0] + '" style="background-position:' +
+                    start += '<div class="aciTreeIcon ' + itemData.props.icon[0] + '" style="background-position:' +
                     itemData.props.icon[1] + 'px ' + itemData.props.icon[2] + 'px' + '"></div>';
                 } else {
-                    html += '<div class="aciTreeIcon ' + itemData.props.icon + '"></div>';
+                    start += '<div class="aciTreeIcon ' + itemData.props.icon + '"></div>';
                 }
             }
-            li.append(html + '<div class="aciTreeText">' + itemData.item + '</div></div>');
+            item.append(start + '<div class="aciTreeText">' + itemData.item + '</div></div></div>' + end + '</div>');
             if (itemData.props && (itemData.props.isFolder || (itemData.props.isFolder === null))){
-                li.addClass((itemData.props.isFolder || (itemData.items && itemData.items.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
+                item.addClass((itemData.props.isFolder || (itemData.items && itemData.items.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
             } else {
-                li.addClass('aciTreeFile');
+                item.addClass('aciTreeFile');
             }
-            return li;
+            return item;
+        },
+
+        // remove item
+        _removeItem: function(item){
+            item.first().remove();
         },
 
         // create/add one or more items
@@ -1016,17 +1047,17 @@
                 } else if (after){
                     parent = this.parent(after);
                 }
-                var items = [], li
+                var items = [], item
                 if (itemData instanceof Array){
                     for(var i in itemData){
-                        li = this._createLi(itemData[i]);
-                        this._itemHook(parent, li, itemData[i], level);
-                        items[items.length] = li.get(0);
+                        item = this._createItem(itemData[i], level);
+                        this._itemHook(parent, item, itemData[i], level);
+                        items[items.length] = item.get(0);
                     }
                 } else {
-                    li = this._createLi(itemData);
-                    this._itemHook(parent, li, itemData, level);
-                    items[items.length] = li.get(0);
+                    item = this._createItem(itemData, level);
+                    this._itemHook(parent, item, itemData, level);
+                    items[items.length] = item.get(0);
                 }
                 items = $(items);
                 if (ul){
@@ -1041,14 +1072,25 @@
             return $([]);
         },
 
-        // ensure there is a UL container
-        _ensureUl: function(item){
-            var ul = item.first().children('.aciTreeUl');
-            if (!ul.length){
-                ul = $('<ul class="aciTreeUl" style="display:none"></ul>');
-                item.first().append(ul);
+        // create children container
+        _createContainer: function(item){
+            if (!item){
+                item = this._instance.jQuery;
             }
-            return ul;
+            var container = item.first().children('.aciTreeUl');
+            if (!container.length){
+                container = $('<ul class="aciTreeUl" style="display:none"></ul>');
+                item.first().append(container);
+            }
+            return container;
+        },
+
+        // remove children container
+        _removeContainer: function(item){
+            if (!item){
+                item = this._instance.jQuery;
+            }
+            item.first().children('.aciTreeUl').remove();
         },
 
         // append one or more items to item
@@ -1061,15 +1103,15 @@
             });
             if (item){
                 if (this.isFolder(item)){
-                    var ul = this._ensureUl(item);
-                    var list = this._createItems(ul, null, null, options.itemData, this.level(item) + 1);
+                    var container = this._createContainer(item);
+                    var list = this._createItems(container, null, null, options.itemData, this.level(item) + 1);
                     if (list.length){
                         item.first().addClass('aciTreeFolder').removeClass('aciTreeFolderMaybe');
                         list.each(function(){
                             _this._trigger($(this), 'added');
                         });
                     } else if (!this.hasChildrens(item)){
-                        ul.remove();
+                        container.remove();
                     }
                     this._success(item, options);
                     return list;
@@ -1078,15 +1120,15 @@
                     return $([]);
                 }
             } else {
-                var ul = this._ensureUl(this._instance.jQuery);
-                var list = this._createItems(ul, null, null, options.itemData, 0);
+                var container = this._createContainer();
+                var list = this._createItems(container, null, null, options.itemData, 0);
                 if (list.length){
                     this._animate(null, true, !this._instance.options.animateRoot || options.unanimated);
                     list.each(function(){
                         _this._trigger($(this), 'added');
                     });
                 } else if (!this.hasChildrens()){
-                    ul.remove();
+                    container.remove();
                 }
                 this._success(item, options);
                 return list;
@@ -1255,7 +1297,7 @@
             if (this.isItem(item)){
                 var itemData = this.itemData(item);
                 var oldIcon = itemData.props.icon;
-                var html = item.first().children('.aciTreeItem');
+                var html = item.first().children('.aciTreeLine').find('.aciTreeItem');
                 var found = html.children('.aciTreeIcon');
                 if (found.length){
                     if (icon){
@@ -1299,7 +1341,7 @@
             if (this.isItem(item)){
                 var itemData = this.itemData(item);
                 var oldText = itemData.item;
-                item.first().children('.aciTreeItem').find('.aciTreeText').html(content);
+                item.first().children('.aciTreeLine').find('.aciTreeText').html(content);
                 itemData.item = content;
                 this._trigger(item, 'textset', {
                     oldText: oldText
@@ -1401,6 +1443,30 @@
             return item ? item.first().parent().children('.aciTreeLi').index(item.first()) : null;
         },
 
+        // set item 0 based index
+        setIndex: function(item, index){
+            var oldIndex = this.getIndex(item);
+            if (oldIndex !== null){
+                if (index != oldIndex){
+                    var siblings = this.siblings(item);
+                    if (siblings.length){
+                        if (index < 1){
+                            siblings.first().before(item);
+                        } else if (index > siblings.length){
+                            siblings.last().after(item);
+                        } else {
+                            siblings.eq(index).before(item);
+                        }
+                    }
+                }
+                this._trigger(item, 'indexset', {
+                    oldIndex: oldIndex
+                });
+                return true;
+            }
+            return false;
+        },
+
         // get item text value
         getText: function(item){
             var itemData = this.itemData(item);
@@ -1447,12 +1513,30 @@
             return item.first().children('.aciTreeUl').children('.aciTreeLi:first');
         },
 
+        // test if item is the first one for it's parent
+        isFirst: function(item){
+            if (item){
+                var parent = this.parent(item);
+                return this.first(parent.length ? parent : null).is(item.first());
+            }
+            return false;
+        },
+
         // get last child of item
         last: function(item){
             if (!item){
                 item = this._instance.jQuery;
             }
             return item.first().children('.aciTreeUl').children('.aciTreeLi:last');
+        },
+
+        // test if item is the last one for it's parent
+        isLast: function(item){
+            if (item){
+                var parent = this.parent(item);
+                return this.last(parent.length ? parent : null).is(item.first());
+            }
+            return false;
         },
 
         // test if item is loading
@@ -1495,7 +1579,7 @@
             if (!parent){
                 parent = this._instance.jQuery;
             }
-            return children && parent.has(children);
+            return children && (parent.has(children).length > 0);
         },
 
         // test if parent has immediate children

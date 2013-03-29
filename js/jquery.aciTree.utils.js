@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.1
+ * aciTree jQuery Plugin v3.0.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Fri Mar 22 19:10 2013 +0200
+ * Date: Fri Mar 29 21:20 2013 +0200
  */
 
 (function($){
@@ -22,7 +22,7 @@
         __extend: function(){
             $.extend(this._private, {
                 // the branch queue
-                branchQueue: new this._queue(null, true, this._instance.options.queueDelay)
+                branchQueue: new this._queue(null, true)
             });
             // call the parent
             this._super();
@@ -186,15 +186,33 @@
                         parent.append(item2);
                     }
                 }
+                this._updateLevel(item1);
+                this._updateLevel(item2);
                 this._trigger(null, 'swapped', {
                     item1: item1,
                     item2: item2
                 });
                 return true;
-            } else {
-                this._trigger(null, 'swapfail');
             }
+            this._trigger(null, 'swapfail');
             return false;
+        },
+
+        // update item level
+        _updateLevel: function(item){
+            var level = this.level(item);
+            var count = item.find('.aciTreeBranch').length;
+            if (count < level){
+                var entry = item.find('.aciTreeEntry');
+                for(var i = level - 1; i >= count; i--){
+                    entry.wrap('<div class="aciTreeBranch aciTreeLevel' + i + '"></div>');
+                }
+            } else if (count > level) {
+                var entry = item.find('.aciTreeEntry');
+                for(var i = level; i < count; i++){
+                    entry.unwrap();
+                }
+            }
         },
 
         // move item up
@@ -338,15 +356,15 @@
                         }
                     }
                 } else {
-                    var list = [];
+                    var found = $();
                     this._instance.jQuery.find('.aciTreeLi').each(function(){
                         if (id == _this.getId($(this))){
-                            list[list.length] = this;
+                            found = $(this);
+                            return false;
                         }
                     });
-                    if (list.length){
-                        var found = $(list);
-                        this._success(found, options, found);
+                    if (found.length){
+                        this._success(found, options);
                         return found;
                     }
                 }

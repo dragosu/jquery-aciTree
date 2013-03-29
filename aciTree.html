@@ -28,7 +28,7 @@
 
             <p>Note: in this demo the node loading it's made with a delay so you can see the loading animation. If you want you can remove the delay from the <i>PHP</i> script ;) ...</p>
 
-            <p id="info">Hover over a tree item to show his info ...</p>
+            <p id="info">Hover over a tree item to show his info (using the aciTree API) ...</p>
 
             <div id="tree" class="aciTree"><div class="eyes"></div><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/php/aciTree.php?branch=" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
@@ -38,7 +38,8 @@
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
                     <table cellspacing="0" cellpadding="10" border="0"><tr><td width="300">
                                 <p>Show Branches: <label><input type="radio" name="branches" value="1" /> Yes</label>
-                                    <label><input type="radio" name="branches" value="0" /> No</label></p>
+                                    <label><input type="radio" name="branches" value="0" /> No</label>
+                                    <em>(note: 'show branches' is using CSS)</em></p>
                                 <p>Use Animations: <label><input type="radio" name="animate" value="1" /> Yes</label>
                                     <label><input type="radio" name="animate" value="0" /> No</label></p>
                                 <p>Expand All: <label><input type="radio" name="expand" value="1" /> Yes</label>
@@ -51,6 +52,9 @@
                                     <label><input type="radio" name="empty" value="0" /> No</label></p>
                                 <p>Selectable: <label><input type="radio" name="selectable" value="1" /> Yes</label>
                                     <label><input type="radio" name="selectable" value="0" /> No</label></p>
+                                <p>Full Row: <label><input type="radio" name="fullRow" value="1" /> Yes</label>
+                                    <label><input type="radio" name="fullRow" value="0" /> No</label>
+                                    <em>(note: 'full row' is using JavaScript + CSS)</em></p>
                                 <p>Text Selection: <label><input type="radio" name="textSelection" value="1" /> Enabled</label>
                                     <label><input type="radio" name="textSelection" value="0" /> Disabled</label></p>
 
@@ -76,6 +80,9 @@
                                     <input id="setFolder" type="button" value="Set as Folder" />
                                     <input id="remove" type="button" value="Remove" /></p>
                             </td><td>
+                                <p>Direction: <label><input type="radio" name="direction" value="1" /> LTR</label>
+                                    <label><input type="radio" name="direction" value="0" /> RTL</label>
+                                    <em>(note: 'direction' is using HTML attribute + CSS)</em></p>
                                 <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
                                         <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
 
@@ -101,6 +108,8 @@
                                     <input id="update_folder" type="button" value="Update as Folder" /></p>
                                 <p>Move Item: <input id="move_up" type="button" value="Up" /> <input id="move_down" type="button" value="Down" />
                                     <input id="move_first" type="button" value="First Position" /> <input id="move_last" type="button" value="Last Position" /></p>
+                                <p>Set Index: <input type="text" name="index" value="0" size="23" />
+                                    <input id="set_index" type="button" value="Set Index" /></p>
                                 <p>Swap Item (by ID): <input type="text" name="swap1" value="/document b.txt" /> <br /> with
                                     <input type="text" name="swap2" value="/Item 3" /> <input id="swap" type="button" value="Swap" /></p>
                             </td></tr></table>
@@ -186,9 +195,12 @@
                         case 'moveddown':
                         case 'movedfirst':
                         case 'movedlast':
+                        case 'indexset':
                             log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old index: [' + data.oldIndex + ']</p>');
-                            // make it visible ;)
-                            api.setVisible(item);
+                            if (!api.isVisible(item)){
+                                // make it visible ;)
+                                api.setVisible(item);
+                            }
                             break;
                         default:
                             if (item){
@@ -230,8 +242,8 @@
                     info += 'hasChildrens: ' + treeApi.hasChildrens(item) + ' count: #' + childs.length +
                         ' folders: #' + treeApi.folders(childs).length + ' (open: #' + treeApi.folders(childs, true).length +
                         ' closed: #' + treeApi.folders(childs, false).length + ') files: #' + treeApi.files(childs).length + '\n';
-                    info += 'first [' + treeApi.getId(treeApi.first(item)) + ']\n';
-                    info += 'last [' + treeApi.getId(treeApi.last(item)) + ']\n';
+                    info += 'first [' + treeApi.getId(treeApi.first(item)) + '] isFirst: ' + treeApi.isFirst(item) + '\n';
+                    info += 'last [' + treeApi.getId(treeApi.last(item)) + '] isLast: ' + treeApi.isLast(item) + '\n';
                     info += 'childrens: total: #' + treeApi.childrens(item, true).length + '\n';
                     return info;
                 }
@@ -274,11 +286,13 @@
                 $('[name=empty][value=' + (options.empty ? 1 : 0) + ']').prop('checked', true);
                 $('[name=unique][value=' + (options.unique ? 1 : 0) + ']').prop('checked', true);
                 $('[name=selectable][value=' + (options.selectable ? 1 : 0) + ']').prop('checked', true);
+                $('[name=fullRow][value=' + (options.fullRow ? 1 : 0) + ']').prop('checked', true);
                 $('[name=textSelection][value=' + (options.textSelection ? 1 : 0) + ']').prop('checked', true);
                 $('[name=checkbox][value=' + (options.checkbox ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
                 $('#setCheckbox').attr('disabled', !options.checkbox);
                 $('#setRadio').attr('disabled', !options.radio);
+                $('[name=direction][value=' + (($('#tree').attr('dir') == 'rtl') ? 0 : 1) + ']').prop('checked', true);
 
                 // update options
 
@@ -321,8 +335,16 @@
                     $('#setRadio').attr('disabled', $(this).val() != 1);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=textSelection],[name=checkbox],[name=radio]').click(function(){
-                    $('#tree').aciTree('option', $(this).prop('name'), $(this).val() == 1);
+                $('[name=direction]').click(function(){
+                    $('#tree').attr('dir', ($(this).val() == 1) ? 'ltr' : 'rtl');
+                });
+
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=checkbox],[name=radio]').click(function(){
+                    var option = $(this).prop('name');
+                    $('#tree').aciTree('option', option, $(this).val() == 1);
+                    if (option == 'fullRow'){
+                        $('#tree').toggleClass('aciTreeFullRow', $(this).val() == 1);
+                    }
                 });
 
                 // FORM button functions
@@ -333,8 +355,9 @@
 
                 // update init options based on inputs
                 function updateOptions(){
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=textSelection]:checked,[name=checkbox]:checked,[name=radio]:checked').each(function(){
-                        $.fn.aciTree.defaults[$(this).prop('name')] = $(this).val() == 1;
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=checkbox]:checked,[name=radio]:checked').each(function(){
+                        var option = $(this).prop('name');
+                        $.fn.aciTree.defaults[option] = $(this).val() == 1;
                     });
                 }
 
@@ -995,6 +1018,21 @@
                     var item = isItem();
                     if (item){
                         treeApi.moveLast(item);
+                    } else {
+                        warn(true);
+                    }
+                });
+
+                // set index
+
+                $('#set_index').click(function(){
+                    var item = isItem();
+                    if (item){
+                        var index = parseInt($('[name=index]').val());
+                        if (isNaN(index)){
+                            index = 0;
+                        }
+                        treeApi.setIndex(item, index);
                     } else {
                         warn(true);
                     }
