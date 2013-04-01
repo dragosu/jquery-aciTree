@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.2
+ * aciTree jQuery Plugin v3.0.0-rc.3
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,12 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Fri Mar 29 21:20 2013 +0200
+ * Date: Apr Mon 1 19:20 2013 +0200
+ */
+
+/*
+ * This extension adds item selection/keyboard navigation to aciTree.
+ *
  */
 
 (function($){

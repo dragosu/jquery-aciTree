@@ -13,6 +13,8 @@ Features:
   navigation (the arrow keys, pageup/pagedown, home/end, enter, escape and
   space can be used);
 
+- supports displaying multiple columns without using tables, with RTL support;
+
 - is possible to change the form in which the tree is displayed,
   the items allows HTML formatting;
 
@@ -38,9 +40,9 @@ $(function(){
 
 });
 
-Check out the demos, now with full item row selection and RTL support!
+Check out the demos, now with multiple column support!
 
-aciTree jQuery Plugin v3.0.0-rc.2
+aciTree jQuery Plugin v3.0.0-rc.3
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -49,4 +51,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 Require jQuery Library >= v1.7.1 http://jquery.com
 + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
 
-Date: Fri Mar 29 21:20 2013 +0200
+Date: Apr Mon 1 19:20 2013 +0200

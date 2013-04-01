@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.2
+ * aciTree jQuery Plugin v3.0.0-rc.3
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,12 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Fri Mar 29 21:20 2013 +0200
+ * Date: Apr Mon 1 19:20 2013 +0200
+ */
+
+/*
+ * A few utility functions for aciTree.
+ *
  */
 
 (function($){
@@ -188,6 +193,10 @@
                 }
                 this._updateLevel(item1);
                 this._updateLevel(item2);
+                var parent = this.parent(item1);
+                this._updateFirstLast(parent.length ? parent : null);
+                parent = this.parent(item2);
+                this._updateFirstLast(parent.length ? parent : null);
                 this._trigger(null, 'swapped', {
                     item1: item1,
                     item2: item2
@@ -218,15 +227,7 @@
         // move item up
         moveUp: function(item){
             if (this.isItem(item)){
-                var prev = this.prev(item);
-                var oldIndex = this.getIndex(item);
-                if (prev.length){
-                    prev.before(item.first());
-                }
-                this._trigger(item, 'movedup', {
-                    oldIndex: oldIndex
-                });
-                return true;
+                return this.setIndex(item, this.getIndex(item) - 1);
             }
             return false;
         },
@@ -234,15 +235,7 @@
         // move item down
         moveDown: function(item){
             if (this.isItem(item)){
-                var next = this.next(item);
-                var oldIndex = this.getIndex(item);
-                if (next.length){
-                    next.after(item.first());
-                }
-                this._trigger(item, 'moveddown', {
-                    oldIndex: oldIndex
-                });
-                return true;
+                return this.setIndex(item, this.getIndex(item) + 1);
             }
             return false;
         },
@@ -250,16 +243,7 @@
         // move item in first position
         moveFirst: function(item){
             if (this.isItem(item)){
-                var parent = this.parent(item);
-                if (!parent.length){
-                    parent = this._instance.jQuery;
-                }
-                var oldIndex = this.getIndex(item);
-                parent.children('.aciTreeUl').prepend(item.first());
-                this._trigger(item, 'movedfirst', {
-                    oldIndex: oldIndex
-                });
-                return true;
+                return this.setIndex(item, 0);
             }
             return false;
         },
@@ -267,16 +251,7 @@
         // move item in last position
         moveLast: function(item){
             if (this.isItem(item)){
-                var parent = this.parent(item);
-                if (!parent.length){
-                    parent = this._instance.jQuery;
-                }
-                var oldIndex = this.getIndex(item);
-                parent.children('.aciTreeUl').append(item.first());
-                this._trigger(item, 'movedlast', {
-                    oldIndex: oldIndex
-                });
-                return true;
+                return this.setIndex(item, Number.MAX_VALUE);
             }
             return false;
         },

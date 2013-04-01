@@ -22,46 +22,50 @@
 }
 .aciTree .aciTreeLi {
     display:block;
-    overflow:visible;
+    clear:both;
     white-space:nowrap;
 }
 
 /* the branch line */
 .aciTree .aciTreeBranch {
-    padding-left:20px;
+    padding-left:20px; /* branch indent */
     background:url(../image/tree.png) -134px 0 repeat-y;
 }
 .aciTree[dir=rtl] .aciTreeBranch {
     padding-left:0;
-    padding-right:20px;
+    padding-right:20px; /* branch indent */
     background:url(../image/tree-branch-rtl.png) right 0 repeat-y;
 }
 /* if the parent is the last child on his level (this is level based; added for #8 levels, if you need more ... add them as needed) */
-.aciTree .aciTreeLi.aciTreeLevel0:last-child .aciTreeBranch.aciTreeLevel0,
-.aciTree .aciTreeLi.aciTreeLevel1:last-child .aciTreeBranch.aciTreeLevel1,
-.aciTree .aciTreeLi.aciTreeLevel2:last-child .aciTreeBranch.aciTreeLevel2,
-.aciTree .aciTreeLi.aciTreeLevel3:last-child .aciTreeBranch.aciTreeLevel3,
-.aciTree .aciTreeLi.aciTreeLevel4:last-child .aciTreeBranch.aciTreeLevel4,
-.aciTree .aciTreeLi.aciTreeLevel5:last-child .aciTreeBranch.aciTreeLevel5,
-.aciTree .aciTreeLi.aciTreeLevel6:last-child .aciTreeBranch.aciTreeLevel6,
-.aciTree .aciTreeLi.aciTreeLevel7:last-child .aciTreeBranch.aciTreeLevel7,
-.aciTree .aciTreeLi.aciTreeLevel8:last-child .aciTreeBranch.aciTreeLevel8,
+.aciTree .aciTreeLi.aciTreeLevel0.aciTreeLast .aciTreeBranch.aciTreeLevel0,
+.aciTree .aciTreeLi.aciTreeLevel1.aciTreeLast .aciTreeBranch.aciTreeLevel1,
+.aciTree .aciTreeLi.aciTreeLevel2.aciTreeLast .aciTreeBranch.aciTreeLevel2,
+.aciTree .aciTreeLi.aciTreeLevel3.aciTreeLast .aciTreeBranch.aciTreeLevel3,
+.aciTree .aciTreeLi.aciTreeLevel4.aciTreeLast .aciTreeBranch.aciTreeLevel4,
+.aciTree .aciTreeLi.aciTreeLevel5.aciTreeLast .aciTreeBranch.aciTreeLevel5,
+.aciTree .aciTreeLi.aciTreeLevel6.aciTreeLast .aciTreeBranch.aciTreeLevel6,
+.aciTree .aciTreeLi.aciTreeLevel7.aciTreeLast .aciTreeBranch.aciTreeLevel7,
+.aciTree .aciTreeLi.aciTreeLevel8.aciTreeLast .aciTreeBranch.aciTreeLevel8,
 .aciTree.aciTreeNoBranches .aciTreeBranch {
     background:none;
 }
 /* the branch line behind the button (for the siblings) */
 .aciTree .aciTreeEntry {
+    overflow:auto;
+    margin-right:8px; /* ~ button width/2 */
     background:url(../image/tree.png) -134px 0 repeat-y;
 }
 .aciTree[dir=rtl] .aciTreeEntry {
+    margin-right:0;
+    margin-left:8px; /* ~ button width/2 */
     background:url(../image/tree-branch-rtl.png) right 0 repeat-y;
 }
-.aciTree .aciTreeLi:last-child>.aciTreeLine .aciTreeEntry,
+.aciTree .aciTreeLi.aciTreeLast>.aciTreeLine .aciTreeEntry,
 .aciTree.aciTreeNoBranches .aciTreeEntry {
     background:none;
 }
 
-.aciTree .aciTreeButton, .aciTree .aciTreeItem, .aciTree .aciTreeIcon, .aciTree .aciTreeText {
+.aciTree .aciTreeButton, .aciTree .aciTreeItem, .aciTree .aciTreeIcon, .aciTree .aciTreeText, .aciTree .aciTreeColumn {
     display:inline-block;
     height:20px;
     line-height:20px;
@@ -72,13 +76,37 @@
     padding:0 2px 0 2px;
     border:1px dashed transparent;
     height:auto;
-    max-width:85%;
     white-space:normal;
     cursor:pointer;
+    /* margin-right need to be set to icon width (+ the width of all columns, if any) */
+    margin-right:18px;
+}
+.aciTree[dir=rtl] .aciTreeItem{
+    margin-right:0;
+    /* margin-left need to be set to icon width (+ the width of all columns, if any) */
+    margin-left:18px;
 }
 .aciTree .aciTreeText {
     display:inline;
     height:auto;
+}
+.aciTree .aciTreeColumn {
+    float:right;
+    height:auto;
+    white-space:normal;
+    cursor:default;
+}
+.aciTree[dir=rtl] .aciTreeColumn {
+    float:left;
+}
+
+/* columns width/style (left to right, if any) */
+
+.aciTree .aciTreeColumn0 {
+    width:80px;
+}
+.aciTree .aciTreeColumn1 {
+    width:60px;
 }
 
 /* item selection */
@@ -118,20 +146,45 @@
 }
 
 .aciTree.aciTreeFullRow .aciTreeLine:hover {
-    background-color:#EFF5FD;
+    background: #e3edf9;
+    background: -moz-linear-gradient(top,  #e3edf9 0%, #9cb7d8 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3edf9), color-stop(100%,#9cb7d8));
+    background: -webkit-linear-gradient(top,  #e3edf9 0%,#9cb7d8 100%);
+    background: -o-linear-gradient(top,  #e3edf9 0%,#9cb7d8 100%);
+    background: -ms-linear-gradient(top,  #e3edf9 0%,#9cb7d8 100%);
+    background: linear-gradient(to bottom,  #e3edf9 0%,#9cb7d8 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e3edf9', endColorstr='#9cb7d8',GradientType=0 );
 }
 .aciTree.aciTreeFullRow .aciTreeSelected>.aciTreeLine {
-    background-color:#E8E8E8;
+    background: #f4f4f4;
+    background: -moz-linear-gradient(top,  #f4f4f4 0%, #c6c6c6 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f4f4f4), color-stop(100%,#c6c6c6));
+    background: -webkit-linear-gradient(top,  #f4f4f4 0%,#c6c6c6 100%);
+    background: -o-linear-gradient(top,  #f4f4f4 0%,#c6c6c6 100%);
+    background: -ms-linear-gradient(top,  #f4f4f4 0%,#c6c6c6 100%);
+    background: linear-gradient(to bottom,  #f4f4f4 0%,#c6c6c6 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#c6c6c6',GradientType=0 );
 }
 .aciTree.aciTreeFullRow.aciTreeFocus .aciTreeSelected>.aciTreeLine {
-    background: #84acdd;
-    background: -moz-linear-gradient(top,  #84acdd 0%, #ebf4fe 2%, #d0e5fe 35%, #d0e5fe 79%, #fcfcfc 95%, #7db9e8 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#84acdd), color-stop(2%,#ebf4fe), color-stop(35%,#d0e5fe), color-stop(79%,#d0e5fe), color-stop(95%,#fcfcfc), color-stop(100%,#7db9e8));
-    background: -webkit-linear-gradient(top,  #84acdd 0%,#ebf4fe 2%,#d0e5fe 35%,#d0e5fe 79%,#fcfcfc 95%,#7db9e8 100%);
-    background: -o-linear-gradient(top,  #84acdd 0%,#ebf4fe 2%,#d0e5fe 35%,#d0e5fe 79%,#fcfcfc 95%,#7db9e8 100%);
-    background: -ms-linear-gradient(top,  #84acdd 0%,#ebf4fe 2%,#d0e5fe 35%,#d0e5fe 79%,#fcfcfc 95%,#7db9e8 100%);
-    background: linear-gradient(to bottom,  #84acdd 0%,#ebf4fe 2%,#d0e5fe 35%,#d0e5fe 79%,#fcfcfc 95%,#7db9e8 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#84acdd', endColorstr='#7db9e8',GradientType=0 );
+    background: #d0e5fe;
+    background: -moz-linear-gradient(top,  #d0e5fe 0%, #84acdd 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d0e5fe), color-stop(100%,#84acdd));
+    background: -webkit-linear-gradient(top,  #d0e5fe 0%,#84acdd 100%);
+    background: -o-linear-gradient(top,  #d0e5fe 0%,#84acdd 100%);
+    background: -ms-linear-gradient(top,  #d0e5fe 0%,#84acdd 100%);
+    background: linear-gradient(to bottom,  #d0e5fe 0%,#84acdd 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e5fe', endColorstr='#84acdd',GradientType=0 );
+}
+.aciTree.aciTreeFullRow.aciTreeFocus .aciTreeSelected>.aciTreeLine:hover,
+.aciTree.aciTreeFullRow .aciTreeSelected>.aciTreeLine:hover {
+    background: #c3dbf7;
+    background: -moz-linear-gradient(top,  #c3dbf7 0%, #84a9d6 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c3dbf7), color-stop(100%,#84a9d6));
+    background: -webkit-linear-gradient(top,  #c3dbf7 0%,#84a9d6 100%);
+    background: -o-linear-gradient(top,  #c3dbf7 0%,#84a9d6 100%);
+    background: -ms-linear-gradient(top,  #c3dbf7 0%,#84a9d6 100%);
+    background: linear-gradient(to bottom,  #c3dbf7 0%,#84a9d6 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c3dbf7', endColorstr='#84a9d6',GradientType=0 );
 }
 
 /* checkbox/radio tree */
@@ -140,15 +193,17 @@
     cursor:pointer;
 }
 .aciTree .aciTreeCheckbox input[type=checkbox], .aciTree .aciTreeRadio input[type=radio] {
-    margin:4px 4px 0 4px;
+    margin-left:2px;
+    margin-right:4px;
     padding:0;
-    vertical-align:top;
+    vertical-align:text-bottom;
 }
 .aciTree .aciTreeSelected .aciTreeCheckbox input[type=checkbox], .aciTree .aciTreeSelected .aciTreeRadio input[type=radio] {
     outline: none;
 }
 .aciTree .aciTreeCheckbox input[type=checkbox].aciTreeTristate {
     opacity:0.6;
+    filter: alpha(opacity = 60);
 }
 
 /* default - item in the middle (comment the hover part to keep the same button image) */
@@ -188,31 +243,31 @@
 
 /* if it's the last item in list (comment the hover part to keep the same button image) */
 
-.aciTree .aciTreeLi:last-child>.aciTreeLine .aciTreeButton {
+.aciTree .aciTreeLi.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:0 -60px;
 }
-.aciTree .aciTreeFolderMaybe:last-child>.aciTreeLine .aciTreeButton {
+.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:-16px -60px;
 }
-.aciTree .aciTreeFolderMaybe:last-child>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton:hover {
     background-position:-32px -60px;
 }
-.aciTree .aciTreeFolder:last-child>.aciTreeLine .aciTreeButton {
+.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:-48px -60px;
 }
-.aciTree .aciTreeFolder:last-child>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton:hover {
     background-position:-64px -60px;
 }
-.aciTree .aciTreeOpen:last-child>.aciTreeLine .aciTreeButton {
+.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:-80px -60px;
 }
-.aciTree .aciTreeOpen:last-child>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton:hover {
     background-position:-96px -60px;
 }
 
 /* the item loader */
 
-.aciTree .aciTreeButton>div {
+.aciTree .aciTreeButton>span {
     display:none;
     position:absolute;
     width:16px;
@@ -221,19 +276,19 @@
     top:2px;
     background:url(../image/load-node.gif) 0 0 no-repeat;
 }
-.aciTree[dir=rtl] .aciTreeButton>div {
-    right:0;
+.aciTree[dir=rtl] .aciTreeButton>span {
+    right:-1px;
 }
 .aciTree .aciTreeLoad>.aciTreeLine .aciTreeButton {
     position:relative;
     /* uncomment next line to hide the button while loading */
     /*background:none !important;*/
 }
-.aciTree .aciTreeLoad>.aciTreeLine .aciTreeButton>div {
-    display:block;
+.aciTree .aciTreeLoad>.aciTreeLine .aciTreeButton>span {
+    display:inline-block;
 }
 
-/* tree item icon (do not show by default) */
+/* tree item icon */
 
 .aciTree .aciTreeIcon {
     width:18px;

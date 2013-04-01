@@ -16,6 +16,7 @@
         <script type="text/javascript" src="js/jquery.aciTree.selectable.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.checkbox.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.radio.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.column.js"></script>
     </head>
     <body>
 
@@ -25,6 +26,7 @@
 
             <p>See a checkbox tree demo <a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">here</a></p>
             <p>See a radio-button tree demo <a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">here</a></p>
+            <p>(<span style="color:red">new</span>) See a multiple column tree demo <a href="/demo/aciTree.html" target="_blank" title="aciTree with columns">here</a></p>
 
             <p>Note: in this demo the node loading it's made with a delay so you can see the loading animation. If you want you can remove the delay from the <i>PHP</i> script ;) ...</p>
 
@@ -155,7 +157,13 @@
                                 // a custom item implementation to show the tree level
                                 this.setText(item, itemData.item + ' (' + level + ')');
                             }
-                        }
+                        }/*,
+                        columnData: [{
+                                width: 80,
+                                value: 'column #1'
+                            }, {
+                                value: 'column #2'
+                            }]*/
                     }).aciTree('api');
                 }
 
@@ -191,10 +199,6 @@
                         case 'swapped':
                             log.prepend('<p>' + data.event + ' [' + api.getId(data.item1) + '] <=> [' + api.getId(data.item2) + ']</p>');
                             break;
-                        case 'movedup':
-                        case 'moveddown':
-                        case 'movedfirst':
-                        case 'movedlast':
                         case 'indexset':
                             log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old index: [' + data.oldIndex + ']</p>');
                             if (!api.isVisible(item)){
@@ -530,7 +534,9 @@
                 $('#addChilds').click(function(){
                     if (isTree()){
                         // the Tree is selected, just add a Folder+File
-                        treeApi.append(null, [newFolder(), newFile()]);
+                        treeApi.append(null, {
+                            itemData: [newFolder(), newFile()]
+                        });
                     } else {
                         var item = isItem();
                         if (item){
