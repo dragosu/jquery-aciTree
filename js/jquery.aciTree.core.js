@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.3
+ * aciTree jQuery Plugin v3.0.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 1 19:20 2013 +0200
+ * Date: Apr Wed 3 20:40 2013 +0200
  */
 
 /*
@@ -61,7 +61,7 @@
  *   collapse: true/false -> propagate on close/toggle
  *   unique: true/false -> close other branches (on open/toggle)?
  *   unanimated: true/false -> if it's TRUE then no animations are to be run (used on open/close/toggle)
- *   itemData: NULL/object[item data]/Array[item data] -> used when adding items
+ *   itemData: object[item data]/Array[item data] -> used when adding items
  * }
  *
  * For the callbacks: 'item' can be a single element or NULL (for the ROOT), 'data' can be some useful data returned (depending on the function called).
@@ -160,6 +160,18 @@
                     expand: _this._instance.options.expand,
                     unique: _this._instance.options.unique
                 });
+            }).on('mouseenter' + this._instance.nameSpace + ' mouseleave' + this._instance.nameSpace, '.aciTreeButton', function(e){
+                var element = $(e.target);
+                if (!element.hasClass('aciTreeButton')){
+                    element = element.parents('.aciTreeButton:first');
+                }
+                element.toggleClass('aciTreeHover', e.type == 'mouseenter');
+            }).on('mouseenter' + this._instance.nameSpace + ' mouseleave' + this._instance.nameSpace, '.aciTreeLine', function(e){
+                var element = $(e.target);
+                if (!element.hasClass('aciTreeLine')){
+                    element = element.parents('.aciTreeLine:first');
+                }
+                element.toggleClass('aciTreeHover', e.type == 'mouseenter');
             });
             this._initHook();
             // we keep the _super reference
@@ -614,9 +626,18 @@
                         fail: options.fail,
                         unanimated: options.unanimated
                     });
-                } else {
+                } else if (this.hasSiblings(item)){
                     this._success(item, options);
                     this._removeItem(item);
+                } else {
+                    var parent = this.parent(item);
+                    this.unload(parent.length ? parent : null, {
+                        success: function(){
+                            _this._notify(item, options);
+                        },
+                        fail: options.fail,
+                        unanimated: options.unanimated
+                    });
                 }
             } else {
                 this._fail(item, options);
@@ -628,7 +649,7 @@
             var _this = this;
             if (options.expand){
                 var queue = new this._queue(this._instance.options.threads, true);
-                this.folders(this.childrens(item), false).each(function(){
+                this.folders(this.childrens(item)).each(function(){
                     var item = $(this);
                     queue.push(function(complete){
                         _this.open(item, {
@@ -658,6 +679,7 @@
                 options.unique = false;
             }
             item.first().addClass('aciTreeOpen');
+            this._updateOddEvenChilds(item);
             this._animate(item, true, options.unanimated, function(){
                 _this._openChilds(item, options);
             });
@@ -667,6 +689,10 @@
         open: function(item, options){
             var _this = this;
             options = this._options(options, function(){
+                if (_this.isOpenPath(item)){
+                    _this._updateVisible(item, true);
+                    _this._updateOddEven(item);
+                }
                 _this._trigger(item, 'opened');
             }, function(){
                 _this._trigger(item, 'openfail');
@@ -702,7 +728,7 @@
                 this.unload(item, options);
             } else if (options.collapse){
                 var queue = new this._queue(this._instance.options.threads, true);
-                this.folders(this.childrens(item), true).each(function(){
+                this.folders(this.childrens(item)).each(function(){
                     var item = $(this);
                     queue.push(function(complete){
                         _this.close(item, {
@@ -737,6 +763,10 @@
         close: function(item, options){
             var _this = this;
             options = this._options(options, function(){
+                if (_this.isOpenPath(item)){
+                    _this._updateVisible(item, false);
+                    _this._updateOddEven(item);
+                }
                 _this._trigger(item, 'closed');
             }, function(){
                 _this._trigger(item, 'closefail');
@@ -754,6 +784,29 @@
                 }
             } else {
                 this._fail(item, options);
+            }
+        },
+
+        // update visible state
+        _updateVisible: function(item, state){
+            var _this = this;
+            var childs = this.childrens(item);
+            if (state){
+                this.folders(childs, true).each(function(){
+                    var item = $(this);
+                    if (!item.hasClass('aciTreeVisible')){
+                        _this._updateVisible(item, true);
+                    }
+                });
+                childs.addClass('aciTreeVisible');
+            } else {
+                this.folders(childs, true).each(function(){
+                    var item = $(this);
+                    if (item.hasClass('aciTreeVisible')){
+                        _this._updateVisible(item, false);
+                    }
+                });
+                childs.removeClass('aciTreeVisible');
             }
         },
 
@@ -813,11 +866,7 @@
 
         // test if item is in view
         isVisible: function(item){
-            if (item){
-                if (this.folders(this.path(item), false).length){
-                    // at least a closed parent
-                    return false;
-                };
+            if (this.isOpenPath(item)){
                 var rect = this._instance.jQuery.get(0).getBoundingClientRect();
                 var size = item.first().children('.aciTreeLine').find('.aciTreeItem');
                 var test = size.get(0).getBoundingClientRect();
@@ -855,6 +904,11 @@
             }
         },
 
+        // test if path to item is open
+        isOpenPath: function(item){
+            return item && item.hasClass('aciTreeVisible');
+        },
+
         // get animation speed by element size
         _speedFraction: function(speed, totalSize, required){
             if ((required < totalSize) && totalSize){
@@ -879,7 +933,7 @@
             return speed;
         },
 
-        // make item visible
+        // bring item in view
         setVisible: function(item, options){
             var _this = this;
             options = this._options(options, function(){
@@ -996,12 +1050,46 @@
             }).run(true);
         },
 
-        // update childs first/last
-        _updateFirstLast: function(item){
+        // update first/last state position
+        _updateFirstLast: function(parent, items){
+            if (items){
+                items.removeClass('aciTreeFirst aciTreeLast');
+            }
+            this.first(parent).addClass('aciTreeFirst');
+            this.last(parent).addClass('aciTreeLast');
+        },
+
+        // update odd/even row state
+        _updateOddEven: function(items){
+            var visible = this._instance.jQuery.find('.aciTreeVisible');
+            var index = 0;
+            if (items){
+                items.each(function(){
+                    var found = visible.index(this);
+                    if (found != -1){
+                        index = Math.min(found, index);
+                    }
+                });
+                index = Math.max(index - 1, 0);
+            }
+            var odd = true;
+            if (index > 0){
+                var first = visible.eq(index);
+                if (first.hasClass('aciTreOdd')){
+                    odd = false;
+                }
+                visible = visible.filter(':gt(' + index + ')');
+            }
+            visible.filter(':odd').removeClass(odd ? 'aciTreeEven' : 'aciTreeOdd').addClass(odd ? 'aciTreeOdd' : 'aciTreeEven');
+            visible.filter(':even').removeClass(odd ? 'aciTreeOdd' : 'aciTreeEven').addClass(odd ? 'aciTreeEven' : 'aciTreeOdd');
+        },
+
+        // update odd/even row state
+        _updateOddEvenChilds: function(item){
+            var odd = item.hasClass('aciTreeOdd');
             var childs = this.childrens(item);
-            childs.removeClass('aciTreeFirst aciTreeLast');
-            childs.first().addClass('aciTreeFirst');
-            childs.last().addClass('aciTreeLast');
+            childs.filter(':odd').removeClass(odd ? 'aciTreeEven' : 'aciTreeOdd').addClass(odd ? 'aciTreeOdd' : 'aciTreeEven');
+            childs.filter(':even').removeClass(odd ? 'aciTreeOdd' : 'aciTreeEven').addClass(odd ? 'aciTreeEven' : 'aciTreeOdd');
         },
 
         // process item before inserting into the DOM
@@ -1115,11 +1203,21 @@
             });
             if (item){
                 if (this.isFolder(item)){
+                    var last = this.last(item);
                     var container = this._createContainer(item);
                     var list = this._createItems(container, null, null, options.itemData, this.level(item) + 1);
                     if (list.length){
-                        this._updateFirstLast(item);
                         item.first().addClass('aciTreeFolder').removeClass('aciTreeFolderMaybe');
+                        if (last.length){
+                            last.removeClass('aciTreeLast');
+                        } else {
+                            list.first().addClass('aciTreeFirst');
+                            list.last().addClass('aciTreeLast');
+                        }
+                        if (this.isOpenPath(item) && this.isOpen(item)){
+                            list.addClass('aciTreeVisible');
+                        }
+                        _this._updateOddEven(list.first());
                         list.each(function(){
                             _this._trigger($(this), 'added');
                         });
@@ -1133,14 +1231,22 @@
                     return $([]);
                 }
             } else {
+                var last = this.last();
                 var container = this._createContainer();
                 var list = this._createItems(container, null, null, options.itemData, 0);
                 if (list.length){
-                    this._updateFirstLast();
-                    this._animate(null, true, !this._instance.options.animateRoot || options.unanimated);
+                    if (last.length){
+                        last.removeClass('aciTreeLast');
+                    } else {
+                        list.first().addClass('aciTreeFirst');
+                        list.last().addClass('aciTreeLast');
+                    }
+                    list.addClass('aciTreeVisible').last().addClass('aciTreeLast');
+                    _this._updateOddEven();
                     list.each(function(){
                         _this._trigger($(this), 'added');
                     });
+                    this._animate(null, true, !this._instance.options.animateRoot || options.unanimated);
                 } else if (!this.hasChildrens()){
                     container.remove();
                 }
@@ -1158,10 +1264,17 @@
                 _this._trigger(item, 'beforefail');
             });
             if (this.isItem(item)){
+                var prev = this.prev(item);
                 var list = this._createItems(null, item, null, options.itemData, this.level(item));
                 if (list.length){
-                    var parent = this.parent(item);
-                    this._updateFirstLast(parent.length ? parent : null);
+                    if (!prev.length){
+                        item.removeClass('aciTreeFirst');
+                        list.first().addClass('aciTreeFirst');
+                    }
+                    if (this.isOpenPath(item)){
+                        list.addClass('aciTreeVisible');
+                    }
+                    _this._updateOddEven(list.first());
                     list.each(function(){
                         _this._trigger($(this), 'added');
                     });
@@ -1183,10 +1296,17 @@
                 _this._trigger(item, 'afterfail');
             });
             if (this.isItem(item)){
+                var next = this.next(item);
                 var list = this._createItems(null, null, item, options.itemData, this.level(item));
                 if (list.length){
-                    var parent = this.parent(item);
-                    this._updateFirstLast(parent.length ? parent : null);
+                    if (!next.length){
+                        item.removeClass('aciTreeLast');
+                        list.last().addClass('aciTreeLast');
+                    }
+                    if (this.isOpenPath(item)){
+                        list.addClass('aciTreeVisible');
+                    }
+                    _this._updateOddEven(list.first());
                     list.each(function(){
                         _this._trigger($(this), 'added');
                     });
@@ -1221,6 +1341,20 @@
                 item = this._instance.jQuery;
             }
             return branch ? item.first().find('.aciTreeLi') : item.first().children('.aciTreeUl').children('.aciTreeLi');
+        },
+
+        // filter only the visible items (items with all parents opened)
+        // if 'view' is TRUE then only the items in view are returned
+        visible: function(items, view){
+            var _this = this;
+            items = items.filter('.aciTreeVisible');
+            if (view){
+                var visible = jQuery.grep(items.get(), function(item){
+                    return _this.isVisible($(item));
+                });
+                items = $(visible);
+            }
+            return items;
         },
 
         // filter only folders from items
@@ -1480,7 +1614,8 @@
                             siblings.eq(index).before(item);
                         }
                         var parent = this.parent(item);
-                        this._updateFirstLast(parent.length ? parent : null);
+                        this._updateFirstLast(parent.length ? parent : null, item.add([siblings.get(0), siblings.get(-1)]));
+                        this._updateOddEven(parent);
                     }
                 }
                 this._trigger(item, 'indexset', {
@@ -1656,7 +1791,7 @@
                     clearTimeout(_this._private.loaderHide);
                     clearInterval(_this._private.loaderInterval);
                     _this._destroyHook(true);
-                    _this._instance.jQuery.unbind(_this._instance.nameSpace).off(_this._instance.nameSpace, '.aciTreeButton');
+                    _this._instance.jQuery.unbind(_this._instance.nameSpace).off(_this._instance.nameSpace, '.aciTreeButton').off(_this._instance.nameSpace, '.aciTreeLine');
                     _this._instance.jQuery.toggleClass('aciTreeLoad', false);
                     _this._instance.locked = false;
                     // call the parent

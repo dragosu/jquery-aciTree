@@ -15,8 +15,8 @@ Features:
 
 - supports displaying multiple columns without using tables, with RTL support;
 
-- is possible to change the form in which the tree is displayed,
-  the items allows HTML formatting;
+- is possible to change the form in which the tree is displayed, the items
+  allows HTML formatting, the odd/even rows can be styled differently;
 
 - you can specify an ICON image for each item (background-position-x and
   background-position-y can be included so that you can use a single image
@@ -40,9 +40,9 @@ $(function(){
 
 });
 
-Check out the demos, now with multiple column support!
+Check out the demos, now with odd/even styling support!
 
-aciTree jQuery Plugin v3.0.0-rc.3
+aciTree jQuery Plugin v3.0.0-rc.4
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -51,4 +51,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 Require jQuery Library >= v1.7.1 http://jquery.com
 + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
 
-Date: Apr Mon 1 19:20 2013 +0200
+Date: Apr Wed 3 20:40 2013 +0200

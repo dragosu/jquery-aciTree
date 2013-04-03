@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.3
+ * aciTree jQuery Plugin v3.0.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 1 19:20 2013 +0200
+ * Date: Apr Wed 3 20:40 2013 +0200
  */
 
 /*
@@ -192,11 +192,14 @@
                     }
                 }
                 this._updateLevel(item1);
-                this._updateLevel(item2);
                 var parent = this.parent(item1);
-                this._updateFirstLast(parent.length ? parent : null);
+                this._updateFirstLast(parent.length ? parent : null, item1.add(item2));
+                this._updateVisibleState(parent.length ? parent : null, item1);
+                this._updateLevel(item2);
                 parent = this.parent(item2);
-                this._updateFirstLast(parent.length ? parent : null);
+                this._updateFirstLast(parent.length ? parent : null, item2.add(item1));
+                this._updateVisibleState(parent.length ? parent : null, item2);
+                this._updateOddEven(item1.add(item2));
                 this._trigger(null, 'swapped', {
                     item1: item1,
                     item2: item2
@@ -221,6 +224,22 @@
                 for(var i = level; i < count; i++){
                     entry.unwrap();
                 }
+            }
+        },
+
+        // update item visible state
+        _updateVisibleState: function(parent, item){
+            if (parent){
+                if (this.isOpenPath(parent) && this.isOpen(parent)){
+                    item.first().addClass('aciTreeVisible');
+                    this._updateVisible(item, true);
+                } else {
+                    this._updateVisible(item, false);
+                    item.first().removeClass('aciTreeVisible');
+                }
+            } else {
+                item.first().addClass('aciTreeVisible');
+                this._updateVisible(item, true);
             }
         },
 

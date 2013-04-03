@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.3
+ * aciTree jQuery Plugin v3.0.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 1 19:20 2013 +0200
+ * Date: Apr Wed 3 20:40 2013 +0200
  */
 
 /*
@@ -51,24 +51,28 @@
 
         // override _initHook
         _initHook: function(){
-            // check column width
-            var index = 0, width = 0, found = false, data;
-            for(var i in this._instance.options.columnData){
-                data = this._instance.options.columnData[i];
-                if (typeof data.width != 'undefined') {
-                    width += data.width;
-                    found = true;
-                } else {
-                    // get it from CSS
-                    width += this._getCss(['aciTree', 'aciTreeColumn' + index], 'width', true);
+            if (this._instance.options.columnData.length){
+                // check column width
+                var index = 0, width = 0, found = false, data;
+                for(var i in this._instance.options.columnData){
+                    data = this._instance.options.columnData[i];
+                    if (typeof data.width != 'undefined') {
+                        width += data.width;
+                        found = true;
+                    } else {
+                        // get it from CSS
+                        width += this._getCss(['aciTree', 'aciTreeColumn' + index], 'width', true);
+                    }
+                    index++;
                 }
-                index++;
-            }
-            if (found){
-                // at least a column width set
-                var icon = this._getCss(['aciTree', 'aciTreeIcon'], 'width', true);
-                this._updateCss('.aciTree .aciTreeItem', 'margin-right:' + (icon + width) + 'px;');
-                this._updateCss('.aciTree[dir=rtl] .aciTreeItem', 'margin-left:' + (icon + width) + 'px;');
+                if (found){
+                    // at least a column width set
+                    var icon = this._getCss(['aciTree', 'aciTreeIcon'], 'width', true);
+                    // add item padding
+                    width += this._getCss(['aciTree', 'aciTreeItem'], 'padding-left', true) + this._getCss(['aciTree', 'aciTreeItem'], 'padding-right', true);
+                    this._updateCss('.aciTree .aciTreeItem', 'margin-right:' + (icon + width) + 'px;');
+                    this._updateCss('.aciTree[dir=rtl] .aciTreeItem', 'margin-left:' + (icon + width) + 'px;');
+                }
             }
             // call the parent
             this._super();
@@ -116,13 +120,15 @@
 
         // override _itemHook
         _itemHook: function(parent, item, itemData, level){
-            var position = item.children('.aciTreeLine').find('.aciTreeEntry');
-            var index = 0, data, column;
-            for(var i in this._instance.options.columnData){
-                data = this._instance.options.columnData[i];
-                column = this._createColumn(itemData, data, index);
-                position.prepend(column);
-                index++;
+            if (this._instance.options.columnData.length){
+                var position = item.children('.aciTreeLine').find('.aciTreeEntry');
+                var index = 0, data, column;
+                for(var i in this._instance.options.columnData){
+                    data = this._instance.options.columnData[i];
+                    column = this._createColumn(itemData, data, index);
+                    position.prepend(column);
+                    index++;
+                }
             }
             // call the parent
             this._super(parent, item, itemData, level);

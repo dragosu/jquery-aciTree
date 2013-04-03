@@ -40,8 +40,7 @@
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
                     <table cellspacing="0" cellpadding="10" border="0"><tr><td width="300">
                                 <p>Show Branches: <label><input type="radio" name="branches" value="1" /> Yes</label>
-                                    <label><input type="radio" name="branches" value="0" /> No</label>
-                                    <em>(note: 'show branches' is using CSS)</em></p>
+                                    <label><input type="radio" name="branches" value="0" /> No</label></p>
                                 <p>Use Animations: <label><input type="radio" name="animate" value="1" /> Yes</label>
                                     <label><input type="radio" name="animate" value="0" /> No</label></p>
                                 <p>Expand All: <label><input type="radio" name="expand" value="1" /> Yes</label>
@@ -55,8 +54,7 @@
                                 <p>Selectable: <label><input type="radio" name="selectable" value="1" /> Yes</label>
                                     <label><input type="radio" name="selectable" value="0" /> No</label></p>
                                 <p>Full Row: <label><input type="radio" name="fullRow" value="1" /> Yes</label>
-                                    <label><input type="radio" name="fullRow" value="0" /> No</label>
-                                    <em>(note: 'full row' is using JavaScript + CSS)</em></p>
+                                    <label><input type="radio" name="fullRow" value="0" /> No</label></p>
                                 <p>Text Selection: <label><input type="radio" name="textSelection" value="1" /> Enabled</label>
                                     <label><input type="radio" name="textSelection" value="0" /> Disabled</label></p>
 
@@ -83,8 +81,9 @@
                                     <input id="remove" type="button" value="Remove" /></p>
                             </td><td>
                                 <p>Direction: <label><input type="radio" name="direction" value="1" /> LTR</label>
-                                    <label><input type="radio" name="direction" value="0" /> RTL</label>
-                                    <em>(note: 'direction' is using HTML attribute + CSS)</em></p>
+                                    <label><input type="radio" name="direction" value="0" /> RTL</label></p>
+                                <p>(<span style="color:red">new</span>) Odd/Even Rows: <label><input type="radio" name="oddeven" value="1" /> Yes</label>
+                                    <label><input type="radio" name="oddeven" value="0" /> No</label></p>
                                 <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
                                         <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
 
@@ -162,6 +161,7 @@
                                 width: 80,
                                 value: 'column #1'
                             }, {
+                                width:80,
                                 value: 'column #2'
                             }]*/
                     }).aciTree('api');
@@ -248,7 +248,11 @@
                         ' closed: #' + treeApi.folders(childs, false).length + ') files: #' + treeApi.files(childs).length + '\n';
                     info += 'first [' + treeApi.getId(treeApi.first(item)) + '] isFirst: ' + treeApi.isFirst(item) + '\n';
                     info += 'last [' + treeApi.getId(treeApi.last(item)) + '] isLast: ' + treeApi.isLast(item) + '\n';
-                    info += 'childrens: total: #' + treeApi.childrens(item, true).length + '\n';
+                    // the next are commented because of the low performance
+                    //var allChilds = treeApi.childrens(null, true);
+                    info += 'childrens: #' + childs.length + /*' (total: #' + allChilds.length + ')' +*/ '\n';
+                    /*info += 'visible: #' + treeApi.visible(childs).length + ' in view: #' + treeApi.visible(childs, true).length +
+                        ' (total: #' + treeApi.visible(allChilds).length + ' total in view: #' + treeApi.visible(allChilds, true).length + ')\n';*/
                     return info;
                 }
 
@@ -297,6 +301,7 @@
                 $('#setCheckbox').attr('disabled', !options.checkbox);
                 $('#setRadio').attr('disabled', !options.radio);
                 $('[name=direction][value=' + (($('#tree').attr('dir') == 'rtl') ? 0 : 1) + ']').prop('checked', true);
+                $('[name=oddeven][value=' + ($('#tree').hasClass('aciTreeColors') ? 1 : 0) + ']').prop('checked', true);
 
                 // update options
 
@@ -341,6 +346,10 @@
 
                 $('[name=direction]').click(function(){
                     $('#tree').attr('dir', ($(this).val() == 1) ? 'ltr' : 'rtl');
+                });
+
+                $('[name=oddeven]').click(function(){
+                    $('#tree').toggleClass('aciTreeColors', $(this).val() == 1);
                 });
 
                 $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=checkbox],[name=radio]').click(function(){

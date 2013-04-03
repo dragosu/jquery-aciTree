@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.3
+ * aciTree jQuery Plugin v3.0.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 1 19:20 2013 +0200
+ * Date: Apr Wed 3 20:40 2013 +0200
  */
 
 /*

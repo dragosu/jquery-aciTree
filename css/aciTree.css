@@ -29,7 +29,7 @@
 /* the branch line */
 .aciTree .aciTreeBranch {
     padding-left:20px; /* branch indent */
-    background:url(../image/tree.png) -134px 0 repeat-y;
+    background:url(../image/tree.png) -130px 0 repeat-y;
 }
 .aciTree[dir=rtl] .aciTreeBranch {
     padding-left:0;
@@ -51,13 +51,10 @@
 }
 /* the branch line behind the button (for the siblings) */
 .aciTree .aciTreeEntry {
-    overflow:auto;
-    margin-right:8px; /* ~ button width/2 */
-    background:url(../image/tree.png) -134px 0 repeat-y;
+    overflow:hidden;
+    background:url(../image/tree.png) -130px 0 repeat-y;
 }
 .aciTree[dir=rtl] .aciTreeEntry {
-    margin-right:0;
-    margin-left:8px; /* ~ button width/2 */
     background:url(../image/tree-branch-rtl.png) right 0 repeat-y;
 }
 .aciTree .aciTreeLi.aciTreeLast>.aciTreeLine .aciTreeEntry,
@@ -78,13 +75,13 @@
     height:auto;
     white-space:normal;
     cursor:pointer;
-    /* margin-right need to be set to icon width (+ the width of all columns, if any) */
-    margin-right:18px;
+    /* margin-right need to be set to icon width + item padding (+ the width of all columns, if any) */
+    margin-right:22px;
 }
 .aciTree[dir=rtl] .aciTreeItem{
     margin-right:0;
-    /* margin-left need to be set to icon width (+ the width of all columns, if any) */
-    margin-left:18px;
+    /* margin-left need to be set to icon width + item padding (+ the width of all columns, if any) */
+    margin-left:22px;
 }
 .aciTree .aciTreeText {
     display:inline;
@@ -111,7 +108,7 @@
 
 /* item selection */
 
-.aciTree .aciTreeItem:hover {
+.aciTree .aciTreeLine.aciTreeHover .aciTreeItem {
     background-color:#EFF5FD;
     border:1px dashed #D9D9D9;
     -webkit-border-radius:3px;
@@ -132,7 +129,7 @@
 
 /* full row selection */
 
-.aciTree.aciTreeFullRow .aciTreeItem:hover {
+.aciTree.aciTreeFullRow .aciTreeLine.aciTreeHover .aciTreeItem {
     background:none;
     border:1px dashed transparent;
 }
@@ -145,7 +142,7 @@
     border:1px dashed transparent;
 }
 
-.aciTree.aciTreeFullRow .aciTreeLine:hover {
+.aciTree.aciTreeFullRow .aciTreeLine.aciTreeHover {
     background: #e3edf9;
     background: -moz-linear-gradient(top,  #e3edf9 0%, #9cb7d8 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3edf9), color-stop(100%,#9cb7d8));
@@ -175,8 +172,8 @@
     background: linear-gradient(to bottom,  #d0e5fe 0%,#84acdd 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e5fe', endColorstr='#84acdd',GradientType=0 );
 }
-.aciTree.aciTreeFullRow.aciTreeFocus .aciTreeSelected>.aciTreeLine:hover,
-.aciTree.aciTreeFullRow .aciTreeSelected>.aciTreeLine:hover {
+.aciTree.aciTreeFullRow.aciTreeFocus .aciTreeSelected>.aciTreeLine.aciTreeHover,
+.aciTree.aciTreeFullRow .aciTreeSelected>.aciTreeLine.aciTreeHover {
     background: #c3dbf7;
     background: -moz-linear-gradient(top,  #c3dbf7 0%, #84a9d6 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c3dbf7), color-stop(100%,#84a9d6));
@@ -210,9 +207,12 @@
 
 .aciTree .aciTreeButton {
     width:16px;
+    margin-left:4px;
     background:url(../image/tree.png) 0 -20px no-repeat;
 }
 .aciTree[dir=rtl] .aciTreeButton {
+    margin-left:0;
+    margin-right:4px;
     background:url(../image/tree-rtl.png) 0 -20px no-repeat;
 }
 .aciTree.aciTreeNoBranches .aciTreeButton {
@@ -225,19 +225,19 @@
 .aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton {
     background-position:-16px -20px;
 }
-.aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton.aciTreeHover {
     background-position:-32px -20px;
 }
 .aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton {
     background-position:-48px -20px;
 }
-.aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton.aciTreeHover {
     background-position:-64px -20px;
 }
 .aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton {
     background-position:-80px -20px;
 }
-.aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton.aciTreeHover {
     background-position:-96px -20px;
 }
 
@@ -249,19 +249,19 @@
 .aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:-16px -60px;
 }
-.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover {
     background-position:-32px -60px;
 }
 .aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:-48px -60px;
 }
-.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover {
     background-position:-64px -60px;
 }
 .aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton {
     background-position:-80px -60px;
 }
-.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton:hover {
+.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover {
     background-position:-96px -60px;
 }
 
@@ -310,14 +310,33 @@
 .aciTree .aciTreeIcon.folder {
     background-position:-112px 0 !important;
 }
-.aciTree .aciTreeItem:hover .aciTreeIcon.folder {
+.aciTree .aciTreeLine.aciTreeHover .aciTreeIcon.folder {
     /* comment next line to keep the same icon on hover */
     background-position:-112px -20px !important;
 }
 .aciTree .aciTreeIcon.file {
     background-position:-112px -40px !important;
 }
-.aciTree .aciTreeItem:hover .aciTreeIcon.file {
+.aciTree .aciTreeLine.aciTreeHover .aciTreeIcon.file {
     /* comment next line to keep the same icon on hover */
     background-position:-112px -60px !important;
+}
+
+/* demo row colors */
+
+.aciTree.aciTreeColors .aciTreeOdd>.aciTreeLine {
+    /* odd rows */
+    background-color:#FFFFC4;
+}
+.aciTree.aciTreeColors .aciTreeEven>.aciTreeLine {
+    /* even rows */
+    background-color:#CAFFCA;
+}
+.aciTree.aciTreeColors .aciTreeFirst>.aciTreeLine {
+    /* first item on each level */
+    /*background-color:#B0DFFF;*/
+}
+.aciTree.aciTreeColors .aciTreeLast>.aciTreeLine {
+    /* last item on each level */
+    /*background-color:#FFCEFF;*/
 }
