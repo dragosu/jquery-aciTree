@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.4
+ * aciTree jQuery Plugin v3.0.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,22 +9,19 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Wed 3 20:40 2013 +0200
+ * Date: Apr Mon 15 20:10 2013 +0200
  */
 
 /*
  * This extension adds checkbox support to aciTree.
  *
- * The are a few extra keys for the 'props' entry:
+ * The are a few extra keys for the item data:
  *
  * {
  *   ...
- *   props: {                           // a list of item properties
- *     ...
- *     checkbox: true,                  // TRUE means the item will have a checkbox
- *     checked: false,                  // if should be checked or not
- *     checkboxName: 'check_field'      // the checkbox name attribute ('options.checkboxName' will be used by default)
- *   },
+ *   checkbox: true,                    // TRUE means the item will have a checkbox
+ *   checked: false,                    // if should be checked or not
+ *   checkboxName: 'check_field'        // the checkbox name attribute ('options.checkboxName' will be used by default)
  *   ...
  * }
  *
@@ -49,20 +46,20 @@
         // init checkbox
         _initCheckbox: function(){
             var _this = this;
-            this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(e, api, item, data){
-                switch (data.event){
+            this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options){
+                switch (eventName){
                     case 'loaded':
                         if (item){
-                            _this._loadCheckbox(item);
+                            api._loadCheckbox(item);
                         }
                         break;
                     case 'focused':
                         // support 'selectable' extension
-                        _this._checkbox(_this.selected()).focus();
+                        api._checkbox(api.selected()).focus();
                         break;
                     case 'selected':
                         // support 'selectable' extension
-                        _this._checkbox(item).focus();
+                        api._checkbox(item).focus();
                         break;
                 }
             }).bind('keydown' + this._private.nameSpace, function(e){
@@ -70,7 +67,7 @@
                     case 9: // tab
                     case 32: // space
                         // support 'selectable' extension
-                        if (_this.isSelected){
+                        if (_this.isSelectable){
                             var selected = _this.selected();
                             if (_this.hasCheckbox(selected)){
                                 if (_this._lastFocus().get(0) == _this._instance.jQuery.get(0)){
@@ -86,20 +83,24 @@
                     var item = _this.itemFrom(e.target);
                     if (_this.hasCheckbox(item)){
                         _this._checkbox(item).focus();
-                        _this.check(item, !_this.isChecked(item));
+                        _this.check(item, {
+                            check: !_this.isChecked(item)
+                        });
                         e.preventDefault();
                     }
                 }
             }).on('focus' + this._private.nameSpace, 'input[type=checkbox]', function(e){
                 // support 'selectable' extension
                 var item = _this.itemFrom(e.target);
-                if (_this.isSelected && !_this.isSelected(item)){
+                if (_this.isSelectable && !_this.isSelected(item)){
                     _this.select(item, true);
                 }
             }).on('click' + this._private.nameSpace, 'input[type=checkbox]', function(e){
                 // update item states
                 var item = _this.itemFrom(e.target);
-                _this.check(item, $(this).is(':checked'));
+                _this.check(item, {
+                    check: $(this).is(':checked')
+                });
             }).on('keydown' + this._private.nameSpace, 'input[type=checkbox]', function(e){
                 // prevent key handling
                 switch (e.which){
@@ -118,7 +119,7 @@
                     case 9: // tab
                     case 32: // space
                         // support 'selectable' extension
-                        if (_this.isSelected){
+                        if (_this.isSelectable){
                             var item = _this.itemFrom(e.target);
                             if (!_this.isSelected(item)){
                                 return false;
@@ -137,7 +138,7 @@
 
         // override _initHook
         _initHook: function(){
-            if (this._instance.options.checkbox){
+            if (this.isCheckbox()){
                 this._initCheckbox();
             }
             // call the parent
@@ -146,10 +147,10 @@
 
         // override _itemHook
         _itemHook: function(parent, item, itemData, level){
-            if (this._instance.options.checkbox){
+            if (this.isCheckbox()){
                 // support 'radio' extension
-                var radio = this.hasRadio && this.hasRadio(item);
-                if (!radio && ((itemData.props && itemData.props.checkbox) || !itemData.props || (typeof itemData.props.checkbox == 'undefined'))){
+                var radio = this.isRadio && this.hasRadio(item);
+                if (!radio && (itemData.checkbox || (typeof itemData.checkbox == 'undefined'))){
                     this._addCheckbox(item, itemData);
                 }
             }
@@ -157,27 +158,26 @@
         },
 
         // support selectable
-        _selectHook: function(item){
-            var result = this._super(item);
-            if ((typeof result != 'undefined') && !result){
-                return false;
+        _selectHook: function(unselected, selected){
+            var result = this._super(unselected, selected);
+            if (result){
+                return true;
             }
-            var selected = this.selected();
-            if (!this.hasCheckbox(selected) && this.hasCheckbox(item)){
-                var checkbox = this._checkbox(item);
+            if (this.isCheckbox() && this.hasCheckbox(unselected) && !this.hasCheckbox(selected)){
+                var checkbox = this._checkbox(unselected);
                 if (checkbox.is(':focus')){
                     checkbox.blur();
                     this._instance.jQuery.focus();
-                    return false;
+                    return true;
                 }
             }
         },
 
         // add item checkbox
         _addCheckbox: function(item, itemData){
-            var name = itemData.props && itemData.props.checkboxName ? itemData.props.checkboxName : this._instance.options.checkboxName;
+            var name = itemData.checkboxName ? itemData.checkboxName : this._instance.options.checkboxName;
             item.first().addClass('aciTreeCheckbox').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="checkbox" name="' +
-                name + '" value="' + this.getId(item) + '"' + (itemData.props && itemData.props.checked ? ' checked="checked"' : '') + ' />');
+                name + '" value="' + this.getId(item) + '"' + (itemData.checked ? ' checked="checked"' : '') + ' />');
         },
 
         // remove item checkbox
@@ -190,13 +190,14 @@
         },
 
         // override setId
-        setId: function(item, id){
-            var result = this._super(item, id);
-            if (result && this.hasCheckbox(item)){
-                // update field value
-                this._checkbox(item).attr('value', id);
-            }
-            return result;
+        setId: function(item, options){
+            options = this._options(options, function(item){
+                if (this.isCheckbox() && this.hasCheckbox(item)){
+                    // update field value
+                    this._checkbox(item).attr('value', this.getId(item));
+                }
+            });
+            this._super(item, options);
         },
 
         // update item on load
@@ -261,7 +262,7 @@
         },
 
         // change new checkbox state by parents/childrens
-        _stateCheckbox: function(item){
+        _stateCheckbox: function(item, options){
             var parent = this.parent(item);
             var list = this.checkboxes(this.childrens(item));
             var checked = this.checkboxes(list, true);
@@ -278,9 +279,11 @@
                         }
                     } else {
                         this._checkbox(item).prop('checked', true);
-                        this._trigger(item, 'checkboxadded');
+                        this._trigger(item, 'checkboxadded', options);
                         if (list.length && !checked.length){
-                            this.check(item, true);
+                            this.check(item, this._inner(options, {
+                                check: true
+                            }));
                         }
                         return;
                     }
@@ -296,46 +299,77 @@
                     this._parentCheckbox(checked);
                 }
             }
-            this._trigger(item, 'checkboxadded');
+            this._trigger(item, 'checkboxadded', options);
         },
 
         // set item with/without a checkbox
-        setCheckbox: function(item, checkbox, name, state){
-            if (checkbox == this.hasCheckbox(item)){
-                if (checkbox){
-                    if  (typeof name != 'undefined'){
-                        // change name
-                        this._checkbox(item).attr('name', name ? name : this._instance.options.checkboxName);
-                        this._trigger(item, 'nameset');
-                    }
-                    if  (typeof state != 'undefined'){
-                        // change state
-                        this.check(item, state);
-                    }
+        // options.checkbox if there will be a checkbox or not
+        // options.checked the new state (if set)
+        // options.checkboxName the new name (if set)
+        setCheckbox: function(item, options){
+            options = this._options(options, null, function(){
+                this._trigger(item, 'checkboxfail', options);
+            });
+            if (this.isCheckbox() && this.isItem(item)){
+                if (!this._trigger(item, 'beforecheckbox', options)){
+                    this._fail(item, options);
+                    return;
                 }
-            } else if (checkbox){
-                // support 'radio' extension
-                if (this.setRadio && this.hasRadio(item)){
-                    this.setRadio(item, false);
-                }
-                this._addCheckbox(item, {
-                    id: this.getId(item),
-                    props: {
-                        hasCheckbox: true,
-                        checkboxName: name
+                var checkbox = !!options.checkbox;
+                var checked = options.checked;
+                var checkboxName = options.checkboxName;
+                if (checkbox == this.hasCheckbox(item)){
+                    if (checkbox){
+                        if  (typeof checkboxName != 'undefined'){
+                            // change name
+                            this._checkbox(item).attr('name', checkboxName ? checkboxName : this._instance.options.checkboxName);
+                        }
+                        if  (typeof checked != 'undefined'){
+                            // change state
+                            this.check(item, this._inner(options, {
+                                check: checked
+                            }));
+                        }
+                        this._trigger(item, 'checkboxset', options);
+                    } else {
+                        this._trigger(item, 'notcheckbox', options);
                     }
-                });
-                if  (typeof state == 'undefined'){
-                    this._stateCheckbox(item);
+                    this._success(item, options);
+                } else if (checkbox){
+                    var process = function(){
+                        this._addCheckbox(item, {
+                            id: this.getId(item),
+                            checkboxName: checkboxName
+                        });
+                        if  (typeof checked == 'undefined'){
+                            this._stateCheckbox(item, options);
+                        } else {
+                            // change state
+                            this.check(item, this._inner(options, {
+                                check: checked
+                            }));
+                            this._trigger(item, 'checkboxadded', options);
+                        }
+                        this._success(item, options);
+                    };
+                    // support 'radio' extension
+                    if (this.isRadio && this.hasRadio(item)){
+                        this.setRadio(item, this._inner(options, {
+                            success: process,
+                            fail: options.fail,
+                            radio: false
+                        }));
+                    } else {
+                        process.apply(this);
+                    }
                 } else {
-                    this._trigger(item, 'checkboxadded');
-                    // change state
-                    this.check(item, state);
+                    this._removeCheckbox(item);
+                    this._parentCheckbox(item);
+                    this._trigger(item, 'checkboxremoved', options);
+                    this._success(item, options);
                 }
             } else {
-                this._removeCheckbox(item);
-                this._parentCheckbox(item);
-                this._trigger(item, 'checkboxremoved');
+                this._fail(item, options);
             }
         },
 
@@ -352,41 +386,55 @@
         },
 
         // (un)check item
-        check: function(item, state){
-            if (this.hasCheckbox(item)){
-                this._checkbox(item).prop('checked', state);
+        // options.check is the new state
+        check: function(item, options){
+            options = this._options(options, null, function(){
+                this._trigger(item, 'checkfail', options);
+            });
+            if (this.isCheckbox() && this.hasCheckbox(item)){
+                if (!this._trigger(item, 'beforecheck', options)){
+                    this._fail(item, options);
+                    return;
+                }
+                var check = options.check;
+                this._checkbox(item).prop('checked', check);
                 this._childCheckbox(item);
                 this._parentCheckbox(item);
-                this._trigger(item, state ? 'checked' : 'unchecked');
-                return true;
+                this._trigger(item, check ? 'checked' : 'unchecked', options);
+                this._success(item, options);
+            } else {
+                // support 'radio' extension
+                if (this._super){
+                    this._super(item, options);
+                } else {
+                    this._fail(item, options);
+                }
             }
-            // support 'radio' extension
-            if (this._super){
-                return this._super(item, state);
-            }
-            return false;
         },
 
         // filter items with checkbox by state (if set)
         checkboxes: function(items, state){
             var _this = this, list = [];
-            if (this._instance.options.checkbox){
-                if (typeof state == 'undefined'){
-                    return items.filter('.aciTreeCheckbox');
-                }
-                items.filter('.aciTreeCheckbox').each(function(){
-                    if (state == _this._checkbox($(this)).is(':checked')){
-                        list[list.length] = this;
-                    }
-                });
+            if (typeof state == 'undefined'){
+                return items.filter('.aciTreeCheckbox');
             }
+            items.filter('.aciTreeCheckbox').each(function(){
+                if (state == _this._checkbox($(this)).is(':checked')){
+                    list[list.length] = this;
+                }
+            });
             return $(list);
+        },
+
+        // test if checkbox is enabled
+        isCheckbox: function(){
+            return this._instance.options.checkbox;
         },
 
         // override set option
         option: function(option, value){
             if (this.wasInit() && !this.isLocked()){
-                if ((option == 'checkbox') && (value != this._instance.options.checkbox)) {
+                if ((option == 'checkbox') && (value != this.isCheckbox())) {
                     if (value){
                         this._initCheckbox();
                     } else {

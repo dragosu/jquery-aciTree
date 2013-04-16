@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.4
+ * aciTree jQuery Plugin v3.0.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Wed 3 20:40 2013 +0200
+ * Date: Apr Mon 15 20:10 2013 +0200
  */
 
 /*
@@ -17,7 +17,7 @@
  *
  * In this version there is no extra public API functionality added, just
  * a new option: 'columnData' to tell what are the columns and show one or
- * more values that will be read from the 'itemData.props'.
+ * more values that will be read from the 'itemData'.
  *
  * Column data is a array of column definitions, each column definition is
  * one object:
@@ -30,9 +30,8 @@
  *
  * where the 'width' is the column width in [px], if undefined - then the value
  * from the CSS will be used; the 'props' is the property name that will be
- * read from the 'itemData.props', if undefined or the
- * 'itemData.props[column.props]' is undefined, then a default value will be
- * set for the column: the 'value'.
+ * read from the 'itemData', if undefined or the 'itemData[column.props]'
+ * is undefined, then a default value will be set for the column: the 'value'.
  *
  */
 
@@ -136,7 +135,7 @@
 
         _createColumn: function(itemData, columnData, index){
             var style = (typeof columnData.width != 'undefined') ? ' style="width:' + columnData.width + 'px"' : '';
-            var value = columnData.props && itemData.props && (typeof itemData.props[columnData.props] != 'undefined') ? itemData.props[columnData.props] :
+            var value = columnData.props && (typeof itemData[columnData.props] != 'undefined') ? itemData[columnData.props] :
             ((typeof columnData.value == 'undefined') ? '' : columnData.value);
             return $('<div class="aciTreeColumn aciTreeColumn' + index + '"' + style + '>' + (value.length ? value : '&nbsp;') + '</div>');
         }

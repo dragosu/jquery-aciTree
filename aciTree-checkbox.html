@@ -20,7 +20,7 @@
 
         <div>
 
-            <p>A little checkbox demo. The <b>isCheckbox</b> flag need to be set for each item into the JSON data (into 'props.isCheckbox') when
+            <p>A little checkbox demo. The <b>isCheckbox</b> flag need to be set for each item into the JSON data when
                 both checkbox and radio extensions are included.<br />
                 By default, all items will have a checkbox (if <b>isCheckbox</b> is missing from the JSON data).</p>
 
@@ -41,7 +41,9 @@
             <div class="log">Tree Log... <a class="clear_log" style="font-size:10px" href="#" title="Clear the LOG" target="_blank">clear log</a>
                 <div></div></div>
 
-            <script language="javascript" type="text/javascript">
+            <div style="clear:both"><pre style="padding:30px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>
+
+            <script id="code" type="text/javascript">
 
                 $(function(){
 
@@ -62,14 +64,22 @@
                         unique: true
                     });
 
+                });
+
+            </script>
+
+            <script type="text/javascript">
+
+                $(function(){
+
                     var log = $('.log div');
 
                     // write to log
-                    $('#tree,#tree-combined').on('acitree', function(e, api, item, data){
+                    $('#tree,#tree-combined').on('acitree', function(event, api, item, eventName, options){
                         if (api.isItem(item)){
-                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + ']</p>');
+                            log.prepend('<p>' + eventName + ' [' + api.getId(item) + ']</p>');
                         } else {
-                            log.prepend('<p>' + data.event + ' [tree]</p>');
+                            log.prepend('<p>' + eventName + ' [tree]</p>');
                         }
                     });
 
@@ -83,6 +93,16 @@
             </script>
 
         </div>
+
+        <script type="text/javascript">
+
+            $(function(){
+
+                $('pre').text($('#code').text());
+
+            });
+
+        </script>
 
     </body>
 </html>

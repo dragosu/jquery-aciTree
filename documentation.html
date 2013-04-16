@@ -1,0 +1,1145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="language" content="en" />
+        <title>aciTree v3.0.0-rc.5 - A treeview control with jQuery</title>
+        <meta name="description" content="aciTree API documentation" />
+        <style type="text/css">
+            html {
+                height: 100%;
+            }
+            html * {
+                margin:0;
+                padding:0;
+            }
+            body {
+                color:#036;
+                font-family:Verdana, Geneva, sans-serif;
+                font-size:14px;
+                max-width:900px;
+                height: 100%;
+                background-color:#eee;
+                margin:20px auto 20px auto;
+            }
+            a, a:visited {
+                color:#333;
+            }
+            a:hover {
+                text-decoration:none;
+            }
+            .body {
+                width:100%;
+                min-height:100%;
+            }
+            ul {
+                list-style:outside;
+                list-style-type:circle;
+                margin:20px 0 20px 18px;
+            }
+            li {
+                margin:4px 0 4px 0;
+            }
+            h1, h2, h3 {
+                color:#930;
+                margin:30px 0 20px 0;
+            }
+            h1 {
+                font-size:1.2em;
+            }
+            h2 {
+                font-size:1.1em;
+            }
+            h3 {
+                font-size:1em;
+            }
+            p {
+                margin-top:10px;
+                margin-bottom:10px;
+            }
+            .api-extensions label {
+                display:inline-block;
+                width:270px;
+                padding-right: 10px;
+                height:25px;
+                font-weight:bold;
+                cursor:pointer;
+            }
+            .api-events label {
+                display:inline-block;
+                width:140px;
+                padding-right: 10px;
+                height:25px;
+                font-weight:bold;
+                color:#993300;
+            }
+            .api {
+                padding:10px 0 10px 0;
+            }
+            .api>div {
+                margin:10px 0 10px 0;
+                opacity:0.9;
+            }
+            .api>div:hover {
+                opacity:1;
+            }
+            .api>div em {
+                color:#993300;
+                font-weight:bold;
+            }
+            .api div span {
+                display:block;
+                font-weight:bold;
+                margin:10px 0 10px 0;
+            }
+            .api div>span:first-child {
+                background-color:#003366;
+                color:#fff;
+                line-height:30px;
+                padding-left:10px;
+            }
+            .api div>span:first-child>span {
+                padding-left:10px;
+                font-style:italic;
+                font-size:0.9em;
+                color:#ccc;
+            }
+            .api div>span:first-child a {
+                float:right;
+                color:#fff;
+                font-weight:bold;
+                text-decoration:none;
+                padding-right:10px;
+                font-size:12px;
+            }
+            .api div span>span {
+                font-weight:normal;
+                display:inline;
+            }
+            .api div span.where>span {
+                display:block;
+                font-weight:bold;
+            }
+            .api div span.where {
+                display:block;
+                font-weight:normal !important;
+                padding-left:40px;
+            }
+            .api div>span.where {
+                display:block;
+            }
+            .api div ul {
+                list-style:none;
+                margin:0;
+                display:inline;
+            }
+            .api div ul>li {
+                padding-left:40px;
+            }
+            .api div ul>li:first-child {
+                display:inline;
+                padding-left:0;
+            }
+            .api div ul>li:last-child {
+                padding-left:0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>aciTree API v3.0.0-rc.5</h1>
+
+       <div class="api"><span class="toc"><a title=".after (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.after">.after -  Add a new item or a list of items after item...</a><br><a title=".ajaxLoad (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.ajaxLoad">.ajaxLoad -  Loads a node with AJAX (if not already loaded)...</a><br><a title=".append (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.append">.append -  Add one or more childrens to item, the new items are added at the end...</a><br><a title=".before (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.before">.before -  Add a new item or a list of items before item...</a><br><a title=".branch (item, callback, load) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.check">.check -  Set a checkbox or radio-button in the checked/unchecked state...</a><br><a title=".checkboxes (items, state) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".childrens (item, branch)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.childrens">.childrens -  Returns a list of childrens from item.
+                    
+                </a><br><a title=".close (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.close">.close -  Closes the item node and all his childrens (if requested)...</a><br><a title=".closeOthers (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.closeOthers">.closeOthers -  Closes all other nodes less the item...</a><br><a title=".destroy (options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.destroy">.destroy -  Destroys the treeview control, .isLocked will return TRUE from the start until...</a><br><a title=".edit (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.edit">.edit -  Enters or exits the editable mode (optionally saving the changes made)...</a><br><a title=".edited () " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.edited">.edited -  Returns the edited LI element.
+                </a><br><a title=".files (items)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.files">.files -  Filter items and return only the 'file' items...</a><br><a title=".first (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.first">.first -  Returns the first children of item.
+                    
+                </a><br><a title=".folders (items, state)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.folders">.folders -  Filter items and return only the 'folder' items...</a><br><a title=".getIcon (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.getIcon">.getIcon -  Returns the item ICON (or NULL if does not exist)...</a><br><a title=".getId (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.getId">.getId -  Returns the item ID (or NULL if does not exists)...</a><br><a title=".getIndex (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.getIndex">.getIndex -  Returns the index starting from 0 for the item (or NULL if does not exists)...</a><br><a title=".getLabel (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.getLabel">.getLabel -  Returns the text value of item (or NULL if does not exists)...</a><br><a title=".hasCheckbox (item) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasCheckbox">.hasCheckbox -  Returns TRUE if the item has a checkbox.
+                    
+                </a><br><a title=".hasChildrens (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasChildrens">.hasChildrens -  Returns TRUE if the item has childrens.
+                    
+                </a><br><a title=".hasFocus (item) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasFocus">.hasFocus -  Returns TRUE if the treeview control has the focus.
+                </a><br><a title=".hasNext (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasNext">.hasNext -  Returns TRUE if there is at least a element after item (belonging to the same...</a><br><a title=".hasParent (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasParent">.hasParent -  Returns TRUE if item has a parent.
+                    
+                </a><br><a title=".hasPrev (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasPrev">.hasPrev -  Returns TRUE if there is at least a element before item (belonging to the same...</a><br><a title=".hasRadio (item) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasRadio">.hasRadio -  Returns TRUE if the item has a radio.
+                    
+                </a><br><a title=".hasSiblings (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.hasSiblings">.hasSiblings -  Returns TRUE if item has siblings on the same level (belonging to the same...</a><br><a title=".init (options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.init">.init -  Init the treeview control (if not initialized already), .isLocked will return...</a><br><a title=".isBusy (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isBusy">.isBusy -  Returns TRUE if the item node is loading.
+                    
+                </a><br><a title=".isChecked (item) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isChecked">.isChecked -  Returns TRUE if the item is checked.
+                    
+                </a><br><a title=".isChildren (parent, children)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isChildren">.isChildren -  Returns TRUE if children have parent as parent...</a><br><a title=".isClosed (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isClosed">.isClosed -  Returns TRUE if the item node is closed.
+                    
+                </a><br><a title=".isEdited (item) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isEdited">.isEdited -  Returns TRUE if the item is edited right now...</a><br><a title=".isFile (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isFile">.isFile -  Returns TRUE if item is a 'file' (does not have any childrens)...</a><br><a title=".isFirst (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isFirst">.isFirst -  Returns TRUE if item is the first item for its parent...</a><br><a title=".isFolder (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isFolder">.isFolder -  Returns TRUE if item is a 'folder' (has childrens)...</a><br><a title=".isImmediateChildren (parent, children)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isImmediateChildren">.isImmediateChildren -  Returns TRUE if children have parent as direct parent...</a><br><a title=".isItem (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isItem">.isItem -  Returns TRUE if item is a valid item.
+                    
+                </a><br><a title=".isLast (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isLast">.isLast -  Returns TRUE if item is the last item for its parent...</a><br><a title=".isLocked ()" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isLocked">.isLocked -  Returns TRUE if the treeview control is in the init or destroy operation...</a><br><a title=".isOpen (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isOpen">.isOpen -  Returns TRUE if the item node is opened.
+                    
+                </a><br><a title=".isOpenPath (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isOpenPath">.isOpenPath -  Returns TRUE if the path to item is open (all the parent nodes are open)...</a><br><a title=".isSelected (item) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isSelected">.isSelected -  Returns TRUE if the item is selected.
+                    
+                </a><br><a title=".isVisible (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.isVisible">.isVisible -  Returns TRUE if item is visible (if all parent nodes are opened and the item...</a><br><a title=".itemFrom (element)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.itemFrom">.itemFrom -  Returns the LI that contains the element.
+                    
+                </a><br><a title=".last (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.last">.last -  Returns the last children of item.
+                    
+                </a><br><a title=".level (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.level">.level -  Returns the item level starting from 0 for the ones in ROOT (or -1 if does not...</a><br><a title=".loadFrom (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.loadFrom">.loadFrom -  Loads a node from a JavaScript variable (if not already loaded)...</a><br><a title=".moveDown (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.moveDown">.moveDown -  Move item down with a position (inside the same parent)...</a><br><a title=".moveFirst (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.moveFirst">.moveFirst -  Move item at the beginning (inside the same parent)...</a><br><a title=".moveLast (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.moveLast">.moveLast -  Move item at the end (inside the same parent)...</a><br><a title=".moveUp (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.moveUp">.moveUp -  Move item up with a position (inside the same parent)...</a><br><a title=".next (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.next">.next -  Returns the next element from item (belonging to the same parent)...</a><br><a title=".open (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.open">.open -  Opens the item node and all his childrens (if requested)...</a><br><a title=".openPath (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.openPath">.openPath -  Opens the entire path till item...</a><br><a title=".option (option, value)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.option">.option -  Set a option at runtime (after init).
+                    
+                </a><br><a title=".options ()" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.options">.options -  Returns the init options (including any new value assigned with option)...</a><br><a title=".parent (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.parent">.parent -  Returns the parent of item.
+                    
+                </a><br><a title=".path (item, reverse)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.path">.path -  Returns a list of parent items till item (starting from ROOT)...</a><br><a title=".prev (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.prev">.prev -  Returns the previous element from item (belonging to the same parent)...</a><br><a title=".radios (items, state) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.radios">.radios -  Filter items and return only the items with a radio-button...</a><br><a title=".remove (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.remove">.remove -  Remove item (including the childrens)...</a><br><a title=".sameParent (item1, item2)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.sameParent">.sameParent -  Returns TRUE if item1 and item2 have the same direct parent...</a><br><a title=".sameTopParent (item1, item2)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.sameTopParent">.sameTopParent -  Returns TRUE if item1 and item2 have the same parent on level 0...</a><br><a title=".searchId (path, load, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.searchId">.searchId -  Searches and returns the LI element with a ID...</a><br><a title=".select (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.select">.select -  Selects/deselects one item.
+                    
+                    Notifies...</a><br><a title=".selected () " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.selected">.selected -  Returns the selected LI element.
+                </a><br><a title=".setCheckbox (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setCheckbox">.setCheckbox -  Set item with or without a checkbox...</a><br><a title=".setFile (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setFile">.setFile -  Transforms item in a 'file'.
+                    
+                    .setFile...</a><br><a title=".setFolder (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setFolder">.setFolder -  Transforms item in a 'folder'...</a><br><a title=".setIcon (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setIcon">.setIcon -  Set the ICON image for item.
+                    
+                    Notifies...</a><br><a title=".setId (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setId">.setId -  Set the item ID.
+                    
+                    Notifies with the...</a><br><a title=".setIndex (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setIndex">.setIndex -  Set the item index.
+                    
+                    Notifies with the...</a><br><a title=".setLabel (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setLabel">.setLabel -  Set the item text content.
+                    
+                    Notifies...</a><br><a title=".setRadio (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setRadio">.setRadio -  Set item with or without a radio-button...</a><br><a title=".setVisible (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.setVisible">.setVisible -  Brings item into the view...</a><br><a title=".siblings (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.siblings">.siblings -  Returns a list of item siblings (belonging to the same parent)...</a><br><a title=".swap (options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.swap">.swap -  Exchanges two items (the items can't be child and parent)...</a><br><a title=".toggle (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.toggle">.toggle -  Opens or closes the item node...</a><br><a title=".topParent (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.topParent">.topParent -  Returns the parent on the level 0 for item...</a><br><a title=".unload (item, options)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.unload">.unload -  Removes all the item childrens...</a><br><a title=".update (item, options) " href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.update">.update -  Update the item, changes the ID, text value, the icon and (optional) loads the...</a><br><a title=".visible (items, view)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.visible">.visible -  Filter items and return only the visible items (the items with all parent...</a><br><a title=".wasInit ()" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.wasInit">.wasInit -  Returns TRUE if the treeview control was initialized.
+                </a><br><a title=".wasLoad (item)" href="http://dev.acoderinsights.ro/en/aciTree-tree-view-with-jQuery#.wasLoad">.wasLoad -  Returns TRUE if item was loaded.
+                    
+                </a><br></span>
+
+                <a name=".after"></a><div data-ext="core"><span>.after (item, options)</span> Add a new item or a list of items after <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> after which the new elements are added
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    itemData: <ul><li>object/array {</li><li>                                    id: (string) unique item ID,</li><li>                                    label: (string) item text value,</li><li>                                            isFolder: (boolean) <i>TRUE</i> if has childrens,</li><li>                                            icon: (string) CSS class name or Array(CSS class, background-position-x, background-position-y)</li><li>                                    }</li></ul></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.items</b> - a list of <i>LI</i> elements (the new added ones).<br>
+                    <b>options.itemData</b> can be an array of objects to add many items at once. <b>.after</b> adds only one level, if you want to add childrens to the new nodes -
+                    you can use <b>.loadFrom</b> (or they will be loaded by default when the nodes will be opened, using <b>.ajaxLoad</b>).
+                    </span>
+                    <b>.after</b> calls <b>options.callbacks.item</b> for each item and notifies regarding the add (after changing the DOM) with the <em>added</em> event.
+                    Notifies with the <em>appended</em> and <em>appendfail</em> events if the operation was successful or not. The operation can be canceled by
+                    returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeafter</em>.
+                </div>
+
+                <a name=".ajaxLoad"></a><div data-ext="core"><span>.ajaxLoad (item, options)</span> Loads a node with AJAX (if not already loaded).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> node to be loaded (or <i>NULL</i> for ROOT)
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The loading with AJAX take place when the nodes are opened for the first time. <b>.ajaxLoad</b> can be called to force
+                        loading a node. The node need to be of type <i>folder</i> and not already loaded. If the node was loaded and you want to reload it -
+                        you'll need to call <b>.unload</b> before calling <b>.ajaxLoad</b>.
+                        The JSON data is requested from the address configured in the init options <b>options.jsonUrl</b> and adding the ID of the node to be loaded at the end.
+                        Are added as many levels as defined in the JSON.
+                        <b>Note</b>: if the operation fails then the node will be made of type <i>file</i> by default.
+                    </span>
+                    <b>.ajaxLoad</b> calls <b>.append</b> for adding the items.
+                    Notifies with the <em>loaded</em> and <em>loadfail</em> events if the operation was successful or not and with the <em>wasloaded</em>
+                    if the node was loaded already. The operation can be canceled by
+                    returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeload</em>.<br>
+                    See <b>.loadFrom</b> for loading from a JavaScript variable (instead of AJAX).
+                </div>
+
+                <a name=".append"></a><div data-ext="core"><span>.append (item, options)</span> Add one or more childrens to <b>item</b>, the new items are added at the end.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to add the childrens to (or <i>NULL</i> for ROOT)
+                        <span>options<span> <ul><li>object/array {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    itemData: <ul><li>object {</li><li>                                    id: (string) unique item ID,</li><li>                                    label: (string) item text value,</li><li>                                            isFolder: (boolean) <i>TRUE</i> if has childrens,</li><li>                                            icon: (string) CSS class name or Array(CSS class, background-position-x, background-position-y)</li><li>                                    }</li></ul></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.items</b> - a list of <i>LI</i> elements (the new added ones).<br>
+                    <b>options.itemData</b> can be an array of objects to add many items at once. <b>.append</b> adds only one level, if you want to add childrens to the new nodes -
+                    you can use <b>.loadFrom</b> (or they will be loaded by default when the nodes will be opened, using <b>.ajaxLoad</b>).
+                    </span>
+                    <b>.append</b> calls <b>options.callbacks.item</b> for each item and notifies regarding the add (after the DOM is changed) with the <em>added</em> event.
+                    Notifies with the <em>appended</em> and <em>appendfail</em> events if the operation was successful or not. The operation can be canceled by
+                    returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeappend</em>.
+                </div>
+
+                <a name=".before"></a><div data-ext="core"><span>.before (item, options)</span> Add a new item or a list of items before <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> before which the new elements are added
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    itemData: <ul><li>object/array {</li><li>                                    id: (string) unique item ID,</li><li>                                    label: (string) item text value,</li><li>                                            isFolder: (boolean) <i>TRUE</i> if has childrens,</li><li>                                            icon: (string) CSS class name or Array(CSS class, background-position-x, background-position-y)</li><li>                                    }</li></ul></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.items</b> - a list of <i>LI</i> elements (the new added ones).<br>
+                    <b>options.itemData</b> can be an array of objects to add many items at once. <b>.before</b> adds only one level, if you want to add childrens to the new nodes -
+                    you can use <b>.loadFrom</b> (or they will be loaded by default when the nodes will be opened, using <b>.ajaxLoad</b>).
+                    </span>
+                    <b>.before</b> calls <b>options.callbacks.item</b> for each item and notifies regarding the add (after the DOM is changed) with the <em>added</em> event.
+                    Notifies with the <em>before</em> and <em>beforefail</em> events if the operation was successful or not. The operation can be canceled by
+                    returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforebefore</em>.
+                </div>
+
+                <a name=".branch"></a><div data-ext="utils extension"><span>.branch (item, callback, load) <span>utils extension</span></span> Run a callback function for every children of <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
+                        <span>callback<span> function (api, item)</span></span>
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                        </span>
+                        <span>load<span> (boolean)</span></span> if <i>TRUE</i> then all - not yet loaded - nodes will be loaded and the
+                        <i>callback</i> will be run for their childrens too
+                    </span>
+                    <b>.branch</b> calls <b>.ajaxLoad</b> when it needs to load a node.
+                </div>
+
+                <a name=".check"></a><div data-ext="checkbox/radio extension" data-ext1="checkbox extension" data-ext2="radio extension"><span>.check (item, options) <span>checkbox/radio extension</span></span> Set a checkbox or radio-button in the checked/unchecked state.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    check: (bool) the new state</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    Notifies with the <em>checked</em> and <em>unchecked</em> events about the new element state. The operation can be canceled by
+                    returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforecheck</em>.
+                </div>
+
+                <a name=".checkboxes"></a><div data-ext="checkbox extension"><span>.checkboxes (items, state) <span>checkbox extension</span></span> Filter <b>items</b> and return only the items with a checkbox.
+                    <span class="where">
+                        where:
+                        <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
+                        <span>state<span> (boolean)</span></span> if set, returns only the elements in the checked/unchecked state (TRUE/FALSE)
+                    </span>
+                </div>
+
+
+                <a name=".childrens"></a><div data-ext="core"><span>.childrens (item, branch)</span> Returns a list of childrens from <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
+                        <span>branch<span> (boolean)</span></span> if <i>TRUE</i> then all <b>item</b> childrens are returned (not only
+                        the direct ones)
+                    </span>
+                </div>
+
+                <a name=".close"></a><div data-ext="core"><span>.close (item, options)</span> Closes the <b>item</b> node and all his childrens (if requested).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be closed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    collapse: (boolean) if <i>TRUE</i> then all childrens will be closed too,</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    If the initialization option <b>options.empty</b> is <b>TRUE</b> then all childrens are removed (<b>.unload</b> will be called).
+                    Notifies with the <em>closed</em> and <em>closefail</em> events if the operation was successful or not and with <em>wasclosed</em> if was closed already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeclose</em>.
+                </div>
+
+                <a name=".closeOthers"></a><div data-ext="core"><span>.closeOthers (item, options)</span> Closes all other nodes less the <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to remain open
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.closeOthers</b> calls <b>.close</b> to close all needed nodes.
+                </div>
+
+                <a name=".destroy"></a><div data-ext="core"><span>.destroy (options)</span> Destroys the treeview control, <b>.isLocked</b> will return <i>TRUE</i> from the start until the end of the operation.
+                    <span class="where">
+                        where:
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.destroy</b> calls <b>.unload</b> for ROOT and notifies with the <em>notinit</em> event if the treeview control was not initialized yet.
+                    Notifies with the <em>destroyed</em> and <em>destroyfail</em> events if the operation was successful or not.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforedestroy</em>.
+                </div>
+
+                <a name=".edit"></a><div data-ext="editable extension"><span>.edit (item, options) <span>editable extension</span></span> Enters or exits the editable mode (optionally saving the changes made).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be edited/exit from the edit mode
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    edit: (boolean) if <i>TRUE</i> then the edit will begin,</li><li>                                    save: (boolean) if <i>TRUE</i> then any changes will be saved</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.edit</b> calls <b>.setLabel</b> to save the changes.
+                    Notifies with the <em>editstart</em> and <em>editstop</em> when it enters/exits from the edit mode, with <em>wasedit</em> if was in the edit mode already and
+                    with <em>editfail</em> if the operation failed.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeedit</em>.
+                </div>
+
+                <a name=".edited"></a><div data-ext="editable extension"><span>.edited () <span>editable extension</span></span> Returns the edited <i>LI</i> element.
+                </div>
+
+                <a name=".files"></a><div data-ext="core"><span>.files (items)</span> Filter <b>items</b> and return only the 'file' items.
+                    <span class="where">
+                        where:
+                        <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
+                    </span>
+                </div>
+
+                <a name=".first"></a><div data-ext="core"><span>.first (item)</span> Returns the first children of <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
+                    </span>
+                </div>
+
+                <a name=".folders"></a><div data-ext="core"><span>.folders (items, state)</span> Filter <b>items</b> and return only the 'folder' items.
+                    <span class="where">
+                        where:
+                        <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
+                        <span>state<span> (boolean)</span></span> if set, returns only the nodes in the open/closed state (TRUE/FALSE)
+                    </span>
+                </div>
+
+                <a name=".getIcon"></a><div data-ext="core"><span>.getIcon (item)</span> Returns the <b>item</b> ICON (or NULL if does not exist).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                    Can return a string or array (depending on the init value).
+                </div>
+
+                <a name=".getId"></a><div data-ext="core"><span>.getId (item)</span> Returns the <b>item</b> ID (or NULL if does not exists).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".getIndex"></a><div data-ext="core"><span>.getIndex (item)</span> Returns the index starting from 0 for the <b>item</b> (or NULL if does not exists).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".getLabel"></a><div data-ext="core"><span>.getLabel (item)</span> Returns the text value of <b>item</b> (or NULL if does not exists).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".hasCheckbox"></a><div data-ext="checkbox extension"><span>.hasCheckbox (item) <span>checkbox extension</span></span> Returns <i>TRUE</i> if the <b>item</b> has a checkbox.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".hasChildrens"></a><div data-ext="core"><span>.hasChildrens (item)</span> Returns <i>TRUE</i> if the <b>item</b> has childrens.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
+                    </span>
+                </div>
+
+                <a name=".hasFocus"></a><div data-ext="selectable extension"><span>.hasFocus (item) <span>selectable extension</span></span> Returns <i>TRUE</i> if the treeview control has the focus.
+                </div>
+
+                <a name=".hasNext"></a><div data-ext="core"><span>.hasNext (item)</span> Returns <i>TRUE</i> if there is at least a element after <b>item</b> (belonging to the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".hasParent"></a><div data-ext="core"><span>.hasParent (item)</span> Returns <i>TRUE</i> if <b>item</b> has a parent.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".hasPrev"></a><div data-ext="core"><span>.hasPrev (item)</span> Returns <i>TRUE</i> if there is at least a element before <b>item</b> (belonging to the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".hasRadio"></a><div data-ext="radio extension"><span>.hasRadio (item) <span>radio extension</span></span> Returns <i>TRUE</i> if the <b>item</b> has a radio.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".hasSiblings"></a><div data-ext="core"><span>.hasSiblings (item)</span> Returns <i>TRUE</i> if <b>item</b> has siblings on the same level (belonging to the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".init"></a><div data-ext="core"><span>.init (options)</span> Init the treeview control (if not initialized already), <b>.isLocked</b> will return <i>TRUE</i> from the start until the end of the operation.
+                    <span class="where">
+                        where:
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.init</b> calls <b>.loadFrom</b> or <b>.ajaxLoad</b> depending on the init options and notifies with the <em>wasinit</em> event
+                    if was initialized already.
+                    Notifies with the <em>init</em> and <em>initfail</em> events if the operation was successful or not.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeinit</em>.
+                </div>
+
+                <a name=".isBusy"></a><div data-ext="core"><span>.isBusy (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is loading.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
+                    </span>
+                </div>
+
+                <a name=".isChecked"></a><div data-ext="checkbox/radio extension" data-ext1="checkbox extension" data-ext2="radio extension"><span>.isChecked (item) <span>checkbox/radio extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is checked.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isChildren"></a><div data-ext="core"><span>.isChildren (parent, children)</span> Returns <i>TRUE</i> if <b>children</b> have <b>parent</b> as parent.
+                    <span class="where">
+                        where:
+                        <span>parent<span> jQuery object</span></span> the parent <i>LI</i>
+                        <span>children<span> jQuery object</span></span> the child <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isClosed"></a><div data-ext="core"><span>.isClosed (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is closed.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isEdited"></a><div data-ext="editable extension"><span>.isEdited (item) <span>editable extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is edited right now.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isFile"></a><div data-ext="core"><span>.isFile (item)</span> Returns <i>TRUE</i> if <b>item</b> is a 'file' (does not have any childrens).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isFirst"></a><div data-ext="core"><span>.isFirst (item)</span> Returns <i>TRUE</i> if <b>item</b> is the first item for its parent.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isFolder"></a><div data-ext="core"><span>.isFolder (item)</span> Returns <i>TRUE</i> if <b>item</b> is a 'folder' (has childrens).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isImmediateChildren"></a><div data-ext="core"><span>.isImmediateChildren (parent, children)</span> Returns <i>TRUE</i> if <b>children</b> have <b>parent</b> as direct parent.
+                    <span class="where">
+                        where:
+                        <span>parent<span> jQuery object</span></span> the parent <i>LI</i>
+                        <span>children<span> jQuery object</span></span> the child <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isItem"></a><div data-ext="core"><span>.isItem (item)</span> Returns <i>TRUE</i> if <b>item</b> is a valid item.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isLast"></a><div data-ext="core"><span>.isLast (item)</span> Returns <i>TRUE</i> if <b>item</b> is the last item for its parent.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isLocked"></a><div data-ext="core"><span>.isLocked ()</span> Returns <i>TRUE</i> if the treeview control is in the <b>init</b> or <b>destroy</b> operation.
+                </div>
+
+                <a name=".isOpen"></a><div data-ext="core"><span>.isOpen (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is opened.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isOpenPath"></a><div data-ext="core"><span>.isOpenPath (item)</span> Returns <i>TRUE</i> if the path to <b>item</b> is open (all the parent nodes are open).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isSelected"></a><div data-ext="selectable extension"><span>.isSelected (item) <span>selectable extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is selected.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isVisible"></a><div data-ext="core"><span>.isVisible (item)</span> Returns <i>TRUE</i> if <b>item</b> is visible (if all parent nodes are opened and the item it's in the visible area).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".itemFrom"></a><div data-ext="core"><span>.itemFrom (element)</span> Returns the <i>LI</i> that contains the <b>element</b>.
+                    <span class="where">
+                        where:
+                        <span>element<span> jQuery object</span></span> a child element for <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".last"></a><div data-ext="core"><span>.last (item)</span> Returns the last children of <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
+                    </span>
+                </div>
+
+                <a name=".level"></a><div data-ext="core"><span>.level (item)</span> Returns the <b>item</b> level starting from 0 for the ones in ROOT (or -1 if does not exists).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".loadFrom"></a><div data-ext="core"><span>.loadFrom (item, options)</span> Loads a node from a <i>JavaScript</i> variable (if not already loaded).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be loaded (or <i>NULL</i> for ROOT)
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used,</li><li>                                    itemData: <ul><li>(array) [ object {</li><li>                                    id: (string) unique item ID,</li><li>                                    label: (string) item text value,</li><li>                                            isFolder: (boolean) <i>TRUE</i> if has childrens,</li><li>                                            open: (boolean) if <i>TRUE</i> then the node will be opened,</li><li>                                            icon: (string) CSS class name or Array(CSS class, background-position-x, background-position-y)</li><li>                                    childs: (array) a list of childrens (in the same format as <i>itemData</i>)</li><li>                                    }, ... ]</li></ul></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        <b>.loadFrom</b> can be called to load a node from a <i>JavaScript</i> variable.
+                        The node need to be of type <i>folder</i> and not already loaded. If the node was loaded and you want to reload it -
+                        you'll need to call <b>.unload</b> before calling <b>.loadFrom</b>. Are added as many levels as defined in the <i>JavaScript</i> variable.
+                        <b>Note</b>: if the operation fails then the node will be made of type <i>file</i> by default.
+                    </span>
+                    <b>.loadFrom</b> calls <b>.append</b> to add the items.
+                    Notifies with the <em>loaded</em> and <em>loadfail</em> events if the operation was successful or not and with the <em>wasloaded</em>
+                    if the node was loaded already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeload</em>.<br>
+                    See <b>.ajaxLoad</b> for loading with AJAX.
+                </div>
+
+                <a name=".moveDown"></a><div data-ext="utils extension"><span>.moveDown (item, options) <span>utils extension</span></span> Move <b>item</b> down with a position (inside the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.oldIndex</b> - the item old index (starting with 0).
+                    </span>
+                    <b>.moveDown</b> calls <b>.setIndex</b> to change item position.
+                </div>
+
+                <a name=".moveFirst"></a><div data-ext="utils extension"><span>.moveFirst (item, options) <span>utils extension</span></span> Move <b>item</b> at the beginning (inside the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.oldIndex</b> - the item old index (starting with 0).
+                    </span>
+                    <b>.moveFirst</b> calls <b>.setIndex</b> to change item position.
+                </div>
+
+                <a name=".moveLast"></a><div data-ext="utils extension"><span>.moveLast (item, options) <span>utils extension</span></span> Move <b>item</b> at the end (inside the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.oldIndex</b> - the item old index (starting with 0).
+                    </span>
+                    <b>.moveLast</b> calls <b>.setIndex</b> to change item position.
+                </div>
+
+                <a name=".moveUp"></a><div data-ext="utils extension"><span>.moveUp (item, options) <span>utils extension</span></span> Move <b>item</b> up with a position (inside the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties:<br>
+                        <b>options.oldIndex</b> - the item old index (starting with 0).
+                    </span>
+                    <b>.moveUp</b> calls <b>.setIndex</b> to change item position.
+                </div>
+
+                <a name=".next"></a><div data-ext="core"><span>.next (item)</span> Returns the next element from <b>item</b> (belonging to the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".open"></a><div data-ext="core"><span>.open (item, options)</span> Opens the <b>item</b> node and all his childrens (if requested).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be opened
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unique: (boolean) if <i>TRUE</i> then all other nodes are closed,</li><li>                                    expand: (boolean) if <i>TRUE</i> then the childrens are opened too,</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.open</b> calls <b>.ajaxLoad</b> when it needs to load a node.
+                    Notifies with the <em>opened</em> and <em>openfail</em> events if the operation was successful or not and with <em>wasopened</em> if the node
+                    was already opened.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeopen</em>.
+                </div>
+
+                <a name=".openPath"></a><div data-ext="core"><span>.openPath (item, options)</span> Opens the entire path till <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.openPath</b> calls <b>.open</b> to open the nodes.
+                </div>
+
+                <a name=".option"></a><div data-ext="core"><span>.option (option, value)</span> Set a option at runtime (after init).
+                    <span class="where">
+                        where:
+                        <span>option<span> (string)</span></span> the option to change
+                        <span>value<span> (mixed)</span></span> the new value (in the same format like the init options)
+                    </span>
+                </div>
+
+                <a name=".options"></a><div data-ext="core"><span>.options ()</span> Returns the init options (including any new value assigned with <b>option</b>).
+                </div>
+
+                <a name=".parent"></a><div data-ext="core"><span>.parent (item)</span> Returns the parent of <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".path"></a><div data-ext="core"><span>.path (item, reverse)</span> Returns a list of parent items till <b>item</b> (starting from ROOT).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>reverse<span> (boolean)</span></span> if <i>TRUE</i> the list will be reversed
+                    </span>
+                </div>
+
+                <a name=".prev"></a><div data-ext="core"><span>.prev (item)</span> Returns the previous element from <b>item</b> (belonging to the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".radios"></a><div data-ext="radio extension"><span>.radios (items, state) <span>radio extension</span></span> Filter <b>items</b> and return only the items with a radio-button.
+                    <span class="where">
+                        where:
+                        <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
+                        <span>state<span> (boolean)</span></span> if set, returns only the elements in the checked/unchecked state (TRUE/FALSE)
+                    </span>
+                </div>
+
+                <a name=".remove"></a><div data-ext="core"><span>.remove (item, options)</span> Remove <b>item</b> (including the childrens).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be removed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.remove</b> calls <b>.unload</b> to remove the childrens.
+                    Notifies with the <em>removed</em> and <em>removefail</em> events if the operation was successful or not.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeremove</em>.
+                </div>
+
+                <a name=".sameParent"></a><div data-ext="core"><span>.sameParent (item1, item2)</span> Returns <i>TRUE</i> if <b>item1</b> and <b>item2</b> have the same direct parent.
+                    <span class="where">
+                        where:
+                        <span>item1<span> jQuery object</span></span> the <i>LI</i>
+                        <span>item2<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".sameTopParent"></a><div data-ext="core"><span>.sameTopParent (item1, item2)</span> Returns <i>TRUE</i> if <b>item1</b> and <b>item2</b> have the same parent on level 0.
+                    <span class="where">
+                        where:
+                        <span>item1<span> jQuery object</span></span> the <i>LI</i>
+                        <span>item2<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".searchId"></a><div data-ext="utils extension"><span>.searchId (path, load, options) <span>utils extension</span></span> Searches and returns the <i>LI</i> element with a ID.
+                    <span class="where">
+                        where:
+                        <span>path<span> (boolean)</span></span> if <i>TRUE</i> then the search stops to the first branch with the ID inside the searched ID
+                        (the IDs need to be path like, the ID of a children need to start with the ID of the parent and add something else after it)
+                        <span>load<span> (boolean)</span></span> if <i>TRUE</i> then all not yet loaded nodes will be loaded and
+                        the search will be made for the childrens too (only if <b>path</b> is <i>TRUE</i>)
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    id: (string) the ID to search for</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> found element</span></span>
+                             <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.searchId</b> calls <b>.ajaxLoad</b> when it needs to load a node.
+                </div>
+
+                <a name=".select"></a><div data-ext="selectable extension"><span>.select (item, options) <span>selectable extension</span></span> Selects/deselects one <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be (de)selected
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    select: (bool) the new state</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.oldSelected</b> - the previous selected item.
+                    </span>
+                    Notifies with the <em>selected</em> event the selection and with the <em>unselected</em> event the deselection of an item and with
+                    <em>wasselected</em> if the item was already selected.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeselect</em>.
+                </div>
+
+                <a name=".selected"></a><div data-ext="selectable extension"><span>.selected () <span>selectable extension</span></span> Returns the selected <i>LI</i> element.
+                </div>
+
+                <a name=".setCheckbox"></a><div data-ext="checkbox extension"><span>.setCheckbox (item, options) <span>checkbox extension</span></span> Set <b>item</b> with or without a checkbox.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    checkbox: (bool) if <i>TRUE</i> then the item will be a checkbox,</li><li>                                    checked: (bool) if set - the new state,</li><li>                                    checkboxName: (string) if set - the new checkbox name</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.setCheckbox</b> calls <b>.check</b> to set the state.
+                    Notifies with the <em>checkboxadded</em> event if the item was set as checkbox type, with <em>checkboxremoved</em> event if the item checkbox was removed,
+                    with the <em>checkboxset</em> event regarding the state change, with <em>notcheckbox</em> if the checkbox removal was requested but it was not of type
+                    checkbox and with <em>checkboxfail</em> if the operation failed.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforecheckbox</em>.
+                </div>
+
+                <a name=".setFile"></a><div data-ext="core"><span>.setFile (item, options)</span> Transforms <b>item</b> in a 'file'.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.setFile</b> calls <b>.unload</b> to remove all childrens and notifies with the <em>fileset</em> and <em>filefail</em>
+                    events if the operation was successful or not and with the <em>wasfile</em> event if was of type 'file' already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforefile</em>.
+                </div>
+
+                <a name=".setFolder"></a><div data-ext="core"><span>.setFolder (item, options)</span> Transforms <b>item</b> in a 'folder'.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    Notifies with the <em>folderset</em> and <em>folderfail</em>
+                    events if the operation was successful or not and with the <em>wasfolder</em> event if was of type 'folder' already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforefolder</em>.
+                </div>
+
+                <a name=".setIcon"></a><div data-ext="core"><span>.setIcon (item, options)</span> Set the ICON image for <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                            <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    icon: (string) CSS class name or Array(CSS class, background-position-x, background-position-y)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation
+                            succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.oldIcon</b> - the old ICON (of NULL if had not existed).
+                    </span>
+                    Notifies with the <em>iconadded</em> event when adding the icon, <em>iconremoved</em> when removing the icon, with <em>noticon</em> if
+                    there was no icon when requesting to remove the icon, with <em>iconset</em> when is updated and with <em>iconfail</em> when the operation failed.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeicon</em>.
+                </div>
+
+                <a name=".setId"></a><div data-ext="core"><span>.setId (item, options)</span> Set the <b>item</b> ID.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                            <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    id: (string) the new ID</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation
+                            succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.oldId</b> - the old ID.
+                        <b>Note</b>: the ID need to be unique at the treeview control level.
+                    </span>
+                    Notifies with the <em>idset</em> and <em>idfail</em>
+                    events if the operation was successful or not and with the <em>wasid</em> event if the ID was of the same value already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeid</em>.
+                </div>
+
+                <a name=".setIndex"></a><div data-ext="core"><span>.setIndex (item, options)</span> Set the <b>item</b> index.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                            <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    index: (numeric) the new index</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation
+                            succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.oldIndex</b> - the old index.
+                    </span>
+                    Notifies with the <em>indexset</em> and <em>indexfail</em>
+                    events if the operation was successful or not and with the <em>wasindex</em> event if the index was of the same value already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeindex</em>.
+                </div>
+
+                <a name=".setLabel"></a><div data-ext="core"><span>.setLabel (item, options)</span> Set the <b>item</b> text content.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                            <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    label: (string) the new label</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation
+                            succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.oldLabel</b> - the old label.
+                    </span>
+                    Notifies with the <em>labelset</em> and <em>labelfail</em>
+                    events if the operation was successful or not and with the <em>waslabel</em> event if the label was of the same value already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforelabel</em>.
+                </div>
+
+                <a name=".setRadio"></a><div data-ext="radio extension"><span>.setRadio (item, options) <span>radio extension</span></span> Set <b>item</b> with or without a radio-button.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    radio: (bool) if <i>TRUE</i> then the item will be a radio-button,</li><li>                                    checked: (bool) if set - the new state,</li><li>                                    radioName: (string) if set - the new radio-button name</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.setRadio</b> calls <b>.check</b> to set the state.
+                    Notifies with the <em>radioadded</em> event if the item was set as radio-button type, with <em>radioremoved</em> event if the item radio-button was removed,
+                    with the <em>radioset</em> event regarding the state change, with <em>notradio</em> if the radio-button removal was requested but it was not of type radio-button
+                    and with <em>radiofail</em> if the operation failed.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeradio</em>.
+                </div>
+
+                <a name=".setVisible"></a><div data-ext="core"><span>.setVisible (item, options)</span> Brings <b>item</b> into the view.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.setVisible</b> calls <b>.openPath</b> to open all parent nodes.
+                    Notifies with the <em>visible</em> and <em>visiblefail</em>
+                    events if the operation was successful or not and with the <em>wasvisible</em> event if was in the visible zone already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforevisible</em>.
+                </div>
+
+                <a name=".siblings"></a><div data-ext="core"><span>.siblings (item)</span> Returns a list of <b>item</b> siblings (belonging to the same parent).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".swap"></a><div data-ext="utils extension"><span>.swap (options) <span>utils extension</span></span> Exchanges two items (the items can't be child and parent).
+                    <span class="where">
+                        where:
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    item1: the first <i>LI</i> item,</li><li>                                    item2: the second <i>LI</i> item,</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    Notifies with the <em>swapped</em> and <em>swapfail</em> events the success or failure of the operation.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeswap</em>.
+                </div>
+
+                <a name=".toggle"></a><div data-ext="core"><span>.toggle (item, options)</span> Opens or closes the <b>item</b> node.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be opened/closed
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unique: (boolean) if <i>TRUE</i> then (on node opening) all other nodes will be closed,</li><li>                                    expand: (boolean) if <i>TRUE</i> then (on open) all childrens will be opened too,</li><li>                                    collapse: (boolean) if <i>TRUE</i> then (on close) all childrens will be closed too,</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.toggle</b> calls <b>.open</b> or <b>.close</b> to open/close a node.
+                    Notifies with the <em>toggled</em> and <em>togglefail</em> events if the operation was successful or not.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforetoggle</em>.
+                </div>
+
+                <a name=".topParent"></a><div data-ext="core"><span>.topParent (item)</span> Returns the parent on the level 0 for <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".unload"></a><div data-ext="core"><span>.unload (item, options)</span> Removes all the <b>item</b> childrens.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    <b>.unload</b> calls <b>.close</b> to close a opened node and notifies with the <em>removed</em> event about removing each of the childrens.
+                    Notifies with the <em>unloaded</em> and <em>unloadfail</em> events if the operation was successful or not and with <em>notloaded</em> if the node was not loaded.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeunload</em>.
+                </div>
+
+                <a name=".update"></a><div data-ext="utils extension"><span>.update (item, options) <span>utils extension</span></span> Update the <b>item</b>, changes the ID, text value, the icon and (optional) loads the node
+                    from a JavaScript variable.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    unanimated: (boolean) if <i>TRUE</i> then no animations will be used,</li><li>                                    itemData: <ul><li>object {</li><li>                                    id: (string) unique item ID,</li><li>                                    label: (string) item text value,</li><li>                                            isFolder: (boolean) <i>TRUE</i> if has childrens,</li><li>                                            icon: (string) CSS class name or Array(CSS class, background-position-x, background-position-y)</li><li>                                    childs: (array) a list of childrens (in the same format as <i>itemData</i>)</li><li>                                    }</li></ul></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        <b>.update</b> changes the node type in <i>folder</i> or <i>file</i>. If <b>options.itemData.childs</b> is set, it calls
+                        <b>.loadFrom</b> to load the node with as many levels as defined in the JavaScript variable. It calls <b>.unload</b> before
+                        <b>.loadFrom</b> if the node was already loaded or if it is changed to the <i>file</i> type.
+                    </span>
+                    <b>.update</b> can call <b>.setId</b>, <b>.setLabel</b>, <b>.setIcon</b>, <b>.unload</b>, <b>.setFolder</b>, <b>.loadFrom</b>, <b>.setFile</b>.
+                    Notifies with the <em>updated</em> and <em>updatefail</em> events if the operation was successful or not.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforeupdate</em>.
+                </div>
+
+                <a name=".visible"></a><div data-ext="core"><span>.visible (items, view)</span> Filter <b>items</b> and return only the visible items (the items with all parent nodes open).
+                    <span class="where">
+                        where:
+                        <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
+                        <span>view<span> (boolean)</span></span> if <i>TRUE</i>, returns only the items in view
+                    </span>
+                    <b>.visible</b> will call <b>.isVisible</b> to find if a item is in view.
+                </div>
+
+                <a name=".wasInit"></a><div data-ext="core"><span>.wasInit ()</span> Returns <i>TRUE</i> if the treeview control was initialized.
+                </div>
+
+                <a name=".wasLoad"></a><div data-ext="core"><span>.wasLoad (item)</span> Returns <i>TRUE</i> if <b>item</b> was loaded.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
+                    </span>
+                </div>
+
+            </div>
+
+        <p>aciTree jQuery Plugin v3.0.0-rc.5</p>
+        <p>http://acoderinsights.ro</p>
+
+        <p>Copyright (c) 2013 Dragos Ursu</p>
+        <p>Dual licensed under the MIT or GPL Version 2 licenses.</p>
+
+        <p>Require jQuery Library >= v1.7.1 http://jquery.com</p>
+        <p>+ aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin</p>
+
+        <p>Date: Apr Mon 15 20:10 2013 +0200</p>
+
+    </body>
+</html>

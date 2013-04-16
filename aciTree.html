@@ -17,6 +17,7 @@
         <script type="text/javascript" src="js/jquery.aciTree.checkbox.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.radio.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.column.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.editable.js"></script>
     </head>
     <body>
 
@@ -26,7 +27,7 @@
 
             <p>See a checkbox tree demo <a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">here</a></p>
             <p>See a radio-button tree demo <a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">here</a></p>
-            <p>(<span style="color:red">new</span>) See a multiple column tree demo <a href="/demo/aciTree.html" target="_blank" title="aciTree with columns">here</a></p>
+            <p>See a multiple column tree demo <a href="/demo/aciTree.html" target="_blank" title="aciTree with columns">here</a></p>
 
             <p>Note: in this demo the node loading it's made with a delay so you can see the loading animation. If you want you can remove the delay from the <i>PHP</i> script ;) ...</p>
 
@@ -63,6 +64,9 @@
                                 <p>Radio Buttons: <label><input type="radio" name="radio" value="1" /> Yes</label>
                                     <label><input type="radio" name="radio" value="0" /> No</label></p>
 
+                                <p>(<span style="color:red">new</span>) Editable: <label><input type="radio" name="editable" value="1" /> Yes</label>
+                                    <label><input type="radio" name="editable" value="0" /> No</label></p>
+
                                 <p><input id="destroy" type="button" value="Destroy" />
                                     <input id="init" type="button" value="Init with AJAX" /></p>
                                 <p><input id="init_data" type="button" value="Init from Data" />
@@ -82,7 +86,7 @@
                             </td><td>
                                 <p>Direction: <label><input type="radio" name="direction" value="1" /> LTR</label>
                                     <label><input type="radio" name="direction" value="0" /> RTL</label></p>
-                                <p>(<span style="color:red">new</span>) Odd/Even Rows: <label><input type="radio" name="oddeven" value="1" /> Yes</label>
+                                <p>Odd/Even Rows: <label><input type="radio" name="oddeven" value="1" /> Yes</label>
                                     <label><input type="radio" name="oddeven" value="0" /> No</label></p>
                                 <p>Set Icon: <select id="setIcon"><option value="">-- choose --</option>
                                         <option value="file">File</option><option value="folder">Folder</option><option value="remove">Remove</option></select></p>
@@ -113,6 +117,12 @@
                                     <input id="set_index" type="button" value="Set Index" /></p>
                                 <p>Swap Item (by ID): <input type="text" name="swap1" value="/document b.txt" /> <br /> with
                                     <input type="text" name="swap2" value="/Item 3" /> <input id="swap" type="button" value="Swap" /></p>
+
+                                <p>(<span style="color:red">new</span>) Cancel UI Tasks : <label><input type="radio" name="cancel_ui" value="1" /> Yes</label>
+                                    <label><input type="radio" name="cancel_ui" value="0" /> No</label></p>
+                                <p>(<span style="color:red">new</span>) Cancel User-Defined Tasks : <label><input type="radio" name="cancel_user" value="1" /> Yes</label>
+                                    <label><input type="radio" name="cancel_user" value="0" /> No</label></p>
+
                             </td></tr></table>
                 </form>
             </div>
@@ -134,27 +144,30 @@
                 var treeApi;
 
                 // if we want to init without one initial AJAX request :)
-                var rootData = [{"id":"\/Item 1","item":"Item 1 - From rootData","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 2","item":"Item 2 - very long item text<br />with a brake","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 3","item":"Item 3","props":{"isFolder":false,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 4","item":"Item 4","props":{"isFolder":false,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 5","item":"Item 5","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 6","item":"Item 6","props":{"isFolder":false,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 7","item":"Item 7","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/Item 8","item":"Item 8","props":{"isFolder":true,"open":false,"icon":"folder"},"items":[]},
-                    {"id":"\/document a.txt","item":"document a.txt","props":{"isFolder":false,"open":false,"icon":"file"},"items":[]},
-                    {"id":"\/document b.txt","item":"document b.txt","props":{"isFolder":false,"open":false,"icon":"file"},"items":[]},
-                    {"id":"\/document c.txt","item":"document c.txt","props":{"isFolder":false,"open":false,"icon":"file"},"items":[]}];
+                var rootData = [{"id":"\/Item 1","label":"Item 1 - From rootData","childs":[],"isFolder":true,"open":false,"icon":"folder","random":34},
+                    {"id":"\/Item 2","label":"Item 2 - very long item text<br />with a brake","childs":[],"isFolder":true,"open":false,"icon":"folder","random":9},
+                    {"id":"\/Item 3","label":"Item 3","childs":[],"isFolder":false,"open":false,"icon":"folder","random":26},
+                    {"id":"\/Item 4","label":"Item 4","childs":[],"isFolder":false,"open":false,"icon":"folder","random":71},
+                    {"id":"\/Item 5","label":"Item 5","childs":[],"isFolder":true,"open":false,"icon":"folder","random":93},
+                    {"id":"\/Item 6","label":"Item 6","childs":[],"isFolder":false,"open":false,"icon":"folder","random":14},
+                    {"id":"\/Item 7","label":"Item 7","childs":[],"isFolder":true,"open":false,"icon":"folder","random":49},
+                    {"id":"\/Item 8","label":"Item 8","childs":[],"isFolder":true,"open":false,"icon":"folder","random":99},
+                    {"id":"\/document a.txt","label":"document a.txt","childs":[],"isFolder":false,"open":false,"icon":"file","random":86},
+                    {"id":"\/document b.txt","label":"document b.txt","childs":[],"isFolder":false,"open":false,"icon":"file","random":76},
+                    {"id":"\/document c.txt","label":"document c.txt","childs":[],"isFolder":false,"open":false,"icon":"file","random":11}];
 
                 // init the Tree
-                function initTree(type){
+                function initTree(type, ui, skip){
                     treeApi = $('#tree').aciTree({
+                        autoInit: false,
                         jsonUrl: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch=',
                         rootData: (type == 'data') ? rootData : null,
                         callbacks: {
                             item: function(parent, item, itemData, level){
                                 // a custom item implementation to show the tree level
-                                this.setText(item, itemData.item + ' (' + level + ')');
+                                this.setLabel(item, {
+                                    label: itemData.label + ' (' + level + ')'
+                                });
                             }
                         }/*,
                         columnData: [{
@@ -165,9 +178,24 @@
                                 value: 'column #2'
                             }]*/
                     }).aciTree('api');
+                    treeApi.init({
+                        uid: (ui == 'ui') ? 'ui' : 'user-defined',
+                        success: function(){
+                            if (!skip){
+                                alert('The treeview control was init !');
+                            }
+                        },
+                        fail: function(){
+                            alert('Failed to init the treeview control !');
+                        }
+                    });
                 }
 
                 var log = $('.log div');
+
+                function alert (message){
+                    log.prepend('<p style="color:red">' + message + '</p>');
+                }
 
                 var eye = $('.eyes'), eyes = 0;
 
@@ -183,24 +211,47 @@
                     eye.css('top', $(this).scrollTop() + 'px');
                 });
 
+                var cancelUi = false, cancelUser = false;
+
                 // show tree events
-                $('#tree').on('acitree', function(e, api, item, data){
+                $('#tree').on('acitree', function(event, api, item, eventName, options){
+                    if (eventName.search(/^before/) != -1){
+                        // cancel if requested
+                        if ((cancelUi && (options.uid == 'ui')) || (cancelUser && (options.uid != 'ui'))){
+                            if (item){
+                                log.prepend('<p>(canceled) ' + eventName + ' [' + api.getId(item) + '] [' + options.uid + ']</p>');
+                            } else {
+                                log.prepend('<p>(canceled) ' + eventName + ' [tree] [' + options.uid + ']</p>');
+                            }
+                            return false;
+                        }
+                    }
                     if (api.isLocked()){
                         // prevent write to log on init/destroy
                         return;
                     }
-                    switch (data.event){
+                    switch (eventName){
                         case 'idset':
-                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old ID: [' + data.oldId + ']</p>');
+                            log.prepend('<p>' + eventName + ' [' + api.getId(item) + '] old ID: [' + options.oldId + '] [' + options.uid + ']</p>');
                             break;
-                        case 'itemset':
-                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old text: [' + data.oldText + ']</p>');
+                        case 'labelset':
+                            log.prepend('<p>' + eventName + ' [' + api.getId(item) + '] old label: [' + options.oldLabel + '] [' + options.uid + ']</p>');
                             break;
                         case 'swapped':
-                            log.prepend('<p>' + data.event + ' [' + api.getId(data.item1) + '] <=> [' + api.getId(data.item2) + ']</p>');
+                            var item1 = options.item1;
+                            var item2 = options.item2;
+                            log.prepend('<p>' + eventName + ' [' + api.getId(item1) + '] <=> [' + api.getId(item2) + '] [' + options.uid + ']</p>');
+                            if (!api.isVisible(item1) && !api.isVisible(item2)){
+                                // make one item visible (check by index, not a problem if not with the same parent ...
+                                if (api.getIndex(item1) < api.getIndex(item2)){
+                                    api.setVisible(item1);
+                                } else {
+                                    api.setVisible(item2);
+                                }
+                            }
                             break;
                         case 'indexset':
-                            log.prepend('<p>' + data.event + ' [' + api.getId(item) + '] old index: [' + data.oldIndex + ']</p>');
+                            log.prepend('<p>' + eventName + ' [' + api.getId(item) + '] old index: [' + options.oldIndex + '] [' + options.uid + ']</p>');
                             if (!api.isVisible(item)){
                                 // make it visible ;)
                                 api.setVisible(item);
@@ -208,11 +259,11 @@
                             break;
                         default:
                             if (item){
-                                log.prepend('<p>' + data.event + ' [' + api.getId(item) + ']</p>');
+                                log.prepend('<p>' + eventName + ' [' + api.getId(item) + '] [' + options.uid + ']</p>');
                             } else {
-                                log.prepend('<p>' + data.event + ' [tree]</p>');
+                                log.prepend('<p>' + eventName + ' [tree] [' + options.uid + ']</p>');
                             }
-                            if (data.event == 'toggled'){
+                            if (eventName == 'toggled'){
                                 eyes++;
                                 showEyes();
                             }
@@ -220,13 +271,13 @@
                 });
 
                 // do it ;-)
-                initTree();
+                initTree(null, 'ui', true);
 
                 // a little debug info tool :)
                 function debug (item){
                     var info = '';
                     info += 'getId: [' + treeApi.getId(item) + ']\n';
-                    info += 'getText: "' + treeApi.getText(item) + '"\n';
+                    info += 'getLabel: "' + treeApi.getLabel(item) + '"\n';
                     info += 'level: ' + treeApi.level(item) + '\n';
                     info += 'getIndex: ' + treeApi.getIndex(item) + '\n';
                     info += 'isFile: ' + treeApi.isFile(item) + '\n';
@@ -302,6 +353,10 @@
                 $('#setRadio').attr('disabled', !options.radio);
                 $('[name=direction][value=' + (($('#tree').attr('dir') == 'rtl') ? 0 : 1) + ']').prop('checked', true);
                 $('[name=oddeven][value=' + ($('#tree').hasClass('aciTreeColors') ? 1 : 0) + ']').prop('checked', true);
+                $('[name=editable][value=' + (options.editable ? 1 : 0) + ']').prop('checked', true);
+
+                $('[name=cancel_ui][value=0]').prop('checked', true);
+                $('[name=cancel_user][value=0]').prop('checked', true);
 
                 // update options
 
@@ -352,7 +407,7 @@
                     $('#tree').toggleClass('aciTreeColors', $(this).val() == 1);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=checkbox],[name=radio]').click(function(){
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=checkbox],[name=radio],[name=editable]').click(function(){
                     var option = $(this).prop('name');
                     $('#tree').aciTree('option', option, $(this).val() == 1);
                     if (option == 'fullRow'){
@@ -360,19 +415,70 @@
                     }
                 });
 
-                // FORM button functions
-
-                $('#destroy').click(function(){
-                    $('#tree').aciTree('destroy');
+                $('[name=cancel_ui]').click(function(){
+                    cancelUi = $(this).val() == 1;
                 });
+
+                $('[name=cancel_user]').click(function(){
+                    cancelUser = $(this).val() == 1;
+                });
+
+                // FORM button functions
 
                 // update init options based on inputs
                 function updateOptions(){
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=checkbox]:checked,[name=radio]:checked').each(function(){
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=editable]:checked').each(function(){
                         var option = $(this).prop('name');
                         $.fn.aciTree.defaults[option] = $(this).val() == 1;
                     });
                 }
+
+                function warnInit(init){
+                    if (treeApi){
+                        if (treeApi.isLocked()){
+                            alert('Please wait until the treeview finishes the init/destroy !');
+                            return true;
+                        }
+                        if (!init && !treeApi.wasInit()){
+                            alert('The treeview need to be init before continue !');
+                            return true;
+                        }
+                        return false;
+                    } else {
+                        alert('Please wait until the treeview finishes the init !');
+                        return true;
+                    }
+                }
+
+                // check before we try to do something
+                $('[type=button]').not('#clear_log').click(function(e){
+                    var init = $(this).is('#init,#init_data,#init_huge');
+                    if (warnInit(init)){
+                        // prevent API calls if not init
+                        e.stopImmediatePropagation();
+                    }
+                });
+
+                // check before we try to do something
+                $('select').change(function(e){
+                    if (warnInit()){
+                        $(this).val('');
+                        // prevent API calls if not init
+                        e.stopImmediatePropagation();
+                    }
+                });
+
+                $('#destroy').click(function(){
+                    $('#tree').aciTree('api').destroy({
+                        uid: 'user-defined',
+                        success: function(){
+                            alert('Treeview control successfully destroyed !');
+                        },
+                        fail: function(){
+                            alert('Failed to destroy the treeview control !');
+                        }
+                    });
+                });
 
                 $('#init').click(function(){
                     // update options
@@ -417,40 +523,94 @@
 
                 // few little helpers ->
 
-                function isTree(){
+                // return TRUE if the treeview is selected
+                function checkIsTree(){
                     return _g_sel && (_g_sel == $('#tree').get(0));
                 }
 
-                function isItem(){
+                // return the selected item (if any)
+                function checkIsItem(){
                     if (_g_sel){
                         var item = treeApi.itemFrom(_g_sel);
-                        // itemFrom can return NULL or empty set
-                        if (item && item.length){
+                        if (treeApi.isItem(item)){
                             return item;
                         }
                     }
                     return null;
                 }
 
-                function warn(item){
-                    if (item){
-                        alert('Please select a Tree item (with a click)!');
-                    } else {
-                        alert('Please select a Tree item or the Tree itself (with a click)!');
+                // test if the treeview or a item is selected, alert if not, return the item if selected
+                function requireSelection(){
+                    var item = checkIsItem();
+                    if (checkIsTree() || item){
+                        return item;
                     }
+                    alert('Please select one item or the treeview itself (with a mouse click, will have a pink background after selection) !');
+                    return null;
+                }
+
+                // test if a item is selected, alert if not, return the item if selected
+                function requireItem(){
+                    var item = checkIsItem();
+                    if (item){
+                        return item;
+                    }
+                    alert('Please select one item (with a mouse click, will have a pink background after selection) !');
+                    return null;
+                }
+
+                // test if a folder item is selected, alert if not, return the item if selected
+                function requireFolder(){
+                    var item = checkIsItem();
+                    if (item && treeApi.isFolder(item)){
+                        return item;
+                    }
+                    alert('Please select one folder item (with a mouse click, will have a pink background after selection) !');
+                    return null;
+                }
+
+                // test if a file item is selected, alert if not, return the item if selected
+                function requireFile(){
+                    var item = checkIsItem();
+                    if (item && treeApi.isFile(item)){
+                        return item;
+                    }
+                    alert('Please select one file item (with a mouse click, will have a pink background after selection) !');
+                    return null;
+                }
+
+                // test if the treeview or the folder was loaded, alert if was loaded, return TRUE if was not loaded
+                function requestLoad(){
+                    if (checkIsTree()){
+                        if (treeApi.wasLoad()){
+                            alert('The treeview was loaded already !');
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        var item = checkIsItem();
+                        if (item && requireFolder(item)){
+                            if (treeApi.wasLoad(item)){
+                                alert('The folder item was loaded already !');
+                            } else {
+                                return true;
+                            }
+                        } else {
+                            requireSelection();
+                        }
+                    }
+                    return false;
                 }
 
                 var fileIndex = 0;
 
-                // get new File item data
+                // get new file item data
                 function newFile(){
                     var itemData = {
                         id: 'a_new_File_ID_' + fileIndex,
-                        item: 'File name ' + fileIndex,
-                        props: {
-                            isFolder: false,
-                            icon: 'file'
-                        }
+                        label: 'File name ' + fileIndex,
+                        isFolder: false,
+                        icon: 'file'
                     };
                     fileIndex++;
                     return itemData;
@@ -458,31 +618,48 @@
 
                 var folderIndex = 0;
 
-                // get new Folder item data
+                // get new folder item data
                 function newFolder(){
                     var itemData = {
                         id: 'a_new_Folder_ID_' + folderIndex,
-                        item: 'Folder name ' + folderIndex,
-                        props: {
-                            isFolder: null,
-                            open: false,
-                            icon: 'folder'
-                        }/*,
-                        items: []*/
+                        label: 'Folder name ' + folderIndex,
+                        isFolder: null,
+                        open: false,
+                        icon: 'folder'
                     };
                     folderIndex++;
                     return itemData;
                 }
 
-                // a new Tree item or items (after or before a item)
+                // add one or more items (after or before a item)
                 function treeAddItem(item, itemData){
                     var before = $('[name=addMode]:checked').val() == 'before';
                     if (before){
                         treeApi.before(item.first(), {
+                            uid: 'user-defined',
+                            success: function(item){
+                                alert('Item(s) successfully added before [' + this.getId(item) + '] !');
+                                if (!this.isVisible(item)){
+                                    this.setVisible(item);
+                                }
+                            },
+                            fail: function(item){
+                                alert('Failed to add the item(s) before [' + this.getId(item) + '] !');
+                            },
                             itemData: itemData
                         });
                     } else {
                         treeApi.after(item.last(), {
+                            uid: 'user-defined',
+                            success: function(item){
+                                alert('Item(s) successfully added after [' + this.getId(item) + '] !');
+                                if (!this.isVisible(item)){
+                                    this.setVisible(item);
+                                }
+                            },
+                            fail: function(item){
+                                alert('Failed to add the item(s) after [' + this.getId(item) + '] !');
+                            },
                             itemData: itemData
                         });
                     }
@@ -492,321 +669,418 @@
 
                 // do something with the selected item ;-)
 
+                // add a file to the treeview or to the selected folder
                 $('#addFile').click(function(){
-                    if (isTree()){
-                        // the Tree is selected, just add a File on the first/last position
+                    if (checkIsTree()){
+                        // the treeview is selected, add a file on the first/last position
                         var childs = treeApi.childrens();
                         if (childs.length){
-                            // Tree already has some items on ROOT
+                            // already has some items on ROOT
                             treeAddItem(childs, newFile());
                         } else {
-                            // no Tree items on ROOT
+                            // no items on ROOT
                             treeApi.append(null, {
+                                uid: 'user-defined',
+                                success: function(){
+                                    alert('The file item was added on ROOT !');
+                                },
+                                fail: function(){
+                                    alert('Failed to add the file item on ROOT !');
+                                },
                                 itemData: newFile()
                             });
                         }
                     } else {
-                        var item = isItem();
+                        var item = requireSelection();
                         if (item){
-                            // a Tree item is selected, add a File before/after it
+                            // a item is selected, add a file before/after it
                             treeAddItem(item, newFile());
-                        } else {
-                            warn();
                         }
                     }
                 });
 
+                // add a folder to the treeview or to the selected folder
                 $('#addFolder').click(function(){
-                    if (isTree()){
-                        // the Tree is selected, just add a Folder on the first/last position
+                    if (checkIsTree()){
+                        // the treeview is selected, add a folder on the first/last position
                         var childs = treeApi.childrens();
                         if (childs.length){
-                            // Tree already has some items on ROOT
+                            // already has some items on ROOT
                             treeAddItem(childs, newFolder());
                         } else {
-                            // no Tree items on ROOT
+                            // no items on ROOT
                             treeApi.append(null, {
+                                uid: 'user-defined',
+                                success: function(){
+                                    alert('The folder item was added on ROOT !');
+                                },
+                                fail: function(){
+                                    alert('Failed to add the folder item on ROOT !');
+                                },
                                 itemData: newFolder()
                             });
                         }
                     } else {
-                        var item = isItem();
+                        var item = requireSelection();
                         if (item){
-                            // a Tree item is selected, add a Folder before/after it
+                            // a item is selected, add a folder before/after it
                             treeAddItem(item, newFolder());
-                        } else {
-                            warn();
                         }
                     }
                 });
 
+                // add childrens to the treeview or to the selected folder
                 $('#addChilds').click(function(){
-                    if (isTree()){
-                        // the Tree is selected, just add a Folder+File
+                    if (checkIsTree()){
+                        // the treeview is selected, add a folder/file
                         treeApi.append(null, {
+                            uid: 'user-defined',
+                            success: function(){
+                                alert('The folder/file items where added on ROOT !');
+                            },
+                            fail: function(){
+                                alert('Failed to add the folder/file items on ROOT !');
+                            },
                             itemData: [newFolder(), newFile()]
                         });
                     } else {
-                        var item = isItem();
-                        if (item){
-                            // a Tree item is selected, add a Folder+File
-                            // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
+                        var item = requireSelection();
+                        if (requireFolder()){
+                            // a item is selected, add a folder/file
                             treeApi.append(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The folder/file items where added to [' + this.getId(item) + '] !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to add the folder/file items to [' + this.getId(item) + '] !');
+                                },
                                 itemData: [newFolder(), newFile()]
                             });
-                            if (!treeApi.isFolder(item)){
-                                alert('Childrens can be added only on Tree Folders!');
-                            }
-                        } else {
-                            warn();
                         }
                     }
                 });
 
+                // unload the treeview or the selected folder
                 $('#unload').click(function(){
-                    if (isTree()){
-                        // the Tree is selected, unload it all >:)
-                        treeApi.unload();
-                    } else {
-                        var item = isItem();
-                        if (item){
-                            // a Tree item is selected, unload the Folder
-                            // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
-                            treeApi.unload(item);
-                            if (!treeApi.isFolder(item)){
-                                alert('Only folders can be unloaded!');
+                    if (checkIsTree()){
+                        // the treeview is selected, unload it >:)
+                        treeApi.unload(null, {
+                            uid: 'user-defined',
+                            success: function(item){
+                                alert('The ROOT was unloaded !');
+                            },
+                            fail: function(item){
+                                alert('Failed to unload the ROOT !');
                             }
-                        } else {
-                            warn();
+                        });
+                    } else {
+                        var item = requireSelection();
+                        if (item && requireFolder()){
+                            // a item is selected, unload it
+                            treeApi.unload(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The item [' + this.getId(item) + '] was unloaded !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to unload the item [' + this.getId(item) + '] !');
+                                }
+                            });
                         }
                     }
                 });
 
+                // load the treeview or the selected folder
                 $('#load').click(function(){
-                    if (isTree()){
-                        // the Tree is selected, load the ROOT
-                        if (treeApi.wasLoad()){
-                            alert('The ROOT was loaded already, nothing to do!');
-                        }
-                        treeApi.ajaxLoad();
-                    } else {
-                        var item = isItem();
-                        if (item){
-                            // a Tree item is selected, load the Folder
-                            // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
-                            if (treeApi.isFolder(item)){
-                                if (treeApi.wasLoad(item)){
-                                    alert('The Folder was loaded already, nothing to do!');
+                    if (requestLoad()){
+                        if (checkIsTree()){
+                            // the treeview is selected, load the ROOT
+                            treeApi.ajaxLoad(null, {
+                                uid: 'user-defined',
+                                success: function(){
+                                    alert('The ROOT was successfully loaded !');
+                                },
+                                fail: function(){
+                                    alert('Failed to load the ROOT !');
                                 }
-                            } else {
-                                alert('Only Tree Folders can be loaded!');
-                            }
-                            treeApi.ajaxLoad(item, {
-                                success: function(){ alert('Tree Folder load complete!'); }
                             });
                         } else {
-                            warn();
+                            var item = checkIsItem();
+                            treeApi.ajaxLoad(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The item [' + this.getId(item) + '] was successfully loaded !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to load the item [' + this.getId(item) + '] !');
+                                }
+                            });
                         }
                     }
                 });
 
+                // set a folder to be a file
                 $('#setFile').click(function(){
-                    var item = isItem();
+                    var item = requireFolder();
                     if (item){
-                        // a Tree item is selected, set the Folder as a File
-                        // note: this should be a Tree Folder (but no need to check, does nothing for a Tree File)
-                        if (!treeApi.isFolder(item)){
-                            alert('Only Tree Folders can be changed to a File!');
-                        }
                         treeApi.setFile(item, {
-                            success: function(){
-                                // if was set then change the icon
-                                this.setIcon(item, 'file');
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                // change the icon
+                                this.setIcon(item, {
+                                    icon: 'file'
+                                });
+                                alert('The item [' + this.getId(item) + '] was made a file !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to make the item [' + this.getId(item) + '] into a file !');
                             }
                         });
-                    } else {
-                        warn(true);
                     }
                 });
 
+                // set a file to be a folder
                 $('#setFolder').click(function(){
-                    var item = isItem();
+                    var item = requireFile();
                     if (item){
-                        // a Tree item is selected, set the File as a Folder
-                        // note: this should be a Tree File (but no need to check, does nothing for a Tree Folder)
-                        if (!treeApi.isFile(item)){
-                            alert('Only Tree Files can be changed to a Folder!');
-                        }
                         treeApi.setFolder(item, {
+                            success: function(item, options){
+                                // change the icon
+                                this.setIcon(item, {
+                                    icon: 'folder'
+                                });
+                                alert('The item [' + this.getId(item) + '] was made a folder !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to make the item [' + this.getId(item) + '] into a folder !');
+                            }
+                        });
+                    }
+                });
+
+                // remove item(s)
+                $('#remove').click(function(){
+                    if (checkIsTree()){
+                        // the treeview is selected, remove all ROOT items
+                        treeApi.unload(null, {
+                            uid: 'user-defined',
                             success: function(){
-                                // if was set then change the icon
-                                this.setIcon(item, 'folder');
+                                alert('The entire treeview was successfully unloaded !');
+                            },
+                            fail: function(){
+                                alert('Failed to remove the ROOT items !');
                             }
                         });
                     } else {
-                        warn(true);
-                    }
-                });
-
-                $('#remove').click(function(){
-                    if (isTree()){
-                        // the Tree is selected, just remove all ROOT items
-                        treeApi.unload();
-                    } else {
-                        var item = isItem();
+                        var item = requireSelection();
                         if (item){
-                            // a Tree item is selected, remove it
-                            treeApi.remove(item);
-                        } else {
-                            warn();
+                            // a item is selected, remove it
+                            treeApi.remove(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The item [' + this.getId(item) + '] was removed !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to remove the item [' + this.getId(item) + '] !');
+                                }
+                            });
                         }
                     }
                 });
 
+                // set item icon
                 $('#setIcon').change(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
-                        // note: the Tree does not interpret the ICON in any way
-                        // if it looks like a Folder it does not mean it's a Folder (same goes for a Tree File)
-                        treeApi.setIcon(item, ($(this).val() == 'remove') ? null : $(this).val());
-                    } else {
-                        warn(true);
+                        treeApi.setIcon(item, {
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The icon for the item [' + this.getId(item) + '] was set !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to set the icon for the item [' + this.getId(item) + '] !');
+                            },
+                            icon: ($(this).val() == 'remove') ? null : $(this).val()
+                        });
                     }
                     $(this).val('');
                 });
 
+                // add a checkbox to the item
                 $('#setCheckbox').change(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
                         if ($(this).val() == 'yes'){
-                            // make sure no radio
-                            treeApi.setRadio(item, false);
-                            treeApi.setCheckbox(item, true);
+                            treeApi.setCheckbox(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The checkbox for the item [' + this.getId(item) + '] was added !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to add the checkbox for the item [' + this.getId(item) + '] !');
+                                },
+                                checkbox: true
+                            });
                         } else {
-                            treeApi.setCheckbox(item, false);
+                            treeApi.setCheckbox(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The checkbox for the item [' + this.getId(item) + '] was removed !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to remove the checkbox for the item [' + this.getId(item) + '] !');
+                                }
+                            });
                         }
-                    } else {
-                        warn(true);
                     }
                     $(this).val('');
                 });
 
+                // add a radio-button to the item
                 $('#setRadio').change(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
                         if ($(this).val() == 'yes'){
-                            // make sure no checkbox
-                            treeApi.setCheckbox(item, false);
-                            treeApi.setRadio(item, true);
+                            treeApi.setRadio(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The radio-button for the item [' + this.getId(item) + '] was added !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to add the radio-button for the item [' + this.getId(item) + '] !');
+                                },
+                                radio: true
+                            });
                         } else {
-                            treeApi.setRadio(item, false);
+                            treeApi.setRadio(item, {
+                                uid: 'user-defined',
+                                success: function(item){
+                                    alert('The radio-button for the item [' + this.getId(item) + '] was removed !');
+                                },
+                                fail: function(item){
+                                    alert('Failed to remove the radio-button for the item [' + this.getId(item) + '] !');
+                                }
+                            });
                         }
-                    } else {
-                        warn(true);
                     }
                     $(this).val('');
                 });
 
+                // open a folder item
                 $('#open').click(function(){
-                    var item = isItem();
+                    var item = requireFolder();
                     if (item){
-                        // open the Folder (does nothing if it's not a Folder)
                         treeApi.open(item, {
-                            expand: treeApi.options().expand
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The item [' + this.getId(item) + '] was opened !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to open the item [' + this.getId(item) + '] !');
+                            }
                         });
-                        if (!treeApi.isFolder(item)){
-                            alert('Only Tree Folders can be opened!');
-                        }
-                    } else {
-                        warn(true);
                     }
                 });
 
+                // close a folder item
                 $('#close').click(function(){
-                    var item = isItem();
+                    var item = requireFolder();
                     if (item){
-                        // open the Folder (does nothing if it's not a Folder)
                         treeApi.close(item, {
-                            collapse: treeApi.options().collapse
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The item [' + this.getId(item) + '] was closed !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to close the item [' + this.getId(item) + '] !');
+                            }
                         });
-                        if (!treeApi.isFolder(item)){
-                            alert('Only Tree Folders can be closed!');
-                        }
-                    } else {
-                        warn(true);
                     }
                 });
 
+                // toggle a folder item
                 $('#toggle').click(function(){
-                    var item = isItem();
+                    var item = requireFolder();
                     if (item){
-                        // open the Folder (does nothing if it's not a Folder)
                         treeApi.toggle(item, {
-                            expand: treeApi.options().expand,
-                            collapse: treeApi.options().collapse
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The item [' + this.getId(item) + '] was toggled !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to toggle the item [' + this.getId(item) + '] !');
+                            }
                         });
-                        if (!treeApi.isFolder(item)){
-                            alert('Only Tree Folders can be opened or closed!');
-                        }
-                    } else {
-                        warn(true);
                     }
                 });
 
                 // time to burn your CPU ;))
 
+                // add 1k file items
                 $('#addFile1k').click(function(){
                     var list = [];
                     for(var i = 0; i < 1000; i++){
                         list[list.length] = newFile();
                     }
-                    if (isTree()){
-                        // the Tree is selected, just add a File on the first/last position
+                    if (checkIsTree()){
+                        // the treeview is selected
                         var childs = treeApi.childrens();
                         if (childs.length){
-                            // Tree already has some items on ROOT
+                            // already has some items on ROOT
                             treeAddItem(childs, list);
                         } else {
-                            // no Tree items on ROOT
+                            // no items on ROOT
                             treeApi.append(null, {
+                                uid: 'user-defined',
+                                success: function(item, options){
+                                    alert('The 1k file items where added to the ROOT !');
+                                },
+                                fail: function(item, options){
+                                    alert('Failed to add the 1k files to the ROOT !');
+                                },
                                 itemData: list
                             });
                         }
                     } else {
-                        var item = isItem();
+                        var item = requireSelection();
                         if (item){
-                            // a Tree item is selected, add a File before/after it
+                            // a item is selected
                             treeAddItem(item, list);
-                        } else {
-                            warn();
                         }
                     }
                 });
 
+                // add 1k folder items
                 $('#addFolder1k').click(function(){
                     var list = [];
                     for(var i = 0; i < 1000; i++){
                         list[list.length] = newFolder();
                     }
-                    if (isTree()){
-                        // the Tree is selected, just add a Folder on the first/last position
+                    if (checkIsTree()){
+                        // the treeview is selected
                         var childs = treeApi.childrens();
                         if (childs.length){
-                            // Tree already has some items on ROOT
+                            // already has some items on ROOT
                             treeAddItem(childs, list);
                         } else {
-                            // no Tree items on ROOT
+                            // no items on ROOT
                             treeApi.append(null, {
+                                uid: 'user-defined',
+                                success: function(item, options){
+                                    alert('The 1k folder items where added to the ROOT !');
+                                },
+                                fail: function(item, options){
+                                    alert('Failed to add the 1k folders to the ROOT !');
+                                },
                                 itemData: list
                             });
                         }
                     } else {
-                        var item = isItem();
+                        var item = requireSelection();
                         if (item){
-                            // a Tree item is selected, add a Folder before/after it
+                            // a item is selected
                             treeAddItem(item, list);
-                        } else {
-                            warn();
                         }
                     }
                 });
@@ -826,247 +1100,318 @@
                 }
 
                 // custom open magic happens here
-                var branch_open = function(api, item){
-                    if (api.isFolder(item)){
+                var branch_open = function(item){
+                    if (this.isFolder(item)){
                         // check if is a folder just to avoid error notification
-                        api.open(item);
+                        this.open(item, {
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The folder item [' + this.getId(item) + '] was opened !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to open the item [' + this.getId(item) + '] !');
+                            }
+                        });
                     }
                 };
 
+                // open item and all subitems
                 $('#branch_open').click(function(){
                     if (checkBusy()){
                         return;
                     }
-                    if (isTree()){
+                    if (checkIsTree()){
                         treeApi.branch(null, branch_open, true);
                     } else {
-                        var item = isItem();
+                        var item = requireFolder();
                         if (item){
                             // need this cause 'branch' is processing only childs (item is not included)
-                            treeApi.open(item);
-                            treeApi.branch(item, branch_open, true);
-                        } else {
-                            warn();
+                            treeApi.open(item, {
+                                success: function(){
+                                    this.branch(item, branch_open, true);
+                                }
+                            });
                         }
                     }
                 });
 
                 // custom close magic happens here
-                var branch_close = function(api, item){
-                    if (api.isFolder(item)){
+                var branch_close = function(item){
+                    if (this.isFolder(item)){
                         // check if is a folder just to avoid error notification
-                        api.close(item);
+                        this.close(item, {
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The folder item [' + this.getId(item) + '] was closed !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to close the item [' + this.getId(item) + '] !');
+                            }
+                        });
                     }
                 };
 
+                // close item and all subitems
                 $('#branch_close').click(function(){
                     if (checkBusy()){
                         return;
                     }
-                    if (isTree()){
+                    if (checkIsTree()){
                         treeApi.branch(null, branch_close);
                     } else {
-                        var item = isItem();
+                        var item = requireFolder();
                         if (item){
                             // need this cause 'branch' is processing only childs (item is not included)
-                            treeApi.close(item);
-                            treeApi.branch(item, branch_close);
-                        } else {
-                            warn();
+                            treeApi.close(item, {
+                                success: function(){
+                                    this.branch(item, branch_close);
+                                }
+                            });
                         }
                     }
                 });
 
                 // custom toggle magic happens here
-                var branch_toggle = function(api, item){
-                    if (api.isFolder(item)){
+                var branch_toggle = function(item){
+                    if (this.isFolder(item)){
                         // check if is a folder just to avoid error notification
-                        api.toggle(item);
+                        this.toggle(item, {
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The folder item [' + this.getId(item) + '] was toggled !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to toggle the item [' + this.getId(item) + '] !');
+                            }
+                        });
                     }
                 };
 
+                // toggle item and all subitems
                 $('#branch_toggle').click(function(){
                     if (checkBusy()){
                         return;
                     }
-                    if (isTree()){
+                    if (checkIsTree()){
                         treeApi.branch(null, branch_toggle, true);
                     } else {
-                        var item = isItem();
+                        var item = requireFolder();
                         if (item){
                             // need this cause 'branch' is processing only childs (item is not included)
-                            treeApi.toggle(item);
-                            treeApi.branch(item, branch_toggle, true);
-                        } else {
-                            warn();
+                            treeApi.toggle(item, {
+                                success: function(){
+                                    this.branch(item, branch_toggle, true);
+                                }
+                            });
                         }
                     }
                 });
 
-                // search by ID and make item visible
-
-                function wasFound(id, item){
-                    var path = '[root] ';
-                    treeApi.path(item).each(function(){
-                        path += '[' + treeApi.getId($(this)) + '] ';
-                    });
-                    // set item visible :)
-                    treeApi.setVisible(item, {
-                        success: function(){
-                            alert('The ID [' + id + '] has been found!\nThe path is: ' + path);
-                        }
-                    });
-                }
-
-                function notFound(id){
-                    alert('The ID [' + id + '] has not been found!');
-                }
-
+                // set item visible, search by ID
                 $('#set_visible').click(function(){
                     var id = $('[name=item_id]').val();
                     var path = $('[name=search_path]').is(':checked');
                     var load = $('[name=search_load]').is(':checked');
-                    if (path && load){
-                        // we need to use callbacks with 'load' cause it's async
-                        treeApi.searchId(id, path, load, {
-                            success: function(item){
-                                wasFound(id, item);
-                            },
-                            fail: function(item){
-                                notFound(id);
-                            }
-                        });
-                    } else {
-                        var found = treeApi.searchId(id, path);
-                        if (found.length){
-                            wasFound(id, found);
-                        } else {
-                            notFound(id);
-                        }
-                    }
+                    treeApi.searchId(path, load, {
+                        uid: 'user-defined',
+                        success: function(item, options){
+                            var _this = this;
+                            var path = '[root] ';
+                            this.path(item).each(function(){
+                                path += '[' + _this.getId($(this)) + '] ';
+                            });
+                            this.setVisible(item, {
+                                uid: 'user-defined',
+                                success: function(item, options){
+                                    alert('The item with the ID [' + this.getId(item) + '] has been found !\nThe path is: ' + path);
+                                },
+                                fail: function(item, options){
+                                    alert('Failed to make visisble the item [' + this.getId(item) + '] !');
+                                }
+                            });
+                        },
+                        fail: function(item, options){
+                            alert('Failed to find the ID [' + options.id + '] !');
+                        },
+                        id: id
+                    });
                 });
 
-                // set item content
-
+                // set item text content
                 $('#set_cnt').click(function(){
-                    var cnt = $('[name=item_cnt]').val();
-                    if (cnt.length){
-                        var item = isItem();
-                        if (item){
-                            treeApi.setText(item, cnt);
-                        } else {
-                            warn(true);
-                        }
-                    } else {
-                        alert('Please enter some content do set the item to!');
+                    var text = $('[name=item_cnt]').val();
+                    var item = requireItem();
+                    if (item){
+                        treeApi.setLabel(item, {
+                            uid: 'user-defined',
+                            success: function(item, options, oldText){
+                                alert('The item text [' + this.getId(item) + '] was set ! ');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to update item text for the item [' + this.getId(item) + '] !');
+                            },
+                            label: text
+                        });
                     }
                 });
 
                 // update items
 
+                // update to a file
                 $('#update_file').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
+                        var file = newFile();
+                        file.item = 'usign [update] to set the item as a file';
                         treeApi.update(item, {
-                            itemData: {
-                                id: 'a_new_file_id',
-                                item: 'usign [update] to set a item as a file',
-                                props: {
-                                    icon: 'file'
-                                }
-                            }
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The item was updated !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to update the item !');
+                            },
+                            itemData: file
                         });
-                    } else {
-                        warn(true);
                     }
                 });
 
+                // update to a folder
                 $('#update_folder').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
+                        var folder = newFolder();
+                        folder.item = 'usign [update] to set the item as a folder';
+                        folder.items = [newFolder(), newFile()];
                         treeApi.update(item, {
-                            itemData: {
-                                id: 'a_new_folder_id',
-                                item: 'usign [update] to set a item as a folder',
-                                props: {
-                                    isFolder: true,
-                                    icon: 'folder'
-                                },
-                                items: rootData // using rootData to init the folder
-                            }
+                            uid: 'user-defined',
+                            success: function(item, options){
+                                alert('The item was updated !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to update the item !');
+                            },
+                            itemData: folder
                         });
-                    } else {
-                        warn(true);
                     }
                 });
 
                 // move items
 
                 $('#move_up').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
-                        treeApi.moveUp(item);
-                    } else {
-                        warn(true);
+                        treeApi.moveUp(item, {
+                            uid: 'user-defined',
+                            success: function(item, options, oldIndex){
+                                alert('The item was moved up !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to move item up !');
+                            }
+                        });
                     }
                 });
 
                 $('#move_down').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
-                        treeApi.moveDown(item);
-                    } else {
-                        warn(true);
+                        treeApi.moveDown(item, {
+                            uid: 'user-defined',
+                            success: function(item, options, oldIndex){
+                                alert('The item was moved down !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to move item down !');
+                            }
+                        });
                     }
                 });
 
                 $('#move_first').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
-                        treeApi.moveFirst(item);
-                    } else {
-                        warn(true);
+                        treeApi.moveFirst(item, {
+                            uid: 'user-defined',
+                            success: function(item, options, oldIndex){
+                                alert('The item was moved on first position !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to move item on first position !');
+                            }
+                        });
                     }
                 });
 
                 $('#move_last').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
-                        treeApi.moveLast(item);
-                    } else {
-                        warn(true);
+                        treeApi.moveLast(item, {
+                            uid: 'user-defined',
+                            success: function(item, options, oldIndex){
+                                alert('The item was moved on last position !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to move item on last position !');
+                            }
+                        });
                     }
                 });
 
-                // set index
-
+                // set item index
                 $('#set_index').click(function(){
-                    var item = isItem();
+                    var item = requireItem();
                     if (item){
                         var index = parseInt($('[name=index]').val());
                         if (isNaN(index)){
                             index = 0;
                         }
-                        treeApi.setIndex(item, index);
-                    } else {
-                        warn(true);
+                        treeApi.setIndex(item, {
+                            uid: 'user-defined',
+                            success: function(item, options, oldIndex){
+                                alert('The item index was set !');
+                            },
+                            fail: function(item, options){
+                                alert('Failed to set the item index !');
+                            },
+                            index: index
+                        });
                     }
                 });
 
                 // swap items by ID (if found)
-
                 $('#swap').click(function(){
                     var swap1 = $('[name=swap1]').val();
-                    var swap2 = $('[name=swap2]').val();
-                    var item1 = treeApi.searchId(swap1);
-                    var item2 = treeApi.searchId(swap2);
-                    if (!item1.length){
-                        alert('First item ID not found!');
-                    } else if (!item2.length){
-                        alert('Second item ID not found!');
-                    } else {
-                        treeApi.swap(item1, item2);
-                    }
+                    treeApi.searchId(true, true, {
+                        uid: 'user-defined',
+                        success: function(item1){
+                            var swap2 = $('[name=swap2]').val();
+                            treeApi.searchId(true, true, {
+                                uid: 'user-defined',
+                                success: function(item2){
+                                    this.swap({
+                                        uid: 'user-defined',
+                                        success: function(item, options){
+                                            alert('[' + this.getId(options.item1) + '] successfully swapped with [' + this.getId(options.item2) + '] !');
+                                        },
+                                        fail: function(item, options){
+                                            alert('Failed to swap [' + this.getId(options.item1) + '] with [' + this.getId(options.item2) + '] !');
+                                        },
+                                        item1: item1,
+                                        item2: item2
+                                    });
+                                },
+                                fail: function(item, options){
+                                    alert('The ID [' + options.id + '] has not been found !');
+                                },
+                                id: swap2
+                            });
+                        },
+                        fail: function(item, options){
+                            alert('The ID [' + options.id + '] has not been found !');
+                        },
+                        id: swap1
+                    });
                 });
 
             });

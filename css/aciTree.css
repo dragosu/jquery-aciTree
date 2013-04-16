@@ -66,6 +66,7 @@
     display:inline-block;
     height:20px;
     line-height:20px;
+    font-family:Verdana, Geneva, sans-serif;
     font-size:11px;
     vertical-align:top;
 }
@@ -201,6 +202,21 @@
 .aciTree .aciTreeCheckbox input[type=checkbox].aciTreeTristate {
     opacity:0.6;
     filter: alpha(opacity = 60);
+}
+
+/* inplace editable */
+
+.aciTree .aciTreeEdited input[type=text] {
+    outline: none;
+    border:1px solid #000;
+    padding:0;
+    margin:0;
+    line-height:18px;
+    height:18px;
+    display:inline-block;
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:11px;
+    vertical-align:top;
 }
 
 /* default - item in the middle (comment the hover part to keep the same button image) */

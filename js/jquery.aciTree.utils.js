@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.4
+ * aciTree jQuery Plugin v3.0.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Wed 3 20:40 2013 +0200
+ * Date: Apr Mon 15 20:10 2013 +0200
  */
 
 /*
@@ -27,79 +27,88 @@
         __extend: function(){
             $.extend(this._private, {
                 // the branch queue
-                branchQueue: new this._queue(null, true)
+                branchQueue: new this._queue(this._instance.options.threads, true).context(this)
             });
             // call the parent
             this._super();
         },
 
         // update item (create tree branch if requested)
-        // if options.itemData have the 'items' property set then
+        // if options.itemData have the 'childs' property set then
         // will be like when calling 'loadFrom' for the item
         update: function(item, options){
-            var _this = this;
             options = this._options(options, function(){
-                _this._trigger(item, 'updated');
+                this._trigger(item, 'updated', options);
             }, function(){
-                _this._trigger(item, 'updatefail');
+                this._trigger(item, 'updatefail', options);
             });
             if (this.isItem(item)){
-                if (options.itemData.props && (options.itemData.props.isFolder || (options.itemData.props.isFolder === null))){
+                if (!this._trigger(item, 'beforeupdate', options)){
+                    this._fail(item, options);
+                    return;
+                }
+                var details = function(){
+                    if (typeof options.itemData.id != 'undefined'){
+                        this.setId(item, {
+                            id: options.itemData.id
+                        });
+                    }
+                    if (typeof options.itemData.label != 'undefined'){
+                        this.setLabel(item, {
+                            label: options.itemData.label
+                        });
+                    }
+                    if (typeof options.itemData.icon != 'undefined'){
+                        this.setIcon(item, {
+                            icon: options.itemData.icon
+                        });
+                    }
+                };
+                if (options.itemData.isFolder || (options.itemData.isFolder === null)){
                     var process = function(){
-                        _this.setId(item, options.itemData.id);
-                        _this.setText(item, options.itemData.item);
-                        if (options.itemData.props){
-                            _this.setIcon(item, options.itemData.props.icon);
-                        }
-                        item.first().removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.props.isFolder ||
-                            (options.itemData.items && options.itemData.items.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
-                        if (options.itemData.items){
-                            if (_this.wasLoad(item)){
-                                _this.unload(item, {
+                        // set item ID/text/icon
+                        details.apply(this);
+                        item.first().removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.isFolder ||
+                            (options.itemData.childs && options.itemData.childs.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
+                        if (options.itemData.childs){
+                            if (this.wasLoad(item)){
+                                this.unload(item, this._inner(options, {
                                     success: function(){
-                                        _this.loadFrom(item, {
+                                        this.loadFrom(item, this._inner(options, {
                                             success: options.success,
                                             fail: options.fail,
-                                            itemData: options.itemData.items
-                                        });
+                                            itemData: options.itemData.childs
+                                        }));
                                     },
-                                    fail: options.fail,
-                                    unanimated: options.unanimated
-                                });
+                                    fail: options.fail
+                                }));
                             } else {
-                                _this.loadFrom(item, {
+                                this.loadFrom(item, this._inner(options, {
                                     success: options.success,
                                     fail: options.fail,
-                                    itemData: options.itemData.items
-                                });
+                                    itemData: options.itemData.childs
+                                }));
                             }
                         } else {
-                            _this._success(item, options);
+                            this._success(item, options);
                         }
                     };
                     if (this.isFolder(item)){
-                        process();
+                        process.apply(this);
                     } else {
-                        this.setFolder(item, {
+                        this.setFolder(item, this._inner(options, {
                             success: process,
                             fail: options.fail
-                        });
+                        }));
                     }
                 } else {
-                    var process = function(){
-                        _this.setId(item, options.itemData.id);
-                        _this.setText(item, options.itemData.item);
-                        if (options.itemData.props){
-                            _this.setIcon(item, options.itemData.props.icon);
-                        }
-                    };
                     if (this.isFile(item)){
-                        process();
+                        details.apply(this);
                     } else {
-                        this.setFile(item, {
-                            success: process,
+                        this.setFile(item, this._inner(options, {
+                            success: details,
                             fail: options.fail
-                        });
+                        }));
                     }
                 }
             } else {
@@ -118,15 +127,15 @@
                     if (_this.isFolder(child)){
                         if (_this.wasLoad(child)){
                             _private.branchQueue.push(function(){
-                                callback(_this, child);
+                                callback.call(this, child);
                                 process(child, callback);
                                 process(child, callback, true);
                             }).run();
                         } else if (load) {
                             _private.branchQueue.push(function(complete){
-                                _this.ajaxLoad(child, {
+                                this.ajaxLoad(child, {
                                     success: function(){
-                                        callback(_this, child);
+                                        callback.call(this, child);
                                         process(child, callback);
                                         process(child, callback, true);
                                         complete();
@@ -139,13 +148,13 @@
                             }, true).run();
                         } else {
                             _private.branchQueue.push(function(){
-                                callback(_this, child);
+                                callback.call(this, child);
                                 process(child, callback, true);
                             }).run();
                         }
                     } else {
                         _private.branchQueue.push(function(){
-                            callback(_this, child);
+                            callback.call(this, child);
                             process(child, callback, true);
                         }).run();
                     }
@@ -164,8 +173,18 @@
         },
 
         // swap two items
-        swap: function(item1, item2){
+        // options.item1 & options.item2 are the swapped items
+        swap: function(options){
+            options = this._options(options, null, function(){
+                this._trigger(null, 'swapfail', options);
+            });
+            var item1 = options.item1;
+            var item2 = options.item2;
             if (this.isItem(item1) && this.isItem(item2) && !this.isChildren(item1, item2) && !this.isChildren(item2, item1) && (item1.get(0) != item2.get(0))){
+                if (!this._trigger(null, 'beforeswap', options)){
+                    this._fail(null, options);
+                    return;
+                }
                 item1 = item1.first();
                 item2 = item2.first();
                 var prev = this.prev(item1);
@@ -200,14 +219,11 @@
                 this._updateFirstLast(parent.length ? parent : null, item2.add(item1));
                 this._updateVisibleState(parent.length ? parent : null, item2);
                 this._updateOddEven(item1.add(item2));
-                this._trigger(null, 'swapped', {
-                    item1: item1,
-                    item2: item2
-                });
-                return true;
+                this._trigger(null, 'swapped', options);
+                this._success(null, options);
+            } else {
+                this._fail(null, options);
             }
-            this._trigger(null, 'swapfail');
-            return false;
         },
 
         // update item level
@@ -244,35 +260,31 @@
         },
 
         // move item up
-        moveUp: function(item){
-            if (this.isItem(item)){
-                return this.setIndex(item, this.getIndex(item) - 1);
-            }
-            return false;
+        moveUp: function(item, options){
+            options = this._options(options);
+            options.index = this.getIndex(item) - 1;
+            this.setIndex(item, options);
         },
 
         // move item down
-        moveDown: function(item){
-            if (this.isItem(item)){
-                return this.setIndex(item, this.getIndex(item) + 1);
-            }
-            return false;
+        moveDown: function(item, options){
+            options = this._options(options);
+            options.index = this.getIndex(item) + 1;
+            this.setIndex(item, options);
         },
 
         // move item in first position
-        moveFirst: function(item){
-            if (this.isItem(item)){
-                return this.setIndex(item, 0);
-            }
-            return false;
+        moveFirst: function(item, options){
+            options = this._options(options);
+            options.index = 0;
+            this.setIndex(item, options);
         },
 
         // move item in last position
-        moveLast: function(item){
-            if (this.isItem(item)){
-                return this.setIndex(item, Number.MAX_VALUE);
-            }
-            return false;
+        moveLast: function(item, options){
+            options = this._options(options);
+            options.index = Number.MAX_VALUE;
+            this.setIndex(item, options);
         },
 
         // search a 'path' ID from a parent
@@ -309,62 +321,61 @@
         },
 
         // search items by ID
+        // options.id is the ID to search for
         // if 'path' is TRUE then the search will be more optimized
         // and reduced to the first branch that matches the ID
         // but the ID must be set like a path otherwise will not work
         // if 'load' is TRUE will also try to load nodes (works only when 'path' is TRUE)
-        searchId: function(id, path, load, options){
+        searchId: function(path, load, options){
             var _this = this;
             options = this._options(options);
-            if (id){
-                if (path){
-                    if (load){
-                        var process = function(item){
-                            var found = _this._search(item, id);
-                            if (found){
-                                if (found.exact){
-                                    _this._success(found.item, options);
-                                } else {
-                                    if (_this.wasLoad(found.item)){
-                                        _this._fail(item, options);
-                                    } else {
-                                        _this.ajaxLoad(found.item, {
-                                            success: function(){
-                                                process(found.item);
-                                            },
-                                            fail: options.fail
-                                        });
-                                    }
-                                }
+            var id = options.id;
+            if (path){
+                if (load){
+                    var process = function(item){
+                        var found = _this._search(item, id);
+                        if (found){
+                            if (found.exact){
+                                _this._success(found.item, options);
                             } else {
-                                _this._fail(item, options);
+                                if (_this.wasLoad(found.item)){
+                                    _this._fail(item, options);
+                                } else {
+                                    _this.ajaxLoad(found.item, _this._inner(options, {
+                                        success: function(){
+                                            process(found.item);
+                                        },
+                                        fail: options.fail
+                                    }));
+                                }
                             }
-                        };
-                        process();
-                        return $([]);
-                    } else {
-                        var found = this._search(null, id);
-                        if (found && found.exact){
-                            this._success(found, options);
-                            return found.item;
+                        } else {
+                            _this._fail(item, options);
                         }
-                    }
+                    };
+                    process();
                 } else {
-                    var found = $();
-                    this._instance.jQuery.find('.aciTreeLi').each(function(){
-                        if (id == _this.getId($(this))){
-                            found = $(this);
-                            return false;
-                        }
-                    });
-                    if (found.length){
-                        this._success(found, options);
-                        return found;
+                    var found = this._search(null, id);
+                    if (found && found.exact){
+                        this._success(found.item, options);
+                    } else {
+                        this._fail(null, options);
                     }
                 }
+            } else {
+                var found = $();
+                this._instance.jQuery.find('.aciTreeLi').each(function(){
+                    if (id == _this.getId($(this))){
+                        found = $(this);
+                        return false;
+                    }
+                });
+                if (found.length){
+                    this._success(found, options);
+                } else {
+                    this._fail(null, options);
+                }
             }
-            this._fail(null, options);
-            return $([]);
         },
 
         // override _destroyHook

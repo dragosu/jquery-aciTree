@@ -11,7 +11,8 @@ Features:
 
 - supports selecting an item, checkbox and radio-button elements, keyboard
   navigation (the arrow keys, pageup/pagedown, home/end, enter, escape and
-  space can be used);
+  space can be used), in-place item editing (using f2 key or the mouse
+  and enter/escape keys to save/cancel editing);
 
 - supports displaying multiple columns without using tables, with RTL support;
 
@@ -40,9 +41,9 @@ $(function(){
 
 });
 
-Check out the demos, now with odd/even styling support!
+Check out the demos, now with in-place edit support!
 
-aciTree jQuery Plugin v3.0.0-rc.4
+aciTree jQuery Plugin v3.0.0-rc.5
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -51,4 +52,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 Require jQuery Library >= v1.7.1 http://jquery.com
 + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
 
-Date: Apr Wed 3 20:40 2013 +0200
+Date: Apr Mon 15 20:10 2013 +0200

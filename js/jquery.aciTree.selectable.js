@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.4
+ * aciTree jQuery Plugin v3.0.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Wed 3 20:40 2013 +0200
+ * Date: Apr Mon 15 20:10 2013 +0200
  */
 
 /*
@@ -47,7 +47,7 @@
             this._super();
         },
 
-        // check if has focus
+        // test if has focus
         hasFocus: function(){
             return this._instance.focus;
         },
@@ -70,15 +70,14 @@
 
         // process onblur
         _blur: function(){
-            var _this = this;
             clearTimeout(this._private.blurTimeout);
-            this._private.blurTimeout = setTimeout(function(){
-                if (_this._instance.focus){
-                    _this._instance.focus = false;
-                    _this._instance.jQuery.removeClass('aciTreeFocus');
-                    _this._trigger(null, 'blurred');
+            this._private.blurTimeout = setTimeout($.proxy(function(){
+                if (this._instance.focus){
+                    this._instance.focus = false;
+                    this._instance.jQuery.removeClass('aciTreeFocus');
+                    this._trigger(null, 'blurred');
                 }
-            }, 10);
+            }, this), 10);
         },
 
         // init selectable
@@ -184,7 +183,9 @@
                         if (!_this.isVisible(item)){
                             _this.setVisible(item);
                         }
-                        _this.select(item, true);
+                        _this.select(item, {
+                            select: true
+                        });
                         return false;
                     } else if (!_this.isVisible(item)){
                         _this.setVisible(item);
@@ -205,7 +206,9 @@
                     _this.setVisible(item);
                 }
                 if (!_this.isSelected(item)){
-                    _this.select(item, true);
+                    _this.select(item, {
+                        select: true
+                    });
                 }
             }).on('dblclick' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', function(e){
                 var item = _this.itemFrom(e.target);
@@ -222,7 +225,7 @@
 
         // override _initHook
         _initHook: function(){
-            if (this._instance.options.selectable){
+            if (this.isSelectable()){
                 this._initSelectable();
             }
             // call the parent
@@ -373,31 +376,44 @@
             return next;
         },
 
-        _selectHook: function(item){
-        // override this to process after select, return FALSE to skip
+        _selectHook: function(unselected, selected){
+        // override this to process after select, return TRUE to skip
         },
 
         // select/deselect item
-        select: function(item, state){
+        // options.select is the new state
+        // options.oldSelected will keep the old selected item
+        select: function(item, options){
             var _this = this;
-            var unselect = this._instance.jQuery.find('.aciTreeSelected');
-            if (item && state){
-                unselect = unselect.not(item);
-            }
-            var oldSelected = this.selected();
-            unselect.removeClass('aciTreeSelected').each(function(){
-                _this._trigger($(this), 'unselected');
+            options = this._options(options, null, function(){
+                this._trigger(item, 'selectfail', options);
             });
-            if (state && this.isItem(item)){
-                if (this.isSelected(item)){
-                    this._trigger(item, 'wasselected');
-                } else {
-                    item.first().addClass('aciTreeSelected');
-                    this._trigger(item, 'selected', {
-                        oldSelected: oldSelected
-                    });
-                    this._selectHook(oldSelected);
+            if (this.isSelectable() && this.isItem(item)){
+                if (!this._trigger(item, 'beforeselect', options)){
+                    this._fail(item, options);
+                    return;
                 }
+                var select = options.select;
+                var unselect = this._instance.jQuery.find('.aciTreeSelected');
+                if (select){
+                    unselect = unselect.not(item.first());
+                }
+                options.oldSelected = this.selected();
+                unselect.removeClass('aciTreeSelected').each(function(){
+                    _this._trigger($(this), 'unselected', options);
+                });
+                if (select){
+                    if (this.isSelected(item)){
+                        this._trigger(item, 'wasselected', options);
+                    } else {
+                        item.first().addClass('aciTreeSelected');
+                        this._selectHook(options.oldSelected, item);
+                        this._trigger(item, 'selected', options);
+                    }
+                }
+                this._success(this, options);
+            } else {
+                this._fail(this, options);
             }
         },
 
@@ -411,11 +427,16 @@
             return item && item.first().hasClass('aciTreeSelected');
         },
 
+        // test if selectable is enabled
+        isSelectable: function(){
+            return this._instance.options.selectable;
+        },
+
         // override set option
         option: function(option, value){
             var _this = this;
             if (this.wasInit() && !this.isLocked()){
-                if ((option == 'selectable') && (value != this._instance.options.selectable)) {
+                if ((option == 'selectable') && (value != this.isSelectable())) {
                     if (value){
                         this._initSelectable();
                     } else {
@@ -453,7 +474,9 @@
             if (!destroy){
                 var selected = this.selected();
                 if (selected.length){
-                    this.select(selected, false);
+                    this.select(selected, {
+                        select: false
+                    });
                 }
             }
         },

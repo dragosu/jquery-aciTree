@@ -28,21 +28,20 @@ abstract class Tree {
 
     private function _json($parentId, Array &$json, $children) {
         $branch = $this->branch($parentId);
-        foreach ($branch as $id => $item) {
+        foreach ($branch as $id => $label) {
             $props = $this->itemProps($id);
-            $items = array();
+            $childs = array();
             if ($children) {
-                $this->_json($id, $items, $children);
-                if (count($items) == 0) {
+                $this->_json($id, $childs, $children);
+                if (count($childs) == 0) {
                     $props['isFolder'] = false;
                 }
             }
-            $json[] = array(
+            $json[] = array_merge(array(
                 'id' => $id,
-                'item' => $item,
-                'props' => $props,
-                'items' => $items
-            );
+                'label' => $label,
+                'childs' => $childs
+            ), $props);
         }
     }
 
