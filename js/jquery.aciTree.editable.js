@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.5
+ * aciTree jQuery Plugin v3.0.0-rc.6
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 15 20:10 2013 +0200
+ * Date: Apr Mon 17 21:40 2013 +0200
  */
 
 /*
@@ -38,28 +38,42 @@
                     case 'blurred':
                         // support 'selectable' extension
                         var edited = api.edited();
-                        api.edit(edited, false, true);
+                        if (edited.length){
+                            api.edit(edited, {
+                                edit: false,
+                                save: true
+                            });
+                        }
                         break;
                     case 'unselected':
                         // support 'selectable' extension
-                        api.edit(item, false, true);
+                        if (api.isEdited(item)){
+                            api.edit(item, {
+                                edit: false,
+                                save: true
+                            });
+                        }
                         break;
                 }
             }).bind('click' + this._private.nameSpace, function(){
                 var edited = _this.edited();
-                _this.edit(edited, {
-                    edit: false,
-                    save: true
-                });
+                if (edited.length){
+                    _this.edit(edited, {
+                        edit: false,
+                        save: true
+                    });
+                }
             }).bind('keydown' + this._private.nameSpace, function(e){
                 switch (e.which){
                     case 113: // F2
                         // support 'selectable' extension
                         if (_this.isSelectable){
                             var selected = _this.selected();
-                            _this.edit(selected, {
-                                edit: true
-                            });
+                            if (!_this.isEdited(selected)){
+                                _this.edit(selected, {
+                                    edit: true
+                                });
+                            }
                         }
                         break;
                 }
@@ -67,12 +81,10 @@
                 if ($(e.target).is('.aciTreeItem,.aciTreeText')){
                     var item = _this.itemFrom(e.target);
                     // support 'selectable' extension
-                    if (_this.isSelectable && _this.isSelectable()){
-                        if (_this.isSelected(item)){
-                            _this.edit(item, {
-                                edit: true
-                            });
-                        }
+                    if (_this.isSelectable && _this.isSelected(item)){
+                        _this.edit(item, {
+                            edit: true
+                        });
                     }
                 }
             }).on('dblclick' + this._private.nameSpace, '.aciTreeItem', function(e){
