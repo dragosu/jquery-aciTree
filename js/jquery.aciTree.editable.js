@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.6
+ * aciTree jQuery Plugin v3.0.0-rc.7
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,14 +9,15 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 17 21:40 2013 +0200
+ * Date: Apr Mon 29 09:40 2013 +0200
  */
 
 /*
- * This extension adds inplace edit support to aciTree.
+ * This extension adds inplace edit support to aciTree,
+ * should be used with the selectable extension.
  */
 
-(function($){
+(function($, window, undefined) {
 
     // extra default options
 
@@ -29,16 +30,16 @@
     // press enter/escape to save/cancel the text edit
 
     var aciTree_editable = {
-
         // init editable
-        _initEditable: function(){
+        _initEditable: function() {
             var _this = this;
-            this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options){
-                switch (eventName){
+            this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
+                switch (eventName) {
                     case 'blurred':
                         // support 'selectable' extension
                         var edited = api.edited();
-                        if (edited.length){
+                        if (edited.length) {
+                            // cancel edit/save the changes
                             api.edit(edited, {
                                 edit: false,
                                 save: true
@@ -47,7 +48,8 @@
                         break;
                     case 'unselected':
                         // support 'selectable' extension
-                        if (api.isEdited(item)){
+                        if (api.isEdited(item)) {
+                            // cancel edit/save the changes
                             api.edit(item, {
                                 edit: false,
                                 save: true
@@ -55,21 +57,24 @@
                         }
                         break;
                 }
-            }).bind('click' + this._private.nameSpace, function(){
+            }).bind('click' + this._private.nameSpace, function() {
+                // click on the tree
                 var edited = _this.edited();
-                if (edited.length){
+                if (edited.length) {
+                    // cancel edit/save the changes
                     _this.edit(edited, {
                         edit: false,
                         save: true
                     });
                 }
-            }).bind('keydown' + this._private.nameSpace, function(e){
-                switch (e.which){
+            }).bind('keydown' + this._private.nameSpace, function(e) {
+                switch (e.which) {
                     case 113: // F2
                         // support 'selectable' extension
-                        if (_this.isSelectable){
+                        if (_this.isSelectable) {
                             var selected = _this.selected();
-                            if (!_this.isEdited(selected)){
+                            if (!_this.isEdited(selected)) {
+                                // enable edit on F2 key
                                 _this.edit(selected, {
                                     edit: true
                                 });
@@ -77,27 +82,29 @@
                         }
                         break;
                 }
-            }).on('mouseup' + this._private.nameSpace, '.aciTreeItem', function(e){
-                if ($(e.target).is('.aciTreeItem,.aciTreeText')){
+            }).on('mouseup' + this._private.nameSpace, '.aciTreeItem', function(e) {
+                if ($(e.target).is('.aciTreeItem,.aciTreeText')) {
                     var item = _this.itemFrom(e.target);
                     // support 'selectable' extension
-                    if (_this.isSelectable && _this.isSelected(item)){
+                    if (_this.isSelectable && _this.isSelected(item)) {
+                        // enable edit on selected item
                         _this.edit(item, {
                             edit: true
                         });
                     }
                 }
-            }).on('dblclick' + this._private.nameSpace, '.aciTreeItem', function(e){
+            }).on('dblclick' + this._private.nameSpace, '.aciTreeItem', function(e) {
                 // support 'selectable' extension
-                if (_this.isSelectable && !_this.isSelectable()){
+                if (_this.isSelectable && !_this.isSelectable()) {
                     var item = _this.itemFrom(e.target);
+                    // enable edit mode
                     _this.edit(item, {
                         edit: true
                     });
                 }
-            }).on('keydown' + this._private.nameSpace, 'input[type=text]', function(e){
+            }).on('keydown' + this._private.nameSpace, 'input[type=text]', function(e) {
                 // key handling
-                switch (e.which){
+                switch (e.which) {
                     case 13: // enter
                         var item = _this.itemFrom(e.target);
                         _this.edit(item, {
@@ -128,103 +135,99 @@
                         e.stopPropagation();
                         break;
                 }
-            }).on('blur' + this._private.nameSpace, 'input[type=text]', function(){
-                if (_this.isSelectable && !_this.isSelectable()){
+            }).on('blur' + this._private.nameSpace, 'input[type=text]', function() {
+                if (_this.isSelectable && !_this.isSelectable()) {
                     var edited = _this.edited();
+                    // cancel edit/save the changes
                     _this.edit(edited, {
                         edit: false,
                         save: true
                     });
                 }
-            }).on('dblclick' + this._private.nameSpace, 'input[type=text]', function(e){
+            }).on('dblclick' + this._private.nameSpace, 'input[type=text]', function(e) {
                 e.stopPropagation();
             });
         },
-
         // override _initHook
-        _initHook: function(){
-            if (this.isEditable()){
+        _initHook: function() {
+            if (this.isEditable()) {
                 this._initEditable();
             }
             // call the parent
             this._super();
         },
-
         // return the edit field
-        _editbox: function(item){
+        _editbox: function(item) {
             return item ? item.first().children('.aciTreeLine').find('input[type=text]') : $([]);
         },
-
         // add item edit field
-        _addEditbox: function(item){
+        _addEditbox: function(item) {
             var line = item.first().addClass('aciTreeEdited').children('.aciTreeLine');
-            var id = 'editable_' + String(this.getId(item)).replace(/[^a-z0-9_-]/ig, '');
+            var id = 'editable_' + window.String(this.getId(item)).replace(/[^a-z0-9_-]/ig, '');
             line.find('.aciTreeText').html('<input id="' + id + '" type="text" value="" />');
             line.find('label').attr('for', id);
             this._editbox(item).val(this.getLabel(item));
         },
-
         // remove item edit field
-        _removeEditbox: function(item){
+        _removeEditbox: function(item) {
             var line = item.first().removeClass('aciTreeEdited').children('.aciTreeLine');
             line.find('.aciTreeText').html(this.getLabel(item));
             line.find('label').removeAttr('for');
         },
-
         // get edited item
-        edited: function(){
+        edited: function() {
             return this._instance.jQuery.find('.aciTreeEdited:first');
         },
-
         // test if item is edited
-        isEdited: function(item){
+        isEdited: function(item) {
             return item && item.first().hasClass('aciTreeEdited');
         },
-
         // set focus to the input
-        _focusEdit: function(item){
+        _focusEdit: function(item) {
             var field = this._editbox(item).focus().trigger('click').get(0);
-            if (field){
+            if (field) {
                 if (typeof field.selectionStart == 'number') {
                     field.selectionStart = field.selectionEnd = field.value.length;
-                } else if (typeof field.createTextRange != 'undefined') {
+                } else if (field.createTextRange !== undefined) {
                     var range = field.createTextRange();
                     range.collapse(false);
                     range.select();
                 }
             }
         },
-
         // override setLabel
-        setLabel: function(item, options){
-            options = this._options(options, function(item){
-                if (this.isEditable() && this.isEdited(item)){
+        setLabel: function(item, options) {
+            options = this._options(options, function(item) {
+                if (this.isEditable() && this.isEdited(item)) {
                     var focus = this._editbox(item).is(':focus');
+                    // add the edit box
                     this._addEditbox(item);
-                    if (focus){
+                    if (focus) {
+                        // focus on the input
                         this._focusEdit(item);
                     }
                 }
             });
             this._super(item, options);
         },
-
         // item inplace edit/stop edit
         // options.edit is the new state
         // options.save tell if is to be saved
-        edit: function(item, options){
-            options = this._options(options, null, function(){
+        edit: function(item, options) {
+            options = this._options(options, null, function() {
                 this._trigger(item, 'editfail', options);
             });
-            if (this.isEditable() && this.isItem(item)){
-                if (!this._trigger(item, 'beforeedit', options)){
+            if (this.isEditable() && this.isItem(item)) {
+                // a way to cancel the edit
+                if (!this._trigger(item, 'beforeedit', options)) {
                     this._fail(item, options);
                     return;
                 }
                 var edit = options.edit;
                 var save = options.save;
-                if (edit && this.isEdited(item)){
-                    if (save){
+                if (edit && this.isEdited(item)) {
+                    // was edited already
+                    if (save) {
                         var text = this._editbox(item).val();
                         this.setLabel(item, {
                             label: text
@@ -233,10 +236,11 @@
                     this._trigger(edited, 'wasedit', options);
                 } else {
                     var edited = this.edited();
-                    if (edited.length){
+                    if (edited.length) {
+                        // a item was edited
                         var text = this._editbox(edited).val();
                         this._removeEditbox(edited);
-                        if (save){
+                        if (save) {
                             this.setLabel(edited, {
                                 label: text
                             });
@@ -245,7 +249,7 @@
                     }
                     if (edit) {
                         // support selectable
-                        if (this.isSelectable && !this.isSelected(item)){
+                        if (this.isSelectable && !this.isSelected(item)) {
                             this.select(item, true);
                         }
                         this._addEditbox(item);
@@ -253,22 +257,20 @@
                         this._trigger(item, 'editstart', options);
                     }
                 }
-                this._success(this, options);
+                this._success(item, options);
             } else {
-                this._fail(this, options);
+                this._fail(item, options);
             }
         },
-
         // test if editable is enabled
-        isEditable: function(){
+        isEditable: function() {
             return this._instance.options.editable;
         },
-
         // override set option
-        option: function(option, value){
-            if (this.wasInit() && !this.isLocked()){
+        option: function(option, value) {
+            if (this.wasInit() && !this.isLocked()) {
                 if ((option == 'editable') && (value != this.isEditable())) {
-                    if (value){
+                    if (value) {
                         this._initEditable();
                     } else {
                         this._doneEditable();
@@ -278,23 +280,21 @@
             // call the parent
             this._super(option, value);
         },
-
         // done editable
-        _doneEditable: function(){
+        _doneEditable: function() {
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
             this._instance.jQuery.off(this._private.nameSpace, 'input[type=text]');
             var edited = this.edited();
-            if (edited.length){
+            if (edited.length) {
                 this.edit(edited, {
                     edit: false,
                     save: true
                 });
             }
         },
-
         // override _destroyHook
-        _destroyHook: function(unloaded){
+        _destroyHook: function(unloaded) {
             this._doneEditable();
             // call the parent
             this._super(unloaded);
@@ -308,4 +308,4 @@
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
 
-})(jQuery);
+})(jQuery, this);

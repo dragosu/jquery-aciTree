@@ -8,15 +8,15 @@
     "ui",
     "ajax"
     ],
-    "version": "3.0.0-rc.6",
+    "version": "3.0.0-rc.7",
     "author": {
         "name": "Dragos Ursu",
-        "email":"winebetterthanbeer@acoderinsights.ro",
+        "email":"dragosu@acoderinsights.ro",
         "url": "https://github.com/dragosu"
     },
     "maintainers": [{
         "name": "Dragos Ursu",
-        "email":"winebetterthanbeer@acoderinsights.ro",
+        "email":"dragosu@acoderinsights.ro",
         "url": "https://github.com/dragosu"
     }],
     "licenses": [{

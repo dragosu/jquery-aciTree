@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0-rc.6
+ * aciTree jQuery Plugin v3.0.0-rc.7
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -9,7 +9,7 @@
  * Require jQuery Library >= v1.7.1 http://jquery.com
  * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
  *
- * Date: Apr Mon 17 21:40 2013 +0200
+ * Date: Apr Mon 29 09:40 2013 +0200
  */
 
 /*
@@ -35,7 +35,7 @@
  *
  */
 
-(function($){
+(function($, window, undefined) {
 
     // extra default options
 
@@ -47,15 +47,14 @@
     // adds item columns, set width with CSS or using the API
 
     var aciTree_column = {
-
         // override _initHook
-        _initHook: function(){
-            if (this._instance.options.columnData.length){
+        _initHook: function() {
+            if (this._instance.options.columnData.length) {
                 // check column width
                 var index = 0, width = 0, found = false, data;
-                for(var i in this._instance.options.columnData){
+                for (var i in this._instance.options.columnData) {
                     data = this._instance.options.columnData[i];
-                    if (typeof data.width != 'undefined') {
+                    if (data.width !== undefined) {
                         width += data.width;
                         found = true;
                     } else {
@@ -64,7 +63,7 @@
                     }
                     index++;
                 }
-                if (found){
+                if (found) {
                     // at least a column width set
                     var icon = this._getCss(['aciTree', 'aciTreeIcon'], 'width', true);
                     // add item padding
@@ -76,15 +75,14 @@
             // call the parent
             this._super();
         },
-
         // read property value from a CSS class name
-        _getCss: function(className, property, numeric){
-            var id = '_getCss_' + String(className).replace(/[^a-z0-9_-]/ig, '_');
+        _getCss: function(className, property, numeric) {
+            var id = '_getCss_' + window.String(className).replace(/[^a-z0-9_-]/ig, '_');
             var test = $('body').find('#' + id);
-            if (!test.length){
-                if (className instanceof Array){
+            if (!test.length) {
+                if (className instanceof Array) {
                     var style = '', end = '';
-                    for(var i in className){
+                    for (var i in className) {
                         style += '<div class="' + className[i] + '">';
                         end += '</div>';
                     }
@@ -96,33 +94,31 @@
                 test = $('body').find('#' + id);
             }
             var value = test.find('*:last').css(property);
-            if (numeric){
+            if (numeric) {
                 value = parseInt(value);
-                if (isNaN(value)){
+                if (isNaN(value)) {
                     value = null;
                 }
             }
             return value;
         },
-
         // dynamically change a CSS class definition
-        _updateCss: function(className, definition){
-            var id = '_updateCss_' + String(className).replace('>', '_gt_').replace(/[^a-z0-9_-]/ig, '_');
+        _updateCss: function(className, definition) {
+            var id = '_updateCss_' + window.String(className).replace('>', '_gt_').replace(/[^a-z0-9_-]/ig, '_');
             var style = '<style id="' + id + '" type="text/css">' + className + '{' + definition + ';}</style>';
             var test = $('body').find('#' + id);
-            if (test.length){
+            if (test.length) {
                 test.replaceWith(style);
             } else {
                 $('body').prepend(style);
             }
         },
-
         // override _itemHook
-        _itemHook: function(parent, item, itemData, level){
-            if (this._instance.options.columnData.length){
+        _itemHook: function(parent, item, itemData, level) {
+            if (this._instance.options.columnData.length) {
                 var position = item.children('.aciTreeLine').find('.aciTreeEntry');
                 var index = 0, data, column;
-                for(var i in this._instance.options.columnData){
+                for (var i in this._instance.options.columnData) {
                     data = this._instance.options.columnData[i];
                     column = this._createColumn(itemData, data, index);
                     position.prepend(column);
@@ -132,11 +128,10 @@
             // call the parent
             this._super(parent, item, itemData, level);
         },
-
-        _createColumn: function(itemData, columnData, index){
-            var style = (typeof columnData.width != 'undefined') ? ' style="width:' + columnData.width + 'px"' : '';
-            var value = columnData.props && (typeof itemData[columnData.props] != 'undefined') ? itemData[columnData.props] :
-            ((typeof columnData.value == 'undefined') ? '' : columnData.value);
+        _createColumn: function(itemData, columnData, index) {
+            var style = (columnData.width !== undefined) ? ' style="width:' + columnData.width + 'px"' : '';
+            var value = columnData.props && (itemData[columnData.props] !== undefined) ? itemData[columnData.props] :
+                    ((columnData.value === undefined) ? '' : columnData.value);
             return $('<div class="aciTreeColumn aciTreeColumn' + index + '"' + style + '>' + (value.length ? value : '&nbsp;') + '</div>');
         }
 
@@ -148,4 +143,4 @@
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
 
-})(jQuery);
+})(jQuery, this);
