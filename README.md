@@ -45,7 +45,7 @@ $(function(){
 
 Check out the demos, now with in-place edit support!
 
-aciTree jQuery Plugin v3.0.0-rc.7
+aciTree jQuery Plugin v3.0.0
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
@@ -54,4 +54,4 @@ Dual licensed under the MIT or GPL Version 2 licenses.
 Require jQuery Library >= v1.7.1 http://jquery.com
 + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
 
-Date: Apr Mon 29 09:40 2013 +0200
+Date: May Fri 03 19:20 2013 +0200
