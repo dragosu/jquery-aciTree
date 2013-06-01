@@ -8,7 +8,7 @@
     "ui",
     "ajax"
     ],
-    "version": "3.0.0",
+    "version": "3.1.0",
     "author": {
         "name": "Dragos Ursu",
         "email":"dragosu@acoderinsights.ro",
@@ -33,6 +33,6 @@
     "bugs": "https://github.com/dragosu/jquery-aciTree/issues",
     "dependencies": {
         "jquery": ">=1.7.1",
-        "aciPlugin": ">=1.1.1"
+        "aciPlugin": ">=1.4.0"
     }
 }

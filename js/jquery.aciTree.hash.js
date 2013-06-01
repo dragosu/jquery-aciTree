@@ -1,15 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -42,24 +40,26 @@
             // call the parent
             this._super();
         },
+        // init hash
+        _initHash: function() {
+            // init aciFragment
+            this._instance.jQuery.aciFragment();
+            this._private.hashApi = this._instance.jQuery.aciFragment('api');
+            this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
+                switch (eventName) {
+                    case 'init':
+                        api._hashRestore();
+                        break;
+                }
+            }).bind('acifragment' + this._private.nameSpace, this.proxy(function(event, api, anchorChanged) {
+                event.stopPropagation();
+                this._hashRestore();
+            }));
+        },
         // override _initHook
         _initHook: function() {
-            var _this = this;
-            // test for aciFragment presence
-            if ($.fn.aciFragment) {
-                this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
-                    switch (eventName) {
-                        case 'init':
-                            api._hashRestore();
-                            break;
-                    }
-                }).bind('acifragment' + this._private.nameSpace, function(event, api, anchorChanged) {
-                    event.stopPropagation();
-                    _this._hashRestore();
-                });
-                // init aciFragment
-                this._instance.jQuery.aciFragment();
-                this._private.hashApi = this._instance.jQuery.aciFragment('api');
+            if (this.isHash()) {
+                this._initHash();
             }
             // call the parent
             this._super();
@@ -130,9 +130,34 @@
             }
             queue.run();
         },
+        // test if hash is enabled
+        isHash: function() {
+            return this._instance.options.selectHash || this._instance.options.openHash;
+        },
+        // override set option
+        option: function(option, value) {
+            var hash = this.isHash();
+            // call the parent
+            this._super(option, value);
+            if (this.isHash() != hash) {
+                if (hash) {
+                    this._doneHash();
+                } else {
+                    this._initHash();
+                }
+            }
+        },
+        // done hash
+        _doneHash: function() {
+            this._instance.jQuery.unbind(this._private.nameSpace);
+            this._private.hashApi = null;
+            this._instance.jQuery.aciFragment('destroy');
+        },
         // override _destroyHook
         _destroyHook: function(unloaded) {
-            this._instance.jQuery.unbind(this._private.nameSpace);
+            if (unloaded) {
+                this._doneHash();
+            }
             // call the parent
             this._super(unloaded);
         }

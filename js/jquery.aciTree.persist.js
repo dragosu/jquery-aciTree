@@ -1,15 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -39,53 +37,54 @@
             // call the parent
             this._super();
         },
+        // init persist
+        _initPersist: function() {
+            this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
+                if (options.uid == 'ui.persist') {
+                    // skip processing itself
+                    return;
+                }
+                switch (eventName) {
+                    case 'init':
+                        api._persistRestore();
+                        break;
+                    case 'selected':
+                        // support 'selectable' extension
+                        api._persistLater(true);
+                        break;
+                    case 'unselected':
+                        // support 'selectable' extension
+                        api._persistLater(true);
+                        break;
+                    case 'opened':
+                        api._persistLater(false);
+                        break;
+                    case 'closed':
+                        api._persistLater(false);
+                        break;
+                }
+            });
+        },
         // override _initHook
         _initHook: function() {
-            var _this = this;
-            // test for jStorage presence
-            if ($.jStorage) {
-                this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
-                    if (!_this._instance.options.persist || (options.uid == 'ui.persist')) {
-                        // skip processing itself
-                        return;
-                    }
-                    switch (eventName) {
-                        case 'init':
-                            api._persistRestore();
-                            break;
-                        case 'selected':
-                            // support 'selectable' extension
-                            api._persistLater(true);
-                            break;
-                        case 'unselected':
-                            // support 'selectable' extension
-                            api._persistLater(true);
-                            break;
-                        case 'opened':
-                            api._persistLater(false);
-                            break;
-                        case 'closed':
-                            api._persistLater(false);
-                            break;
-                    }
-                });
+            if (this.isPersistOn()) {
+                this._initPersist();
             }
             // call the parent
             this._super();
         },
         // persist states
         _persistLater: function(selected) {
-            var _this = this;
             if (selected) {
                 window.clearTimeout(this._private.selectTimeout);
-                this._private.selectTimeout = window.setTimeout(function() {
-                    _this._persistSelected();
-                }, 250);
+                this._private.selectTimeout = window.setTimeout(this.proxy(function() {
+                    this._persistSelected();
+                }), 250);
             } else {
                 window.clearTimeout(this._private.stateTimeout);
-                this._private.stateTimeout = window.setTimeout(function() {
-                    _this._persistOpen();
-                }, 250);
+                this._private.stateTimeout = window.setTimeout(this.proxy(function() {
+                    this._persistOpen();
+                }), 250);
             }
         },
         // restore item states
@@ -151,16 +150,15 @@
         },
         // persist opened items
         _persistOpen: function() {
-            var _this = this;
             var opened = [];
-            this.visible(this.folders(this.childrens(null, true), true)).each(function() {
-                opened[opened.length] = _this.getId($(this));
-            })
+            this.visible(this.folders(this.childrens(null, true), true)).each(this.proxy(function(element) {
+                opened[opened.length] = this.getId($(element));
+            }, true));
             $.jStorage.set('aciTree_' + this._instance.options.persist + '_opened', opened);
         },
         // test if there is any saved data
         isPersist: function() {
-            if ($.jStorage && this._instance.options.persist) {
+            if (this.isPersistOn()) {
                 var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
                 if (selected) {
                     return true;
@@ -174,14 +172,37 @@
         },
         // remove any saved states
         unpersist: function() {
-            if ($.jStorage && this._instance.options.persist) {
+            if (this.isPersistOn()) {
                 $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_selected');
                 $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_opened');
             }
         },
+        // test if persist is enabled
+        isPersistOn: function() {
+            return this._instance.options.persist;
+        },
+        // override set option
+        option: function(option, value) {
+            var persist = this.isPersistOn();
+            // call the parent
+            this._super(option, value);
+            if (this.isPersistOn() != persist) {
+                if (persist) {
+                    this._donePersist();
+                } else {
+                    this._initPersist();
+                }
+            }
+        },
+        // done persist
+        _donePersist: function() {
+            this._instance.jQuery.unbind(this._private.nameSpace);
+        },
         // override _destroyHook
         _destroyHook: function(unloaded) {
-            this._instance.jQuery.unbind(this._private.nameSpace);
+            if (unloaded) {
+                this._donePersist();
+            }
             // call the parent
             this._super(unloaded);
         }

@@ -1,20 +1,17 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
  * A few utility functions for aciTree.
- *
  */
 
 (function($, window, undefined) {
@@ -117,20 +114,18 @@
         // callback call for each children of item
         // when 'load' is TRUE will also try to load nodes
         branch: function(item, callback, load) {
-            var _this = this;
-            var _private = this._private;
-            var process = function(item, callback, next) {
-                var child = next ? _this.next(item) : _this.first(item);
+            var process = this.proxy(function(item, callback, next) {
+                var child = next ? this.next(item) : this.first(item);
                 if (child.length) {
-                    if (_this.isFolder(child)) {
-                        if (_this.wasLoad(child)) {
-                            _private.branchQueue.push(function() {
+                    if (this.isFolder(child)) {
+                        if (this.wasLoad(child)) {
+                            this._private.branchQueue.push(function() {
                                 callback.call(this, child);
                                 process(child, callback);
                                 process(child, callback, true);
                             }).run();
                         } else if (load) {
-                            _private.branchQueue.push(function(complete) {
+                            this._private.branchQueue.push(function(complete) {
                                 this.ajaxLoad(child, {
                                     success: function() {
                                         callback.call(this, child);
@@ -145,19 +140,19 @@
                                 });
                             }, true).run();
                         } else {
-                            _private.branchQueue.push(function() {
+                            this._private.branchQueue.push(function() {
                                 callback.call(this, child);
                                 process(child, callback, true);
                             }).run();
                         }
                     } else {
-                        _private.branchQueue.push(function() {
+                        this._private.branchQueue.push(function() {
                             callback.call(this, child);
                             process(child, callback, true);
                         }).run();
                     }
                 }
-            };
+            });
             process(item, callback);
         },
         // override isBusy to check branchQueue too
@@ -168,7 +163,7 @@
                 return this._super(item) || !this._private.branchQueue.empty();
             }
         },
-        // swap two items
+        // swap two items (they can't be parent & child)
         // options.item1 & options.item2 are the swapped items
         swap: function(options) {
             options = this._options(options, null, function() {
@@ -209,11 +204,11 @@
                 }
                 this._updateLevel(item1);
                 var parent = this.parent(item1);
-                this._updateFirstLast(parent.length ? parent : null, item1.add(item2));
+                this._updateFirstLast(parent.length ? parent : null, item1);
                 this._updateVisibleState(parent.length ? parent : null, item1);
                 this._updateLevel(item2);
                 parent = this.parent(item2);
-                this._updateFirstLast(parent.length ? parent : null, item2.add(item1));
+                this._updateFirstLast(parent.length ? parent : null, item2);
                 this._updateVisibleState(parent.length ? parent : null, item2);
                 this._updateOddEven(item1.add(item2));
                 this._trigger(null, 'swapped', options);
@@ -223,19 +218,38 @@
             }
         },
         // update item level
-        _updateLevel: function(item) {
-            var level = this.level(item);
-            var count = item.find('.aciTreeBranch').length;
-            if (count < level) {
-                var entry = item.find('.aciTreeEntry');
-                for (var i = level - 1; i >= count; i--) {
+        _updateItemLevel: function(item, fromLevel, toLevel) {
+            item.removeClass('aciTreeLevel' + fromLevel).addClass('aciTreeLevel' + toLevel);
+            var entry = item.children('.aciTreeLine').find('.aciTreeEntry');
+            if (fromLevel < toLevel) {
+                for (var i = fromLevel; i < toLevel; i++) {
                     entry.wrap('<div class="aciTreeBranch aciTreeLevel' + i + '"></div>');
                 }
-            } else if (count > level) {
-                var entry = item.find('.aciTreeEntry');
-                for (var i = level; i < count; i++) {
+            } else if (fromLevel > toLevel) {
+                for (var i = toLevel; i < fromLevel; i++) {
                     entry.unwrap();
                 }
+            }
+        },
+        // update child level
+        _updateChildLevel: function(item, fromLevel, toLevel) {
+            this.childrens(item).each(this.proxy(function(element) {
+                var item = $(element);
+                this._updateItemLevel(item, fromLevel, toLevel);
+                if (this.isFolder(item)) {
+                    this.childrens(item).each(this.proxy(function(element) {
+                        this._updateChildLevel($(element), fromLevel + 1, toLevel + 1);
+                    }, true));
+                }
+            }, true));
+        },
+        // update item level
+        _updateLevel: function(item) {
+            var level = this.level(item);
+            var found = window.parseInt(item.attr('class').match(/aciTreeLevel[0-9]+/)[0].match(/[0-9]+/));
+            if (level != found) {
+                this._updateItemLevel(item, found, level);
+                this._updateChildLevel(item, found + 1, level + 1);
             }
         },
         // update item visible state
@@ -256,13 +270,13 @@
         // move item up
         moveUp: function(item, options) {
             options = this._options(options);
-            options.index = this.getIndex(item) - 1;
+            options.index = window.Math.max(this.getIndex(item) - 1, 0);
             this.setIndex(item, options);
         },
         // move item down
         moveDown: function(item, options) {
             options = this._options(options);
-            options.index = this.getIndex(item) + 1;
+            options.index = window.Math.min(this.getIndex(item) + 1, this.siblings(item).length);
             this.setIndex(item, options);
         },
         // move item in first position
@@ -274,8 +288,138 @@
         // move item in last position
         moveLast: function(item, options) {
             options = this._options(options);
-            options.index = Number.MAX_VALUE;
+            options.index = this.siblings(item).length;
             this.setIndex(item, options);
+        },
+        // move item before another (they can't be parent & child)
+        // options.before is the element before which the item will be moved
+        moveBefore: function(item, options) {
+            options = this._options(options, null, function() {
+                this._trigger(item, 'movefail', options);
+            }, function() {
+                this._trigger(item, 'wasbefore', options);
+            });
+            var before = options.before;
+            if (this.isItem(item) && this.isItem(before) && !this.isChildren(item, before) && (item.get(0) != before.get(0))) {
+                // a way to cancel the operation
+                if (!this._trigger(item, 'beforemove', options)) {
+                    this._fail(item, options);
+                    return;
+                }
+                if (this.prev(before).get(0) == item.get(0)) {
+                    this._notify(item, options);
+                } else {
+                    item = item.first();
+                    before = before.first();
+                    var parent = this.parent(item);
+                    var prev = this.prev(item);
+                    if (!prev.length) {
+                        prev = parent.length ? parent : this.first();
+                    }
+                    item.insertBefore(before);
+                    if (parent.length && !this.hasChildrens(parent)) {
+                        this.setFile(parent);
+                    }
+                    this._updateLevel(item);
+                    this._updateFirstLast(parent.length ? parent : null);
+                    parent = this.parent(item);
+                    this._updateFirstLast(parent.length ? parent : null, item.add(before));
+                    this._updateVisibleState(parent.length ? parent : null, item);
+                    this._updateOddEven(item.add(before).add(prev));
+                    this._trigger(item, 'moved', options);
+                    this._success(item, options);
+                }
+            } else {
+                this._fail(item, options);
+            }
+        },
+        // move item after another (they can't be parent & child)
+        // options.after is the element after which the item will be moved
+        moveAfter: function(item, options) {
+            options = this._options(options, null, function() {
+                this._trigger(item, 'movefail', options);
+            }, function() {
+                this._trigger(item, 'wasafter', options);
+            });
+            var after = options.after;
+            if (this.isItem(item) && this.isItem(after) && !this.isChildren(item, after) && (item.get(0) != after.get(0))) {
+                // a way to cancel the operation
+                if (!this._trigger(item, 'beforemove', options)) {
+                    this._fail(item, options);
+                    return;
+                }
+                if (this.next(after).get(0) == item.get(0)) {
+                    this._notify(item, options);
+                } else {
+                    item = item.first();
+                    after = after.first();
+                    var parent = this.parent(item);
+                    var prev = this.prev(item);
+                    if (!prev.length) {
+                        prev = parent.length ? parent : this.first();
+                    }
+                    item.insertAfter(after);
+                    if (parent.length && !this.hasChildrens(parent)) {
+                        this.setFile(parent);
+                    }
+                    this._updateLevel(item);
+                    this._updateFirstLast(parent.length ? parent : null);
+                    parent = this.parent(item);
+                    this._updateFirstLast(parent.length ? parent : null, item.add(after));
+                    this._updateVisibleState(parent.length ? parent : null, item);
+                    this._updateOddEven(item.add(after).add(prev));
+                    this._trigger(item, 'moved', options);
+                    this._success(item, options);
+                }
+            } else {
+                this._fail(item, options);
+            }
+        },
+        // move item to be a child of another (they can't be parent & child and the targeted parent item must be empty)
+        // options.parent is the parent element on which the item will be added
+        asChild: function(item, options) {
+            options = this._options(options, null, function() {
+                this._trigger(item, 'childfail', options);
+            });
+            var parent = options.parent;
+            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildrens(parent) && (item.get(0) != parent.get(0))) {
+                // a way to cancel the operation
+                if (!this._trigger(item, 'beforechild', options)) {
+                    this._fail(item, options);
+                    return;
+                }
+                item = item.first();
+                parent = parent.first();
+                var process = function() {
+                    var oldParent = this.parent(item);
+                    var prev = this.prev(item);
+                    if (!prev.length) {
+                        prev = oldParent.length ? oldParent : this.first();
+                    }
+                    var container = this._createContainer(parent);
+                    container.append(item);
+                    if (oldParent.length && !this.hasChildrens(oldParent)) {
+                        this.setFile(oldParent);
+                    }
+                    this._updateLevel(item);
+                    this._updateFirstLast(oldParent.length ? oldParent : null);
+                    this._updateFirstLast(parent.length ? parent : null, item);
+                    this._updateVisibleState(parent.length ? parent : null, item);
+                    this._updateOddEven(item.add(prev));
+                    this._trigger(item, 'childset', options);
+                    this._success(item, options);
+                };
+                if (this.isFolder(parent)) {
+                    process.apply(this);
+                } else {
+                    this.setFolder(parent, this._inner(options, {
+                        success: process,
+                        fail: options.fail
+                    }));
+                }
+            } else {
+                this._fail(item, options);
+            }
         },
         // search a 'path' ID from a parent
         _search: function(parent, pathId) {
@@ -316,21 +460,20 @@
         // but the ID must be set like a path otherwise will not work
         // if 'load' is TRUE will also try to load nodes (works only when 'path' is TRUE)
         searchId: function(path, load, options) {
-            var _this = this;
             options = this._options(options);
             var id = options.id;
             if (path) {
                 if (load) {
-                    var process = function(item) {
-                        var found = _this._search(item, id);
+                    var process = this.proxy(function(item) {
+                        var found = this._search(item, id);
                         if (found) {
                             if (found.exact) {
-                                _this._success(found.item, options);
+                                this._success(found.item, options);
                             } else {
-                                if (_this.wasLoad(found.item)) {
-                                    _this._fail(item, options);
+                                if (this.wasLoad(found.item)) {
+                                    this._fail(item, options);
                                 } else {
-                                    _this.ajaxLoad(found.item, _this._inner(options, {
+                                    this.ajaxLoad(found.item, this._inner(options, {
                                         success: function() {
                                             process(found.item);
                                         },
@@ -339,9 +482,9 @@
                                 }
                             }
                         } else {
-                            _this._fail(item, options);
+                            this._fail(item, options);
                         }
-                    };
+                    });
                     process();
                 } else {
                     var found = this._search(null, id);
@@ -353,12 +496,12 @@
                 }
             } else {
                 var found = $();
-                this._instance.jQuery.find('.aciTreeLi').each(function() {
-                    if (id == _this.getId($(this))) {
-                        found = $(this);
+                this._instance.jQuery.find('.aciTreeLi').each(this.proxy(function(element) {
+                    if (id == this.getId($(element))) {
+                        found = $(element);
                         return false;
                     }
-                });
+                }, true));
                 if (found.length) {
                     this._success(found, options);
                 } else {

@@ -1,15 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -45,7 +43,6 @@
     var aciTree_checkbox = {
         // init checkbox
         _initCheckbox: function() {
-            var _this = this;
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
                     case 'loaded':
@@ -62,46 +59,46 @@
                         api._checkbox(item).focus();
                         break;
                 }
-            }).bind('keydown' + this._private.nameSpace, function(e) {
+            }).bind('keydown' + this._private.nameSpace, this.proxy(function(e) {
                 switch (e.which) {
                     case 9: // tab
                     case 32: // space
                         // support 'selectable' extension
-                        if (_this.isSelectable) {
-                            var selected = _this.selected();
-                            if (_this.hasCheckbox(selected)) {
-                                if (_this._lastFocus().get(0) == _this._instance.jQuery.get(0)) {
-                                    _this._checkbox(selected).focus().trigger(e);
+                        if (this.isSelectable) {
+                            var selected = this.selected();
+                            if (this.hasCheckbox(selected)) {
+                                if (this._lastFocus().get(0) == this._instance.jQuery.get(0)) {
+                                    this._checkbox(selected).focus().trigger(e);
                                 }
                                 e.stopImmediatePropagation();
                             }
                         }
                         break;
                 }
-            }).on('click' + this._private.nameSpace, '.aciTreeItem', function(e) {
+            })).on('click' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
                 if ($(e.target).hasClass('aciTreeItem')) {
-                    var item = _this.itemFrom(e.target);
-                    if (_this.hasCheckbox(item)) {
-                        _this._checkbox(item).focus();
-                        _this.check(item, {
-                            check: !_this.isChecked(item)
+                    var item = this.itemFrom(e.target);
+                    if (this.hasCheckbox(item)) {
+                        this._checkbox(item).focus();
+                        this.check(item, {
+                            check: !this.isChecked(item)
                         });
                         e.preventDefault();
                     }
                 }
-            }).on('focus' + this._private.nameSpace, 'input[type=checkbox]', function(e) {
+            })).on('focus' + this._private.nameSpace, 'input[type=checkbox]', this.proxy(function(e) {
                 // support 'selectable' extension
-                var item = _this.itemFrom(e.target);
-                if (_this.isSelectable && !_this.isSelected(item)) {
-                    _this.select(item, true);
+                var item = this.itemFrom(e.target);
+                if (this.isSelectable && !this.isSelected(item)) {
+                    this.select(item, true);
                 }
-            }).on('click' + this._private.nameSpace, 'input[type=checkbox]', function(e) {
+            })).on('click' + this._private.nameSpace, 'input[type=checkbox]', this.proxy(function(element, e) {
                 // update item states
-                var item = _this.itemFrom(e.target);
-                _this.check(item, {
-                    check: $(this).is(':checked')
+                var item = this.itemFrom(e.target);
+                this.check(item, {
+                    check: $(element).is(':checked')
                 });
-            }).on('keydown' + this._private.nameSpace, 'input[type=checkbox]', function(e) {
+            }, true)).on('keydown' + this._private.nameSpace, 'input[type=checkbox]', this.proxy(function(e) {
                 // prevent key handling
                 switch (e.which) {
                     case 38: // up
@@ -119,16 +116,16 @@
                     case 9: // tab
                     case 32: // space
                         // support 'selectable' extension
-                        if (_this.isSelectable) {
-                            var item = _this.itemFrom(e.target);
-                            if (!_this.isSelected(item)) {
+                        if (this.isSelectable) {
+                            var item = this.itemFrom(e.target);
+                            if (!this.isSelected(item)) {
                                 return false;
                             }
                         }
                         e.stopPropagation();
                         break;
                 }
-            });
+            }));
         },
         // return the checkbox
         _checkbox: function(item) {
@@ -211,39 +208,37 @@
         },
         // check/uncheck all childrens based on item
         _childCheckbox: function(item) {
-            var _this = this;
             var state = this._checkbox(item).removeClass('aciTreeTristate').is(':checked');
-            var process = function(item) {
-                _this.checkboxes(_this.childrens(item)).each(function() {
-                    _this._checkbox($(this)).prop('checked', state).removeClass('aciTreeTristate');
-                    process($(this));
-                });
-            };
+            var process = this.proxy(function(item) {
+                this.checkboxes(this.childrens(item)).each(this.proxy(function(element) {
+                    this._checkbox($(element)).prop('checked', state).removeClass('aciTreeTristate');
+                    process($(element));
+                }, true));
+            });
             process(item);
         },
         // check/uncheck parents based on direct childrens
         _parentCheckbox: function(item) {
-            var _this = this;
-            this.path(item, true).each(function() {
-                if (!_this.hasCheckbox($(this))) {
+            this.path(item, true).each(this.proxy(function(element) {
+                if (!this.hasCheckbox($(element))) {
                     // break on missing checkbox
                     return false;
                 }
-                var list = _this.checkboxes(_this.childrens($(this)));
+                var list = this.checkboxes(this.childrens($(element)));
                 if (list.length) {
-                    var checked = _this.checkboxes(list, true).length;
+                    var checked = this.checkboxes(list, true).length;
                     if (checked) {
                         // there is at least a child checked
                         var tristate = (checked != list.length) || (list.find('.aciTreeTristate').length > 0);
-                        _this._checkbox($(this)).prop('checked', true).toggleClass('aciTreeTristate', tristate);
+                        this._checkbox($(element)).prop('checked', true).toggleClass('aciTreeTristate', tristate);
                     } else {
                         // there are no childs checked
-                        _this._checkbox($(this)).prop('checked', false).removeClass('aciTreeTristate');
+                        this._checkbox($(element)).prop('checked', false).removeClass('aciTreeTristate');
                     }
                 } else {
-                    _this._checkbox($(this)).removeClass('aciTreeTristate');
+                    this._checkbox($(element)).removeClass('aciTreeTristate');
                 }
-            });
+            }, true));
         },
         // test if item have a checkbox
         hasCheckbox: function(item) {
@@ -400,15 +395,15 @@
         },
         // filter items with checkbox by state (if set)
         checkboxes: function(items, state) {
-            var _this = this, list = [];
+            var list = [];
             if (state === undefined) {
                 return items.filter('.aciTreeCheckbox');
             }
-            items.filter('.aciTreeCheckbox').each(function() {
-                if (state == _this._checkbox($(this)).is(':checked')) {
-                    list[list.length] = this;
+            items.filter('.aciTreeCheckbox').each(this.proxy(function(element) {
+                if (state == this._checkbox($(element)).is(':checked')) {
+                    list[list.length] = element;
                 }
-            });
+            }, true));
             return $(list);
         },
         // test if checkbox is enabled
@@ -431,14 +426,13 @@
         },
         // done checkbox
         _doneCheckbox: function(destroy) {
-            var _this = this;
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
             this._instance.jQuery.off(this._private.nameSpace, 'input[type=checkbox]');
             if (!destroy) {
-                this.checkboxes(this.childrens(null, true)).each(function() {
-                    _this.setCheckbox($(this), false);
-                });
+                this.checkboxes(this.childrens(null, true)).each(this.proxy(function(element) {
+                    this.setCheckbox($(element), false);
+                }, true));
             }
         },
         // override _destroyHook

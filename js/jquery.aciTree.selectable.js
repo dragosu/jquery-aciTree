@@ -1,20 +1,17 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
  * This extension adds item selection/keyboard navigation to aciTree.
- *
  */
 
 (function($, window, undefined) {
@@ -66,154 +63,152 @@
         // process onblur
         _blur: function() {
             window.clearTimeout(this._private.blurTimeout);
-            this._private.blurTimeout = window.setTimeout($.proxy(function() {
+            this._private.blurTimeout = window.setTimeout(this.proxy(function() {
                 if (this._instance.focus) {
                     this._instance.focus = false;
                     this._instance.jQuery.removeClass('aciTreeFocus');
                     this._trigger(null, 'blurred');
                 }
-            }, this), 10);
+            }), 10);
         },
         // init selectable
         _initSelectable: function() {
-            var _this = this;
             if (this._instance.jQuery.attr('tabindex') === undefined) {
                 this._instance.jQuery.attr('tabindex', 0);
             }
-            this._instance.jQuery.bind('focusin' + this._private.nameSpace, function(e) {
-                _this._focus($(e.target));
-            }).bind('focusout' + this._private.nameSpace, function() {
-                _this._blur();
-            }).bind('keydown' + this._private.nameSpace, function(e) {
-                if (!_this._instance.focus) {
+            this._instance.jQuery.bind('focusin' + this._private.nameSpace, this.proxy(function(e) {
+                this._focus($(e.target));
+            })).bind('focusout' + this._private.nameSpace, this.proxy(function() {
+                this._blur();
+            })).bind('keydown' + this._private.nameSpace, this.proxy(function(e) {
+                if (!this._instance.focus) {
                     // do not handle if we do not have focus
                     return;
                 }
-                var selected = _this.selected();
-                if (selected.length && _this.isBusy(selected)) {
+                var selected = this.selected();
+                if (selected.length && this.isBusy(selected)) {
                     // skip when busy
                     return false;
                 }
                 var item = $([]);
                 switch (e.which) {
                     case 38: // up
-                        item = selected.length ? _this._prevOpen(selected) : _this.first();
+                        item = selected.length ? this._prevOpen(selected) : this.first();
                         break;
                     case 40: // down
-                        item = selected.length ? _this._nextOpen(selected) : _this.first();
+                        item = selected.length ? this._nextOpen(selected) : this.first();
                         break;
                     case 37: // left
                         if (selected.length) {
-                            if (_this.isOpen(selected)) {
-                                _this.close(selected, {
-                                    collapse: _this._instance.options.collapse,
-                                    expand: _this._instance.options.expand,
-                                    unique: _this._instance.options.unique
+                            if (this.isOpen(selected)) {
+                                this.close(selected, {
+                                    collapse: this._instance.options.collapse,
+                                    expand: this._instance.options.expand,
+                                    unique: this._instance.options.unique
                                 });
                             } else {
-                                item = _this.parent(selected);
+                                item = this.parent(selected);
                             }
                         } else {
-                            item = _this.first();
+                            item = this.first();
                         }
                         break;
                     case 39: // right
                         if (selected.length) {
-                            if (_this.isFolder(selected) && _this.isClosed(selected)) {
-                                _this.open(selected, {
-                                    collapse: _this._instance.options.collapse,
-                                    expand: _this._instance.options.expand,
-                                    unique: _this._instance.options.unique
+                            if (this.isFolder(selected) && this.isClosed(selected)) {
+                                this.open(selected, {
+                                    collapse: this._instance.options.collapse,
+                                    expand: this._instance.options.expand,
+                                    unique: this._instance.options.unique
                                 });
                             } else {
-                                item = _this.first(selected);
+                                item = this.first(selected);
                             }
                         } else {
-                            item = _this.first();
+                            item = this.first();
                         }
                         break;
                     case 33: // pgup
-                        item = selected.length ? _this._prevPage(selected) : _this.first();
+                        item = selected.length ? this._prevPage(selected) : this.first();
                         break;
                     case 34: // pgdown
-                        item = selected.length ? _this._nextPage(selected) : _this.first();
+                        item = selected.length ? this._nextPage(selected) : this.first();
                         break;
                     case 36: // home
-                        item = _this.first();
+                        item = this.first();
                         break;
                     case 35: // end
-                        item = _this._lastOpen();
+                        item = this._lastOpen();
                         break;
                     case 13: // enter
-                        if (selected.length && _this.isFolder(selected) && _this.isClosed(selected)) {
-                            _this.open(selected, {
-                                collapse: _this._instance.options.collapse,
-                                expand: _this._instance.options.expand,
-                                unique: _this._instance.options.unique
+                        if (selected.length && this.isFolder(selected) && this.isClosed(selected)) {
+                            this.open(selected, {
+                                collapse: this._instance.options.collapse,
+                                expand: this._instance.options.expand,
+                                unique: this._instance.options.unique
                             });
                         }
                         break;
                     case 27: // escape
-                        if (selected.length && _this.isOpen(selected)) {
-                            _this.close(selected, {
-                                collapse: _this._instance.options.collapse,
-                                expand: _this._instance.options.expand,
-                                unique: _this._instance.options.unique
+                        if (selected.length && this.isOpen(selected)) {
+                            this.close(selected, {
+                                collapse: this._instance.options.collapse,
+                                expand: this._instance.options.expand,
+                                unique: this._instance.options.unique
                             });
                         }
                         break;
                     case 32: // space
-                        if (selected.length && _this.isFolder(selected)) {
-                            _this.toggle(selected, {
-                                collapse: _this._instance.options.collapse,
-                                expand: _this._instance.options.expand,
-                                unique: _this._instance.options.unique
+                        if (selected.length && this.isFolder(selected)) {
+                            this.toggle(selected, {
+                                collapse: this._instance.options.collapse,
+                                expand: this._instance.options.expand,
+                                unique: this._instance.options.unique
                             });
                         }
                         break;
                 }
                 if (item.length) {
-                    if (!_this.isSelected(item)) {
-                        if (!_this.isVisible(item)) {
-                            _this.setVisible(item);
+                    if (!this.isSelected(item)) {
+                        if (!this.isVisible(item)) {
+                            this.setVisible(item);
                         }
-                        _this.select(item, {
+                        this.select(item, {
                             select: true
                         });
                         return false;
-                    } else if (!_this.isVisible(item)) {
-                        _this.setVisible(item);
+                    } else if (!this.isVisible(item)) {
+                        this.setVisible(item);
                         return false;
                     }
                 }
-            });
+            }));
             this._fullRow(this._instance.options.fullRow);
         },
         // change full row mode
         _fullRow: function(state) {
-            var _this = this;
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeLine,.aciTreeItem').off(this._private.nameSpace, '.aciTreeItem');
-            this._instance.jQuery.on('click' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', function(e) {
-                var item = _this.itemFrom(e.target);
-                if (!_this.isVisible(item)) {
-                    _this.setVisible(item);
+            this._instance.jQuery.on('click' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', this.proxy(function(e) {
+                var item = this.itemFrom(e.target);
+                if (!this.isVisible(item)) {
+                    this.setVisible(item);
                 }
-                if (!_this.isSelected(item)) {
-                    _this.select(item, {
+                if (!this.isSelected(item)) {
+                    this.select(item, {
                         select: true
                     });
                 }
-            }).on('dblclick' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', function(e) {
-                var item = _this.itemFrom(e.target);
-                if (_this.isFolder(item)) {
-                    _this.toggle(item, {
-                        collapse: _this._instance.options.collapse,
-                        expand: _this._instance.options.expand,
-                        unique: _this._instance.options.unique
+            })).on('dblclick' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', this.proxy(function(e) {
+                var item = this.itemFrom(e.target);
+                if (this.isFolder(item)) {
+                    this.toggle(item, {
+                        collapse: this._instance.options.collapse,
+                        expand: this._instance.options.expand,
+                        unique: this._instance.options.unique
                     });
                     return false;
                 }
-            });
+            }));
         },
         // override _initHook
         _initHook: function() {
@@ -261,15 +256,14 @@
         },
         // get last visible child starting from item
         _lastOpen: function(item) {
-            var _this = this;
-            var opened = function(item) {
-                var last = _this.last(item);
-                if (_this.isOpen(last)) {
+            var opened = this.proxy(function(item) {
+                var last = this.last(item);
+                if (this.isOpen(last)) {
                     return opened(last);
                 } else {
                     return last;
                 }
-            };
+            });
             if (!item) {
                 item = this.last();
             }
@@ -291,11 +285,10 @@
         },
         // get next visible starting with item
         _nextOpen: function(item) {
-            var _this = this;
-            var opened = function(item) {
-                var parent = _this.parent(item);
+            var opened = this.proxy(function(item) {
+                var parent = this.parent(item);
                 if (parent.length) {
-                    var next = _this.next(parent);
+                    var next = this.next(parent);
                     if (next.length) {
                         return next;
                     } else {
@@ -303,7 +296,7 @@
                     }
                 }
                 return null;
-            };
+            });
             if (this.isOpen(item)) {
                 return this.first(item);
             } else {
@@ -366,7 +359,6 @@
         // options.select is the new state
         // options.oldSelected will keep the old selected item
         select: function(item, options) {
-            var _this = this;
             options = this._options(options, null, function() {
                 this._trigger(item, 'selectfail', options);
             });
@@ -382,9 +374,9 @@
                     unselect = unselect.not(item.first());
                 }
                 options.oldSelected = this.selected();
-                unselect.removeClass('aciTreeSelected').each(function() {
-                    _this._trigger($(this), 'unselected', options);
-                });
+                unselect.removeClass('aciTreeSelected').each(this.proxy(function(element) {
+                    this._trigger($(element), 'unselected', options);
+                }, true));
                 if (select) {
                     if (this.isSelected(item)) {
                         this._trigger(item, 'wasselected', options);
@@ -413,7 +405,6 @@
         },
         // override set option
         option: function(option, value) {
-            var _this = this;
             if (this.wasInit() && !this.isLocked()) {
                 if ((option == 'selectable') && (value != this.isSelectable())) {
                     if (value) {
@@ -427,13 +418,13 @@
                 }
                 if ((option == 'textSelection') && (value != this._instance.options.textSelection)) {
                     if (value) {
-                        this._instance.jQuery.find('.aciTreeItem').each(function() {
-                            _this._selectable($(this), true);
-                        });
+                        this._instance.jQuery.find('.aciTreeItem').each(this.proxy(function(element) {
+                            this._selectable($(element), true);
+                        }, true));
                     } else {
-                        this._instance.jQuery.find('.aciTreeItem').each(function() {
-                            _this._selectable($(this));
-                        });
+                        this._instance.jQuery.find('.aciTreeItem').each(this.proxy(function(element) {
+                            this._selectable($(element));
+                        }, true));
                     }
                 }
             }

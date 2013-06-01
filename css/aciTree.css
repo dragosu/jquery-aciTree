@@ -219,6 +219,96 @@
     vertical-align:top;
 }
 
+/* sortable items */
+
+.aciTree .aciTreeChild {
+    height:0;
+    line-height:0;
+}
+
+.aciTree .aciTreePlaceholder {
+    height:0;
+    line-height:0;
+    overflow:show;
+    position:relative;
+}
+
+.aciTree .aciTreePlaceholder div {
+    position:absolute;
+    top:2px;
+    left:2px;
+    width:16px;
+    height:16px;
+    margin-left:20px;
+    background:#ccc url(../image/drag-drop.png) 0 0 no-repeat;
+    border:1px solid #999;
+}
+
+.aciTree .aciTreeChild .aciTreePlaceholder div {
+    top:-20px;
+    left:-18px;
+}
+
+.aciTree .aciTreePlaceholder.aciTreeBefore div { 
+    background-position:-32px 0 !important; 
+}
+.aciTree .aciTreePlaceholder.aciTreeAfter div { 
+    top:-20px;
+    background-position:-16px 0 !important; 
+}
+
+.aciTree.aciTreeDragDrop .aciTreeItem, .aciTree.aciTreeDragDrop .aciTreeColumn,
+.aciTree.aciTreeDragDrop .aciTreeCheckbox label, .aciTree.aciTreeDragDrop .aciTreeRadio label {
+    cursor:inherit !important;
+}
+
+/* this is level based; added for #8 levels, if you need more ... add them as needed */
+.aciTree .aciTreeLi.aciTreeLevel0 .aciTreePlaceholder div { margin-left:40px; }
+.aciTree .aciTreeLi.aciTreeLevel1 .aciTreePlaceholder div { margin-left:60px; }
+.aciTree .aciTreeLi.aciTreeLevel2 .aciTreePlaceholder div { margin-left:80px; }
+.aciTree .aciTreeLi.aciTreeLevel3 .aciTreePlaceholder div { margin-left:100px; }
+.aciTree .aciTreeLi.aciTreeLevel4 .aciTreePlaceholder div { margin-left:120px; }
+.aciTree .aciTreeLi.aciTreeLevel5 .aciTreePlaceholder div { margin-left:140px; }
+.aciTree .aciTreeLi.aciTreeLevel6 .aciTreePlaceholder div { margin-left:160px; }
+.aciTree .aciTreeLi.aciTreeLevel7 .aciTreePlaceholder div { margin-left:180px; }
+.aciTree .aciTreeLi.aciTreeLevel8 .aciTreePlaceholder div { margin-left:200px; }
+
+.aciTree[dir=rtl] .aciTreePlaceholder div {
+    left:auto;
+    right:4px;    
+    margin-left:0;
+    margin-right:20px;
+    background-position:-48px 0;
+}
+
+.aciTree .aciTreeChild .aciTreePlaceholder div {
+    right:-16px;
+}
+
+/* this is level based; added for #8 levels, if you need more ... add them as needed */
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel0 .aciTreePlaceholder div { margin-right:40px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel1 .aciTreePlaceholder div { margin-right:60px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel2 .aciTreePlaceholder div { margin-right:80px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel3 .aciTreePlaceholder div { margin-right:100px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel4 .aciTreePlaceholder div { margin-right:120px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel5 .aciTreePlaceholder div { margin-right:140px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel6 .aciTreePlaceholder div { margin-right:160px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel7 .aciTreePlaceholder div { margin-right:180px; }
+.aciTree[dir=rtl] .aciTreeLi.aciTreeLevel8 .aciTreePlaceholder div { margin-right:200px; }
+
+.aciTreeHelper {
+    position:absolute;
+    max-width:300px;
+    color:#000;
+    background-color:#d0e5fe;
+    border:1px dashed #84acdd;    
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;    
+    padding:4px;
+    margin:20px 0 0 20px;
+}
+
 /* default - item in the middle (comment the hover part to keep the same button image) */
 
 .aciTree .aciTreeButton {
@@ -231,55 +321,29 @@
     margin-right:4px;
     background:url(../image/tree-rtl.png) 0 -20px no-repeat;
 }
-.aciTree.aciTreeNoBranches .aciTreeButton {
-    background:url(../image/tree-no-branches.png) 0 -20px no-repeat;
+.aciTree.aciTreeNoBranches .aciTreeButton { 
+    background:url(../image/tree-no-branches.png) 0 -20px no-repeat; 
 }
-.aciTree.aciTreeNoBranches[dir=rtl] .aciTreeButton {
-    background:url(../image/tree-no-branches-rtl.png) 0 -20px no-repeat;
+.aciTree.aciTreeNoBranches[dir=rtl] .aciTreeButton { 
+    background:url(../image/tree-no-branches-rtl.png) 0 -20px no-repeat; 
 }
 
-.aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton {
-    background-position:-16px -20px;
-}
-.aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton.aciTreeHover {
-    background-position:-32px -20px;
-}
-.aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton {
-    background-position:-48px -20px;
-}
-.aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton.aciTreeHover {
-    background-position:-64px -20px;
-}
-.aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton {
-    background-position:-80px -20px;
-}
-.aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton.aciTreeHover {
-    background-position:-96px -20px;
-}
+.aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton { background-position:-16px -20px; }
+.aciTree .aciTreeFolderMaybe>.aciTreeLine .aciTreeButton.aciTreeHover { background-position:-32px -20px; }
+.aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton { background-position:-48px -20px; }
+.aciTree .aciTreeFolder>.aciTreeLine .aciTreeButton.aciTreeHover { background-position:-64px -20px; }
+.aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton { background-position:-80px -20px; }
+.aciTree .aciTreeOpen>.aciTreeLine .aciTreeButton.aciTreeHover { background-position:-96px -20px; }
 
 /* if it's the last item in list (comment the hover part to keep the same button image) */
 
-.aciTree .aciTreeLi.aciTreeLast>.aciTreeLine .aciTreeButton {
-    background-position:0 -60px;
-}
-.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton {
-    background-position:-16px -60px;
-}
-.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover {
-    background-position:-32px -60px;
-}
-.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton {
-    background-position:-48px -60px;
-}
-.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover {
-    background-position:-64px -60px;
-}
-.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton {
-    background-position:-80px -60px;
-}
-.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover {
-    background-position:-96px -60px;
-}
+.aciTree .aciTreeLi.aciTreeLast>.aciTreeLine .aciTreeButton { background-position:0 -60px; }
+.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton { background-position:-16px -60px; }
+.aciTree .aciTreeFolderMaybe.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover { background-position:-32px -60px; }
+.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton { background-position:-48px -60px; }
+.aciTree .aciTreeFolder.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover { background-position:-64px -60px; }
+.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton { background-position:-80px -60px; }
+.aciTree .aciTreeOpen.aciTreeLast>.aciTreeLine .aciTreeButton.aciTreeHover { background-position:-96px -60px; }
 
 /* the item loader */
 
@@ -314,12 +378,8 @@
     margin-left:1px;
     background:url(../image/tree-rtl.png) 0 0 no-repeat;
 }
-.aciTree.aciTreeNoBranches .aciTreeIcon {
-    background:url(../image/tree-no-branches.png) 0 0 no-repeat;
-}
-.aciTree.aciTreeNoBranches[dir=rtl] .aciTreeIcon {
-    background:url(../image/tree-no-branches-rtl.png) 0 0 no-repeat;
-}
+.aciTree.aciTreeNoBranches .aciTreeIcon { background:url(../image/tree-no-branches.png) 0 0 no-repeat; }
+.aciTree.aciTreeNoBranches[dir=rtl] .aciTreeIcon { background:url(../image/tree-no-branches-rtl.png) 0 0 no-repeat; }
 
 /* demo file/folder icon class */
 

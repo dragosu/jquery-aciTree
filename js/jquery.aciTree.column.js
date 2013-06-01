@@ -1,15 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -128,6 +126,7 @@
             // call the parent
             this._super(parent, item, itemData, level);
         },
+        // create column markup
         _createColumn: function(itemData, columnData, index) {
             var style = (columnData.width !== undefined) ? ' style="width:' + columnData.width + 'px"' : '';
             var value = columnData.props && (itemData[columnData.props] !== undefined) ? itemData[columnData.props] :

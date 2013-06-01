@@ -1,15 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.0.0
+ * aciTree jQuery Plugin v3.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin
- *
- * Date: May Fri 03 19:20 2013 +0200
+ * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -32,7 +30,6 @@
     var aciTree_editable = {
         // init editable
         _initEditable: function() {
-            var _this = this;
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
                     case 'blurred':
@@ -57,69 +54,69 @@
                         }
                         break;
                 }
-            }).bind('click' + this._private.nameSpace, function() {
+            }).bind('click' + this._private.nameSpace, this.proxy(function() {
                 // click on the tree
-                var edited = _this.edited();
+                var edited = this.edited();
                 if (edited.length) {
                     // cancel edit/save the changes
-                    _this.edit(edited, {
+                    this.edit(edited, {
                         edit: false,
                         save: true
                     });
                 }
-            }).bind('keydown' + this._private.nameSpace, function(e) {
+            })).bind('keydown' + this._private.nameSpace, this.proxy(function(e) {
                 switch (e.which) {
                     case 113: // F2
                         // support 'selectable' extension
-                        if (_this.isSelectable) {
-                            var selected = _this.selected();
-                            if (!_this.isEdited(selected)) {
+                        if (this.isSelectable) {
+                            var selected = this.selected();
+                            if (!this.isEdited(selected)) {
                                 // enable edit on F2 key
-                                _this.edit(selected, {
+                                this.edit(selected, {
                                     edit: true
                                 });
                             }
                         }
                         break;
                 }
-            }).on('mouseup' + this._private.nameSpace, '.aciTreeItem', function(e) {
+            })).on('mouseup' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
                 if ($(e.target).is('.aciTreeItem,.aciTreeText')) {
-                    var item = _this.itemFrom(e.target);
+                    var item = this.itemFrom(e.target);
                     // support 'selectable' extension
-                    if (_this.isSelectable && _this.isSelected(item)) {
+                    if (this.isSelectable && this.isSelected(item)) {
                         // enable edit on selected item
-                        _this.edit(item, {
+                        this.edit(item, {
                             edit: true
                         });
                     }
                 }
-            }).on('dblclick' + this._private.nameSpace, '.aciTreeItem', function(e) {
+            })).on('dblclick' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
                 // support 'selectable' extension
-                if (_this.isSelectable && !_this.isSelectable()) {
-                    var item = _this.itemFrom(e.target);
+                if (this.isSelectable && !this.isSelectable()) {
+                    var item = this.itemFrom(e.target);
                     // enable edit mode
-                    _this.edit(item, {
+                    this.edit(item, {
                         edit: true
                     });
                 }
-            }).on('keydown' + this._private.nameSpace, 'input[type=text]', function(e) {
+            })).on('keydown' + this._private.nameSpace, 'input[type=text]', this.proxy(function(e) {
                 // key handling
                 switch (e.which) {
                     case 13: // enter
-                        var item = _this.itemFrom(e.target);
-                        _this.edit(item, {
+                        var item = this.itemFrom(e.target);
+                        this.edit(item, {
                             edit: false,
                             save: true
                         });
-                        _this._instance.jQuery.focus();
+                        this._instance.jQuery.focus();
                         e.stopPropagation();
                         break;
                     case 27: // escape
-                        var item = _this.itemFrom(e.target);
-                        _this.edit(item, {
+                        var item = this.itemFrom(e.target);
+                        this.edit(item, {
                             edit: false
                         });
-                        _this._instance.jQuery.focus();
+                        this._instance.jQuery.focus();
                         e.preventDefault();
                         e.stopPropagation();
                         break;
@@ -135,16 +132,16 @@
                         e.stopPropagation();
                         break;
                 }
-            }).on('blur' + this._private.nameSpace, 'input[type=text]', function() {
-                if (_this.isSelectable && !_this.isSelectable()) {
-                    var edited = _this.edited();
+            })).on('blur' + this._private.nameSpace, 'input[type=text]', this.proxy(function() {
+                if (this.isSelectable && !this.isSelectable()) {
+                    var edited = this.edited();
                     // cancel edit/save the changes
-                    _this.edit(edited, {
+                    this.edit(edited, {
                         edit: false,
                         save: true
                     });
                 }
-            }).on('dblclick' + this._private.nameSpace, 'input[type=text]', function(e) {
+            })).on('dblclick' + this._private.nameSpace, 'input[type=text]', function(e) {
                 e.stopPropagation();
             });
         },
@@ -295,7 +292,9 @@
         },
         // override _destroyHook
         _destroyHook: function(unloaded) {
-            this._doneEditable();
+            if (unloaded) {
+                this._doneEditable();
+            }
             // call the parent
             this._super(unloaded);
         }

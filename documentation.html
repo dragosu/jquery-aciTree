@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="language" content="en" />
-        <title>aciTree v3.0.0 - A treeview control with jQuery</title>
+        <title>aciTree v3.1.0 - A treeview control with jQuery</title>
         <meta name="description" content="aciTree API documentation" />
         <style type="text/css">
             html {
@@ -147,9 +147,9 @@
     </head>
 
     <body>
-        <h1>aciTree API v3.0.0</h1>
+        <h1>aciTree API v3.1.0</h1>
 
-<div class="api"><span class="toc"><a title=".after (item, options)" href="#.after">.after -  Add a new item or a list of items after item...</a><br><a title=".ajaxLoad (item, options)" href="#.ajaxLoad">.ajaxLoad -  Loads a node with AJAX (if not already loaded)...</a><br><a title=".append (item, options)" href="#.append">.append -  Add one or more childrens to item, the new items are added at the end...</a><br><a title=".before (item, options)" href="#.before">.before -  Add a new item or a list of items before item...</a><br><a title=".branch (item, callback, load) " href="#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="#.check">.check -  Set a checkbox or radio-button in the checked/unchecked state...</a><br><a title=".checkboxes (items, state) " href="#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".childrens (item, branch)" href="#.childrens">.childrens -  Returns a list of childrens from item.
+<div class="api"><span class="toc"><a title=".after (item, options)" href="#.after">.after -  Add a new item or a list of items after item...</a><br><a title=".ajaxLoad (item, options)" href="#.ajaxLoad">.ajaxLoad -  Loads a node with AJAX (if not already loaded)...</a><br><a title=".append (item, options)" href="#.append">.append -  Add one or more childrens to item, the new items are added at the end...</a><br><a title=".asChild (item, options) " href="#.asChild">.asChild -  Moves item so it becomes child of a parent item...</a><br><a title=".before (item, options)" href="#.before">.before -  Add a new item or a list of items before item...</a><br><a title=".branch (item, callback, load) " href="#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="#.check">.check -  Set a checkbox or radio-button in the checked/unchecked state...</a><br><a title=".checkboxes (items, state) " href="#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".childrens (item, branch)" href="#.childrens">.childrens -  Returns a list of childrens from item.
                     
                 </a><br><a title=".close (item, options)" href="#.close">.close -  Closes the item node and all his childrens (if requested)...</a><br><a title=".closeOthers (item, options)" href="#.closeOthers">.closeOthers -  Closes all other nodes less the item...</a><br><a title=".destroy (options)" href="#.destroy">.destroy -  Destroys the treeview control, .isLocked will return TRUE from the start until...</a><br><a title=".edit (item, options) " href="#.edit">.edit -  Enters or exits the editable mode (optionally saving the changes made)...</a><br><a title=".edited () " href="#.edited">.edited -  Returns the edited LI element.
                 </a><br><a title=".files (items)" href="#.files">.files -  Filter items and return only the 'file' items...</a><br><a title=".first (item)" href="#.first">.first -  Returns the first children of item.
@@ -180,7 +180,7 @@
                     
                 </a><br><a title=".last (item)" href="#.last">.last -  Returns the last children of item.
                     
-                </a><br><a title=".level (item)" href="#.level">.level -  Returns the item level starting from 0 for the ones in ROOT (or -1 if does not...</a><br><a title=".loadFrom (item, options)" href="#.loadFrom">.loadFrom -  Loads a node from a JavaScript variable (if not already loaded)...</a><br><a title=".moveDown (item, options) " href="#.moveDown">.moveDown -  Move item down with a position (inside the same parent)...</a><br><a title=".moveFirst (item, options) " href="#.moveFirst">.moveFirst -  Move item at the beginning (inside the same parent)...</a><br><a title=".moveLast (item, options) " href="#.moveLast">.moveLast -  Move item at the end (inside the same parent)...</a><br><a title=".moveUp (item, options) " href="#.moveUp">.moveUp -  Move item up with a position (inside the same parent)...</a><br><a title=".next (item)" href="#.next">.next -  Returns the next element from item (belonging to the same parent)...</a><br><a title=".open (item, options)" href="#.open">.open -  Opens the item node and all his childrens (if requested)...</a><br><a title=".openPath (item, options)" href="#.openPath">.openPath -  Opens the entire path till item...</a><br><a title=".option (option, value)" href="#.option">.option -  Set a option at runtime (after init).
+                </a><br><a title=".level (item)" href="#.level">.level -  Returns the item level starting from 0 for the ones in ROOT (or -1 if does not...</a><br><a title=".loadFrom (item, options)" href="#.loadFrom">.loadFrom -  Loads a node from a JavaScript variable (if not already loaded)...</a><br><a title=".moveAfter (item, options) " href="#.moveAfter">.moveAfter -  Move item after a specific item...</a><br><a title=".moveBefore (item, options) " href="#.moveBefore">.moveBefore -  Move item before a specific item...</a><br><a title=".moveDown (item, options) " href="#.moveDown">.moveDown -  Move item down with a position (inside the same parent)...</a><br><a title=".moveFirst (item, options) " href="#.moveFirst">.moveFirst -  Move item at the beginning (inside the same parent)...</a><br><a title=".moveLast (item, options) " href="#.moveLast">.moveLast -  Move item at the end (inside the same parent)...</a><br><a title=".moveUp (item, options) " href="#.moveUp">.moveUp -  Move item up with a position (inside the same parent)...</a><br><a title=".next (item)" href="#.next">.next -  Returns the next element from item (belonging to the same parent)...</a><br><a title=".open (item, options)" href="#.open">.open -  Opens the item node and all his childrens (if requested)...</a><br><a title=".openPath (item, options)" href="#.openPath">.openPath -  Opens the entire path till item...</a><br><a title=".option (option, value)" href="#.option">.option -  Set a option at runtime (after init).
                     
                 </a><br><a title=".options ()" href="#.options">.options -  Returns the init options (including any new value assigned with option)...</a><br><a title=".parent (item)" href="#.parent">.parent -  Returns the parent of item.
                     
@@ -217,7 +217,7 @@
                     <b>options.itemData</b> can be an array of objects to add many items at once. <b>.after</b> adds only one level, if you want to add childrens to the new nodes -
                     you can use <b>.loadFrom</b> (or they will be loaded by default when the nodes will be opened, using <b>.ajaxLoad</b>).
                     </span>
-                    <b>.after</b> calls <b>options.callbacks.item</b> for each item and notifies regarding the add (after changing the DOM) with the <em>added</em> event.
+                    <b>.after</b> calls <b>options.itemHook</b> for each item and notifies regarding the add (after changing the DOM) with the <em>added</em> event.
                     Notifies with the <em>appended</em> and <em>appendfail</em> events if the operation was successful or not. The operation can be canceled by
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeafter</em>.
                 </div>
@@ -259,10 +259,25 @@
                     <b>options.itemData</b> can be an array of objects to add many items at once. <b>.append</b> adds only one level, if you want to add childrens to the new nodes -
                     you can use <b>.loadFrom</b> (or they will be loaded by default when the nodes will be opened, using <b>.ajaxLoad</b>).
                     </span>
-                    <b>.append</b> calls <b>options.callbacks.item</b> for each item and notifies regarding the add (after the DOM is changed) with the <em>added</em> event.
+                    <b>.append</b> calls <b>options.itemHook</b> for each item and notifies regarding the add (after the DOM is changed) with the <em>added</em> event.
                     Notifies with the <em>appended</em> and <em>appendfail</em> events if the operation was successful or not. The operation can be canceled by
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeappend</em>.
                 </div>
+                
+                <a name=".asChild"></a><div data-ext="utils extension"><span>.asChild (item, options) <span>utils extension</span></span> Moves <b>item</b> so it becomes child of a parent item.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object/array {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    parent: (jQuery object) the parent item</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>                                    
+                        <b>asChild</b> set the item as a child only for empty parents (elements without childrens). If the parent item is of type <i>file</i> then <b>.setFolder</b> is called.
+                    </span>
+                    Notifies with the <em>childset</em> and <em>childfail</em> events if the operation was successful or not. The operation can be canceled by
+                    returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforechild</em>.
+                </div>                
 
                 <a name=".before"></a><div data-ext="core"><span>.before (item, options)</span> Add a new item or a list of items before <b>item</b>.
                     <span class="where">
@@ -278,7 +293,7 @@
                     <b>options.itemData</b> can be an array of objects to add many items at once. <b>.before</b> adds only one level, if you want to add childrens to the new nodes -
                     you can use <b>.loadFrom</b> (or they will be loaded by default when the nodes will be opened, using <b>.ajaxLoad</b>).
                     </span>
-                    <b>.before</b> calls <b>options.callbacks.item</b> for each item and notifies regarding the add (after the DOM is changed) with the <em>added</em> event.
+                    <b>.before</b> calls <b>options.itemHook</b> for each item and notifies regarding the add (after the DOM is changed) with the <em>added</em> event.
                     Notifies with the <em>before</em> and <em>beforefail</em> events if the operation was successful or not. The operation can be canceled by
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforebefore</em>.
                 </div>
@@ -663,6 +678,36 @@
                     See <b>.ajaxLoad</b> for loading with AJAX.
                 </div>
 
+                <a name=".moveAfter"></a><div data-ext="utils extension"><span>.moveAfter (item, options) <span>utils extension</span></span> Move <b>item</b> after a specific item.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    after: (jQuery object) the element after which to move <b>item</b></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    Notifies with the <em>moved</em> and <em>movefail</em> events if the operation was successful or not and with the <em>wasafter</em>
+                    if the item was in the requested position.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforemove</em>.
+                </div>   
+                
+                <a name=".moveBefore"></a><div data-ext="utils extension"><span>.moveBefore (item, options) <span>utils extension</span></span> Move <b>item</b> before a specific item.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    before: (jQuery object) the element before which to move <b>item</b></li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                    </span>
+                    Notifies with the <em>moved</em> and <em>movefail</em> events if the operation was successful or not and with the <em>wasbefore</em>
+                    if the item was in the requested position.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforemove</em>.
+                </div>                 
+                
                 <a name=".moveDown"></a><div data-ext="utils extension"><span>.moveDown (item, options) <span>utils extension</span></span> Move <b>item</b> down with a position (inside the same parent).
                     <span class="where">
                         where:
@@ -1138,16 +1183,14 @@
 
             </div>            
 
-        <p>aciTree jQuery Plugin v3.0.0</p>
+        <p>aciTree jQuery Plugin v3.1.0</p>
         <p>http://acoderinsights.ro</p>
 
         <p>Copyright (c) 2013 Dragos Ursu</p>
         <p>Dual licensed under the MIT or GPL Version 2 licenses.</p>
 
         <p>Require jQuery Library >= v1.7.1 http://jquery.com</p>
-        <p>+ aciPlugin >= v1.1.1 https://github.com/dragosu/jquery-aciPlugin</p>
-
-        <p>Date: May Fri 03 19:20 2013 +0200</p>
+        <p>+ aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin</p>
 
     </body>
 </html>
