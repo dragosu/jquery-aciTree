@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.1.0
+ * aciTree jQuery Plugin v3.1.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -32,7 +32,7 @@
             if (isContainer) {
                 helper.html('move ' + this.getLabel(item) + ' to ' + this.getLabel(this.itemFrom(hover)));
                 placeholder.removeClass('aciTreeAfter aciTreeBefore');
-            } else {
+            } else if (before !== null) {
                 if (before) {
                     helper.html('move ' + this.getLabel(item) + ' before ' + this.getLabel(hover));
                     placeholder.removeClass('aciTreeAfter').addClass('aciTreeBefore');
@@ -47,6 +47,14 @@
     // aciTree sortable extension
 
     var aciTree_sortable = {
+        __extend: function() {
+            // add extra data
+            $.extend(this._private, {
+                openTimeout: null
+            });
+            // call the parent
+            this._super();
+        },
         // init sortable
         _initSortable: function() {
             this._instance.jQuery.aciSortable({
@@ -76,11 +84,30 @@
                     }).html(this.getLabel(item));
                 }),
                 drag: this.proxy(function(item, placeholder, isValid, helper) {
+                    if (!isValid) {
+                        window.clearTimeout(this._private.openTimeout);
+                    }
                     if (this._instance.options.sortDrag) {
                         this._instance.options.sortDrag.apply(this, arguments);
                     }
                 }),
                 valid: this.proxy(function(item, hover, before, isContainer, placeholder, helper) {
+                    window.clearTimeout(this._private.openTimeout);
+                    if (!isContainer && this.isFolder(hover)) {
+                        if (!this.isOpen(hover) && !hover.data('opening' + this._private.nameSpace)) {
+                            this._private.openTimeout = window.setTimeout(this.proxy(function() {
+                                hover.data('opening' + this._private.nameSpace, true);
+                                this.open(hover, {
+                                    success: function(item) {
+                                        item.removeData('opening' + this._private.nameSpace);
+                                    },
+                                    fail: function(item) {
+                                        item.removeData('opening' + this._private.nameSpace);
+                                    }
+                                });
+                            }), 1000);
+                        }
+                    }
                     var options = this._options({
                         hover: hover,
                         before: before,
@@ -98,25 +125,14 @@
                     return true;
                 }),
                 create: this.proxy(function(api, item, hover) {
-                    if (this.isFolder(hover)) {
-                        if (!this.isOpen(hover) && !hover.data('opening' + this._private.nameSpace)) {
-                            hover.data('opening' + this._private.nameSpace, true);
-                            this.open(hover, {
-                                success: function(item) {
-                                    item.removeData('opening' + this._private.nameSpace);
-                                },
-                                fail: function(item) {
-                                    item.removeData('opening' + this._private.nameSpace);
-                                }
-                            });
-                        }
-                    } else {
+                    if (this.isFile(hover)) {
                         hover.append(api._instance.options.childHolder);
                         return true;
                     }
                     return false;
                 }, true),
                 end: this.proxy(function(item, placeholder, helper) {
+                    window.clearTimeout(this._private.openTimeout);
                     var options = {
                         placeholder: placeholder,
                         helper: helper

@@ -460,7 +460,7 @@
 
                 $('script.code').each(function() {
                     $(this).before('<div style="clear:both"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
-                    $(this).prev('div').find('pre').text($(this).text());
+                    $(this).prev('div').find('pre').text($(this).html());
                 });
 
             });

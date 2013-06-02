@@ -43,9 +43,9 @@ $(function(){
 
 });
 
-Check out the demos, now with drag & drop for sorting support!
+Check out the demos, now with drag & drop item ordering support!
 
-aciTree jQuery Plugin v3.1.0
+aciTree jQuery Plugin v3.1.1
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
