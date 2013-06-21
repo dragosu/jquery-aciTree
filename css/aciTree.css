@@ -76,12 +76,14 @@
     height:auto;
     white-space:normal;
     cursor:pointer;
-    /* margin-right need to be set to icon width + item padding (+ the width of all columns, if any) */
+    /* margin-right need to be set to icon width [.aciTree .aciTreeIcon : 18] + 
+    item padding [.aciTree .aciTreeItem : 4] (+ the width of all columns, if any) */
     margin-right:22px;
 }
 .aciTree[dir=rtl] .aciTreeItem{
     margin-right:0;
-    /* margin-left need to be set to icon width + item padding (+ the width of all columns, if any) */
+    /* margin-left need to be set to icon width [.aciTree .aciTreeIcon : 18] + 
+    item padding [.aciTree .aciTreeItem : 4] (+ the width of all columns, if any) */
     margin-left:22px;
 }
 .aciTree .aciTreeText {

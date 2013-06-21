@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.1.1
+ * aciTree jQuery Plugin v3.2.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -150,7 +150,7 @@
                 return;
             }
             this._instance.locked = true;
-            this._instance.jQuery.bind('mousedown' + this._instance.nameSpace, function(e) {
+            this._instance.jQuery.addClass('aciTree' + this._instance.index).bind('mousedown' + this._instance.nameSpace, function(e) {
                 // set focus on the treeview
                 var element = $(e.target);
                 if (element.is('.aciTreeButton,.aciTreeLoad,.aciTreeEntry,.aciTreeIcon')) {
@@ -1970,7 +1970,7 @@
                     window.clearInterval(this._private.loaderInterval);
                     this._destroyHook(true);
                     this._instance.jQuery.unbind(this._instance.nameSpace).off(this._instance.nameSpace, '.aciTreeButton').off(this._instance.nameSpace, '.aciTreeLine');
-                    this._instance.jQuery.toggleClass('aciTreeLoad', false);
+                    this._instance.jQuery.removeClass('aciTree' + this._instance.index).toggleClass('aciTreeLoad', false);
                     this._instance.locked = false;
                     // call the parent
                     this._super();

@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.1.1
+ * aciTree jQuery Plugin v3.2.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -13,11 +13,10 @@
 /*
  * This extension adds multiple column support to aciTree.
  *
- * In this version there is no extra public API functionality added, just
- * a new option: 'columnData' to tell what are the columns and show one or
+ * The 'columnData' option is used to tell what are the columns and show one or
  * more values that will be read from the 'itemData'.
  *
- * Column data is a array of column definitions, each column definition is
+ * Column data is an array of column definitions, each column definition is
  * one object:
  *
  * {
@@ -49,25 +48,19 @@
         _initHook: function() {
             if (this._instance.options.columnData.length) {
                 // check column width
-                var index = 0, width = 0, found = false, data;
+                var index = 0, found = false, data;
                 for (var i in this._instance.options.columnData) {
                     data = this._instance.options.columnData[i];
                     if (data.width !== undefined) {
-                        width += data.width;
+                        // update column width
+                        this._updateCss('.aciTree.aciTree' + this._instance.index + ' .aciTreeColumn' + index, 'width:' + data.width + 'px;');
                         found = true;
-                    } else {
-                        // get it from CSS
-                        width += this._getCss(['aciTree', 'aciTreeColumn' + index], 'width', true);
                     }
                     index++;
                 }
                 if (found) {
                     // at least a column width set
-                    var icon = this._getCss(['aciTree', 'aciTreeIcon'], 'width', true);
-                    // add item padding
-                    width += this._getCss(['aciTree', 'aciTreeItem'], 'padding-left', true) + this._getCss(['aciTree', 'aciTreeItem'], 'padding-right', true);
-                    this._updateCss('.aciTree .aciTreeItem', 'margin-right:' + (icon + width) + 'px;');
-                    this._updateCss('.aciTree[dir=rtl] .aciTreeItem', 'margin-left:' + (icon + width) + 'px;');
+                    this._updateWidth();
                 }
             }
             // call the parent
@@ -103,12 +96,59 @@
         // dynamically change a CSS class definition
         _updateCss: function(className, definition) {
             var id = '_updateCss_' + window.String(className).replace('>', '_gt_').replace(/[^a-z0-9_-]/ig, '_');
-            var style = '<style id="' + id + '" type="text/css">' + className + '{' + definition + ';}</style>';
+            var style = '<style id="' + id + '" type="text/css">' + className + '{' + definition + '}</style>';
             var test = $('body').find('#' + id);
             if (test.length) {
                 test.replaceWith(style);
             } else {
                 $('body').prepend(style);
+            }
+        },
+        // get column width by index (0 based)
+        getWidth: function(column) {
+            if (column < this._instance.options.columnData.length) {
+                return this._getCss(['aciTree aciTree' + this._instance.index, 'aciTreeColumn' + column], 'width', true);
+            }
+            return null;
+        },
+        // set column width by index (0 based)
+        setWidth: function(column, width) {
+            if (column < this._instance.options.columnData.length) {
+                this._updateCss('.aciTree.aciTree' + this._instance.index + ' .aciTreeColumn' + column, 'width:' + width + 'px;');
+                this._updateWidth();
+            }
+        },
+        // update item margins
+        _updateWidth: function() {
+            var index = 0, width = 0;
+            for (var i in this._instance.options.columnData) {
+                if (this.isColumn(index)) {
+                    width += this.getWidth(index);
+                }
+                index++;
+            }
+            var icon = this._getCss(['aciTree', 'aciTreeIcon'], 'width', true);
+            // add item padding
+            width += this._getCss(['aciTree', 'aciTreeItem'], 'padding-left', true) + this._getCss(['aciTree', 'aciTreeItem'], 'padding-right', true);
+            this._updateCss('.aciTree.aciTree' + this._instance.index + ' .aciTreeItem', 'margin-right:' + (icon + width) + 'px;');
+            this._updateCss('.aciTree[dir=rtl].aciTree' + this._instance.index + ' .aciTreeItem', 'margin-right:0;margin-left:' + (icon + width) + 'px;');
+        },
+        // test if column is visible by index (0 based)
+        isColumn: function(column) {
+            if (column < this._instance.options.columnData.length) {
+                return this._getCss(['aciTree aciTree' + this._instance.index, 'aciTreeColumn' + column], 'display') != 'none';
+            }
+            return false;
+        },
+        // set column by index (0 based) to be visible or hidden
+        // if show is undefined then the column visibility will be toggled
+        toggleColumn: function(column, show) {
+            if (column < this._instance.options.columnData.length) {
+                if (show === undefined) {
+                    var show = !this.isColumn(column);
+                }
+                this._updateCss('.aciTree.aciTree' + this._instance.index + ' .aciTreeColumn' + column, 'display:' + (show ? 'inherit' : 'none') + ';');
+                this._updateWidth();
             }
         },
         // override _itemHook
@@ -128,10 +168,9 @@
         },
         // create column markup
         _createColumn: function(itemData, columnData, index) {
-            var style = (columnData.width !== undefined) ? ' style="width:' + columnData.width + 'px"' : '';
             var value = columnData.props && (itemData[columnData.props] !== undefined) ? itemData[columnData.props] :
                     ((columnData.value === undefined) ? '' : columnData.value);
-            return $('<div class="aciTreeColumn aciTreeColumn' + index + '"' + style + '>' + (value.length ? value : '&nbsp;') + '</div>');
+            return $('<div class="aciTreeColumn aciTreeColumn' + index + '">' + (value.length ? value : '&nbsp;') + '</div>');
         }
 
     };

@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="language" content="en" />
-        <title>aciTree v3.1.1 - A treeview control with jQuery</title>
+        <title>aciTree v3.2.0 - A treeview control with jQuery</title>
         <meta name="description" content="aciTree API documentation" />
         <style type="text/css">
             html {
@@ -147,14 +147,20 @@
     </head>
 
     <body>
-        <h1>aciTree API v3.1.1</h1>
+        <h1>aciTree API v3.2.0</h1>
+        
+        <p>Please note that here are listed only the public API methods, you need to 
+            <a href="http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery" target="_blank" title="aciTree home">read</a> about the available init options and how to listen
+        for the aciTree events before you'll be able to use aciTree. Try out the <a href="aciTree.html" target="_blank" title="aciTree demos">demos</a> to understand how to use the API.</p>
 
 <div class="api"><span class="toc"><a title=".after (item, options)" href="#.after">.after -  Add a new item or a list of items after item...</a><br><a title=".ajaxLoad (item, options)" href="#.ajaxLoad">.ajaxLoad -  Loads a node with AJAX (if not already loaded)...</a><br><a title=".append (item, options)" href="#.append">.append -  Add one or more childrens to item, the new items are added at the end...</a><br><a title=".asChild (item, options) " href="#.asChild">.asChild -  Moves item so it becomes child of a parent item...</a><br><a title=".before (item, options)" href="#.before">.before -  Add a new item or a list of items before item...</a><br><a title=".branch (item, callback, load) " href="#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="#.check">.check -  Set a checkbox or radio-button in the checked/unchecked state...</a><br><a title=".checkboxes (items, state) " href="#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".childrens (item, branch)" href="#.childrens">.childrens -  Returns a list of childrens from item.
                     
                 </a><br><a title=".close (item, options)" href="#.close">.close -  Closes the item node and all his childrens (if requested)...</a><br><a title=".closeOthers (item, options)" href="#.closeOthers">.closeOthers -  Closes all other nodes less the item...</a><br><a title=".destroy (options)" href="#.destroy">.destroy -  Destroys the treeview control, .isLocked will return TRUE from the start until...</a><br><a title=".edit (item, options) " href="#.edit">.edit -  Enters or exits the editable mode (optionally saving the changes made)...</a><br><a title=".edited () " href="#.edited">.edited -  Returns the edited LI element.
                 </a><br><a title=".files (items)" href="#.files">.files -  Filter items and return only the 'file' items...</a><br><a title=".first (item)" href="#.first">.first -  Returns the first children of item.
                     
-                </a><br><a title=".folders (items, state)" href="#.folders">.folders -  Filter items and return only the 'folder' items...</a><br><a title=".getIcon (item)" href="#.getIcon">.getIcon -  Returns the item ICON (or NULL if does not exist)...</a><br><a title=".getId (item)" href="#.getId">.getId -  Returns the item ID (or NULL if does not exists)...</a><br><a title=".getIndex (item)" href="#.getIndex">.getIndex -  Returns the index starting from 0 for the item (or NULL if does not exists)...</a><br><a title=".getLabel (item)" href="#.getLabel">.getLabel -  Returns the text value of item (or NULL if does not exists)...</a><br><a title=".hasCheckbox (item) " href="#.hasCheckbox">.hasCheckbox -  Returns TRUE if the item has a checkbox.
+                </a><br><a title=".folders (items, state)" href="#.folders">.folders -  Filter items and return only the 'folder' items...</a><br><a title=".getIcon (item)" href="#.getIcon">.getIcon -  Returns the item ICON (or NULL if does not exist)...</a><br><a title=".getId (item)" href="#.getId">.getId -  Returns the item ID (or NULL if does not exists)...</a><br><a title=".getIndex (item)" href="#.getIndex">.getIndex -  Returns the index starting from 0 for the item (or NULL if does not exists)...</a><br><a title=".getLabel (item)" href="#.getLabel">.getLabel -  Returns the text value of item (or NULL if does not exists)...</a><br><a title=".getWidth (column) " href="#.getWidth">.getWidth -  Returns the column width (in pixels).
+                    
+                </a><br><a title=".hasCheckbox (item) " href="#.hasCheckbox">.hasCheckbox -  Returns TRUE if the item has a checkbox.
                     
                 </a><br><a title=".hasChildrens (item)" href="#.hasChildrens">.hasChildrens -  Returns TRUE if the item has childrens.
                     
@@ -168,6 +174,8 @@
                 </a><br><a title=".isChecked (item) " href="#.isChecked">.isChecked -  Returns TRUE if the item is checked.
                     
                 </a><br><a title=".isChildren (parent, children)" href="#.isChildren">.isChildren -  Returns TRUE if children have parent as parent...</a><br><a title=".isClosed (item)" href="#.isClosed">.isClosed -  Returns TRUE if the item node is closed.
+                    
+                </a><br><a title=".isColumn (column) " href="#.isColumn">.isColumn -  Returns TRUE if the column is visible.
                     
                 </a><br><a title=".isEdited (item) " href="#.isEdited">.isEdited -  Returns TRUE if the item is edited right now...</a><br><a title=".isFile (item)" href="#.isFile">.isFile -  Returns TRUE if item is a 'file' (does not have any childrens)...</a><br><a title=".isFirst (item)" href="#.isFirst">.isFirst -  Returns TRUE if item is the first item for its parent...</a><br><a title=".isFolder (item)" href="#.isFolder">.isFolder -  Returns TRUE if item is a 'folder' (has childrens)...</a><br><a title=".isImmediateChildren (parent, children)" href="#.isImmediateChildren">.isImmediateChildren -  Returns TRUE if children have parent as direct parent...</a><br><a title=".isItem (item)" href="#.isItem">.isItem -  Returns TRUE if item is a valid item.
                     
@@ -197,13 +205,17 @@
                     
                     Notifies with the...</a><br><a title=".setLabel (item, options)" href="#.setLabel">.setLabel -  Set the item text content.
                     
-                    Notifies...</a><br><a title=".setRadio (item, options) " href="#.setRadio">.setRadio -  Set item with or without a radio-button...</a><br><a title=".setVisible (item, options)" href="#.setVisible">.setVisible -  Brings item into the view...</a><br><a title=".siblings (item)" href="#.siblings">.siblings -  Returns a list of item siblings (belonging to the same parent)...</a><br><a title=".swap (options) " href="#.swap">.swap -  Exchanges two items (the items can't be child and parent)...</a><br><a title=".toggle (item, options)" href="#.toggle">.toggle -  Opens or closes the item node...</a><br><a title=".topParent (item)" href="#.topParent">.topParent -  Returns the parent on the level 0 for item...</a><br><a title=".unload (item, options)" href="#.unload">.unload -  Removes all the item childrens...</a><br><a title=".unpersist () " href="#.unpersist">.unpersist -  Removes the save data (if there is any).
+                    Notifies...</a><br><a title=".setRadio (item, options) " href="#.setRadio">.setRadio -  Set item with or without a radio-button...</a><br><a title=".setVisible (item, options)" href="#.setVisible">.setVisible -  Brings item into the view...</a><br><a title=".setWidth (column, width) " href="#.setWidth">.setWidth -  Set the column width (in pixels).
+                    
+                </a><br><a title=".siblings (item)" href="#.siblings">.siblings -  Returns a list of item siblings (belonging to the same parent)...</a><br><a title=".swap (options) " href="#.swap">.swap -  Exchanges two items (the items can't be child and parent)...</a><br><a title=".toggle (item, options)" href="#.toggle">.toggle -  Opens or closes the item node...</a><br><a title=".toggleColumn (column, show) " href="#.toggleColumn">.toggleColumn -  Show or hide a column.
+                    
+                </a><br><a title=".topParent (item)" href="#.topParent">.topParent -  Returns the parent on the level 0 for item...</a><br><a title=".unload (item, options)" href="#.unload">.unload -  Removes all the item childrens...</a><br><a title=".unpersist () " href="#.unpersist">.unpersist -  Removes the save data (if there is any).
                 </a><br><a title=".update (item, options) " href="#.update">.update -  Update the item, changes the ID, text value, the icon and (optional) loads the...</a><br><a title=".visible (items, view)" href="#.visible">.visible -  Filter items and return only the visible items (the items with all parent...</a><br><a title=".wasInit ()" href="#.wasInit">.wasInit -  Returns TRUE if the treeview control was initialized.
                 </a><br><a title=".wasLoad (item)" href="#.wasLoad">.wasLoad -  Returns TRUE if item was loaded.
                     
                 </a><br></span>
 
-                <a name=".after"></a><div data-ext="core"><span>.after (item, options)</span> Add a new item or a list of items after <b>item</b>.
+                <a name=".after"></a><div style="display: block;" data-ext="core"><span>.after (item, options)</span> Add a new item or a list of items after <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> after which the new elements are added
@@ -222,7 +234,7 @@
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeafter</em>.
                 </div>
 
-                <a name=".ajaxLoad"></a><div data-ext="core"><span>.ajaxLoad (item, options)</span> Loads a node with AJAX (if not already loaded).
+                <a name=".ajaxLoad"></a><div style="display: block;" data-ext="core"><span>.ajaxLoad (item, options)</span> Loads a node with AJAX (if not already loaded).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> node to be loaded (or <i>NULL</i> for ROOT)
@@ -245,7 +257,7 @@
                     See <b>.loadFrom</b> for loading from a JavaScript variable (instead of AJAX).
                 </div>
 
-                <a name=".append"></a><div data-ext="core"><span>.append (item, options)</span> Add one or more childrens to <b>item</b>, the new items are added at the end.
+                <a name=".append"></a><div style="display: block;" data-ext="core"><span>.append (item, options)</span> Add one or more childrens to <b>item</b>, the new items are added at the end.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to add the childrens to (or <i>NULL</i> for ROOT)
@@ -264,7 +276,7 @@
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeappend</em>.
                 </div>
                 
-                <a name=".asChild"></a><div data-ext="utils extension"><span>.asChild (item, options) <span>utils extension</span></span> Moves <b>item</b> so it becomes child of a parent item.
+                <a name=".asChild"></a><div style="display: block;" data-ext="utils extension"><span>.asChild (item, options) <span>utils extension</span></span> Moves <b>item</b> so it becomes child of a parent item.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -279,7 +291,7 @@
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforechild</em>.
                 </div>                
 
-                <a name=".before"></a><div data-ext="core"><span>.before (item, options)</span> Add a new item or a list of items before <b>item</b>.
+                <a name=".before"></a><div style="display: block;" data-ext="core"><span>.before (item, options)</span> Add a new item or a list of items before <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> before which the new elements are added
@@ -298,7 +310,7 @@
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforebefore</em>.
                 </div>
 
-                <a name=".branch"></a><div data-ext="utils extension"><span>.branch (item, callback, load) <span>utils extension</span></span> Run a callback function for every children of <b>item</b>.
+                <a name=".branch"></a><div style="display: block;" data-ext="utils extension"><span>.branch (item, callback, load) <span>utils extension</span></span> Run a callback function for every children of <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
@@ -312,7 +324,7 @@
                     <b>.branch</b> calls <b>.ajaxLoad</b> when it needs to load a node.
                 </div>
 
-                <a name=".check"></a><div data-ext="checkbox/radio extension" data-ext1="checkbox extension" data-ext2="radio extension"><span>.check (item, options) <span>checkbox/radio extension</span></span> Set a checkbox or radio-button in the checked/unchecked state.
+                <a name=".check"></a><div style="display: block;" data-ext="checkbox/radio extension" data-ext1="checkbox extension" data-ext2="radio extension"><span>.check (item, options) <span>checkbox/radio extension</span></span> Set a checkbox or radio-button in the checked/unchecked state.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -326,7 +338,7 @@
                     returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforecheck</em>.
                 </div>
 
-                <a name=".checkboxes"></a><div data-ext="checkbox extension"><span>.checkboxes (items, state) <span>checkbox extension</span></span> Filter <b>items</b> and return only the items with a checkbox.
+                <a name=".checkboxes"></a><div style="display: block;" data-ext="checkbox extension"><span>.checkboxes (items, state) <span>checkbox extension</span></span> Filter <b>items</b> and return only the items with a checkbox.
                     <span class="where">
                         where:
                         <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
@@ -335,7 +347,7 @@
                 </div>
 
 
-                <a name=".childrens"></a><div data-ext="core"><span>.childrens (item, branch)</span> Returns a list of childrens from <b>item</b>.
+                <a name=".childrens"></a><div style="display: block;" data-ext="core"><span>.childrens (item, branch)</span> Returns a list of childrens from <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
@@ -344,7 +356,7 @@
                     </span>
                 </div>
 
-                <a name=".close"></a><div data-ext="core"><span>.close (item, options)</span> Closes the <b>item</b> node and all his childrens (if requested).
+                <a name=".close"></a><div style="display: block;" data-ext="core"><span>.close (item, options)</span> Closes the <b>item</b> node and all his childrens (if requested).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be closed
@@ -359,7 +371,7 @@
                     The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeclose</em>.
                 </div>
 
-                <a name=".closeOthers"></a><div data-ext="core"><span>.closeOthers (item, options)</span> Closes all other nodes less the <b>item</b>.
+                <a name=".closeOthers"></a><div style="display: block;" data-ext="core"><span>.closeOthers (item, options)</span> Closes all other nodes less the <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to remain open
@@ -372,7 +384,7 @@
                     <b>.closeOthers</b> calls <b>.close</b> to close all needed nodes.
                 </div>
 
-                <a name=".destroy"></a><div data-ext="core"><span>.destroy (options)</span> Destroys the treeview control, <b>.isLocked</b> will return <i>TRUE</i> from the start until the end of the operation.
+                <a name=".destroy"></a><div style="display: block;" data-ext="core"><span>.destroy (options)</span> Destroys the treeview control, <b>.isLocked</b> will return <i>TRUE</i> from the start until the end of the operation.
                     <span class="where">
                         where:
                         <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
@@ -386,7 +398,7 @@
                     The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforedestroy</em>.
                 </div>
 
-                <a name=".edit"></a><div data-ext="editable extension"><span>.edit (item, options) <span>editable extension</span></span> Enters or exits the editable mode (optionally saving the changes made).
+                <a name=".edit"></a><div style="display: block;" data-ext="editable extension"><span>.edit (item, options) <span>editable extension</span></span> Enters or exits the editable mode (optionally saving the changes made).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be edited/exit from the edit mode
@@ -402,24 +414,24 @@
                     The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeedit</em>.
                 </div>
 
-                <a name=".edited"></a><div data-ext="editable extension"><span>.edited () <span>editable extension</span></span> Returns the edited <i>LI</i> element.
+                <a name=".edited"></a><div style="display: block;" data-ext="editable extension"><span>.edited () <span>editable extension</span></span> Returns the edited <i>LI</i> element.
                 </div>
 
-                <a name=".files"></a><div data-ext="core"><span>.files (items)</span> Filter <b>items</b> and return only the 'file' items.
+                <a name=".files"></a><div style="display: block;" data-ext="core"><span>.files (items)</span> Filter <b>items</b> and return only the 'file' items.
                     <span class="where">
                         where:
                         <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
                     </span>
                 </div>
 
-                <a name=".first"></a><div data-ext="core"><span>.first (item)</span> Returns the first children of <b>item</b>.
+                <a name=".first"></a><div style="display: block;" data-ext="core"><span>.first (item)</span> Returns the first children of <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
                     </span>
                 </div>
 
-                <a name=".folders"></a><div data-ext="core"><span>.folders (items, state)</span> Filter <b>items</b> and return only the 'folder' items.
+                <a name=".folders"></a><div style="display: block;" data-ext="core"><span>.folders (items, state)</span> Filter <b>items</b> and return only the 'folder' items.
                     <span class="where">
                         where:
                         <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
@@ -427,7 +439,7 @@
                     </span>
                 </div>
 
-                <a name=".getIcon"></a><div data-ext="core"><span>.getIcon (item)</span> Returns the <b>item</b> ICON (or NULL if does not exist).
+                <a name=".getIcon"></a><div style="display: block;" data-ext="core"><span>.getIcon (item)</span> Returns the <b>item</b> ICON (or NULL if does not exist).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -435,80 +447,87 @@
                     Can return a string or array (depending on the init value).
                 </div>
 
-                <a name=".getId"></a><div data-ext="core"><span>.getId (item)</span> Returns the <b>item</b> ID (or NULL if does not exists).
+                <a name=".getId"></a><div style="display: block;" data-ext="core"><span>.getId (item)</span> Returns the <b>item</b> ID (or NULL if does not exists).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".getIndex"></a><div data-ext="core"><span>.getIndex (item)</span> Returns the index starting from 0 for the <b>item</b> (or NULL if does not exists).
+                <a name=".getIndex"></a><div style="display: block;" data-ext="core"><span>.getIndex (item)</span> Returns the index starting from 0 for the <b>item</b> (or NULL if does not exists).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".getLabel"></a><div data-ext="core"><span>.getLabel (item)</span> Returns the text value of <b>item</b> (or NULL if does not exists).
+                <a name=".getLabel"></a><div style="display: block;" data-ext="core"><span>.getLabel (item)</span> Returns the text value of <b>item</b> (or NULL if does not exists).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+                
+                <a name=".getWidth"></a><div style="display: block;" data-ext="column extension"><span>.getWidth (column) <span>column extension</span></span> Returns the column width (in pixels).
+                    <span class="where">
+                        where:
+                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                    </span>
+                </div>                
+
+                <a name=".hasCheckbox"></a><div style="display: block;" data-ext="checkbox extension"><span>.hasCheckbox (item) <span>checkbox extension</span></span> Returns <i>TRUE</i> if the <b>item</b> has a checkbox.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".hasCheckbox"></a><div data-ext="checkbox extension"><span>.hasCheckbox (item) <span>checkbox extension</span></span> Returns <i>TRUE</i> if the <b>item</b> has a checkbox.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".hasChildrens"></a><div data-ext="core"><span>.hasChildrens (item)</span> Returns <i>TRUE</i> if the <b>item</b> has childrens.
+                <a name=".hasChildrens"></a><div style="display: block;" data-ext="core"><span>.hasChildrens (item)</span> Returns <i>TRUE</i> if the <b>item</b> has childrens.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
                     </span>
                 </div>
 
-                <a name=".hasFocus"></a><div data-ext="selectable extension"><span>.hasFocus (item) <span>selectable extension</span></span> Returns <i>TRUE</i> if the treeview control has the focus.
+                <a name=".hasFocus"></a><div style="display: block;" data-ext="selectable extension"><span>.hasFocus (item) <span>selectable extension</span></span> Returns <i>TRUE</i> if the treeview control has the focus.
                 </div>
 
-                <a name=".hasNext"></a><div data-ext="core"><span>.hasNext (item)</span> Returns <i>TRUE</i> if there is at least a element after <b>item</b> (belonging to the same parent).
+                <a name=".hasNext"></a><div style="display: block;" data-ext="core"><span>.hasNext (item)</span> Returns <i>TRUE</i> if there is at least a element after <b>item</b> (belonging to the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".hasParent"></a><div data-ext="core"><span>.hasParent (item)</span> Returns <i>TRUE</i> if <b>item</b> has a parent.
+                <a name=".hasParent"></a><div style="display: block;" data-ext="core"><span>.hasParent (item)</span> Returns <i>TRUE</i> if <b>item</b> has a parent.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".hasPrev"></a><div data-ext="core"><span>.hasPrev (item)</span> Returns <i>TRUE</i> if there is at least a element before <b>item</b> (belonging to the same parent).
+                <a name=".hasPrev"></a><div style="display: block;" data-ext="core"><span>.hasPrev (item)</span> Returns <i>TRUE</i> if there is at least a element before <b>item</b> (belonging to the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".hasRadio"></a><div data-ext="radio extension"><span>.hasRadio (item) <span>radio extension</span></span> Returns <i>TRUE</i> if the <b>item</b> has a radio.
+                <a name=".hasRadio"></a><div style="display: block;" data-ext="radio extension"><span>.hasRadio (item) <span>radio extension</span></span> Returns <i>TRUE</i> if the <b>item</b> has a radio.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".hasSiblings"></a><div data-ext="core"><span>.hasSiblings (item)</span> Returns <i>TRUE</i> if <b>item</b> has siblings on the same level (belonging to the same parent).
+                <a name=".hasSiblings"></a><div style="display: block;" data-ext="core"><span>.hasSiblings (item)</span> Returns <i>TRUE</i> if <b>item</b> has siblings on the same level (belonging to the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".init"></a><div data-ext="core"><span>.init (options)</span> Init the treeview control (if not initialized already), <b>.isLocked</b> will return <i>TRUE</i> from the start until the end of the operation.
+                <a name=".init"></a><div style="display: block;" data-ext="core"><span>.init (options)</span> Init the treeview control (if not initialized already), <b>.isLocked</b> will return <i>TRUE</i> from the start until the end of the operation.
                     <span class="where">
                         where:
                         <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options)</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
@@ -523,21 +542,21 @@
                     The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforeinit</em>.
                 </div>
 
-                <a name=".isBusy"></a><div data-ext="core"><span>.isBusy (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is loading.
+                <a name=".isBusy"></a><div style="display: block;" data-ext="core"><span>.isBusy (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is loading.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
                     </span>
                 </div>
 
-                <a name=".isChecked"></a><div data-ext="checkbox/radio extension" data-ext1="checkbox extension" data-ext2="radio extension"><span>.isChecked (item) <span>checkbox/radio extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is checked.
+                <a name=".isChecked"></a><div style="display: block;" data-ext="checkbox/radio extension" data-ext1="checkbox extension" data-ext2="radio extension"><span>.isChecked (item) <span>checkbox/radio extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is checked.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".isChildren"></a><div data-ext="core"><span>.isChildren (parent, children)</span> Returns <i>TRUE</i> if <b>children</b> have <b>parent</b> as parent.
+                <a name=".isChildren"></a><div style="display: block;" data-ext="core"><span>.isChildren (parent, children)</span> Returns <i>TRUE</i> if <b>children</b> have <b>parent</b> as parent.
                     <span class="where">
                         where:
                         <span>parent<span> jQuery object</span></span> the parent <i>LI</i>
@@ -545,119 +564,126 @@
                     </span>
                 </div>
 
-                <a name=".isClosed"></a><div data-ext="core"><span>.isClosed (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is closed.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isEdited"></a><div data-ext="editable extension"><span>.isEdited (item) <span>editable extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is edited right now.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isFile"></a><div data-ext="core"><span>.isFile (item)</span> Returns <i>TRUE</i> if <b>item</b> is a 'file' (does not have any childrens).
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isFirst"></a><div data-ext="core"><span>.isFirst (item)</span> Returns <i>TRUE</i> if <b>item</b> is the first item for its parent.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isFolder"></a><div data-ext="core"><span>.isFolder (item)</span> Returns <i>TRUE</i> if <b>item</b> is a 'folder' (has childrens).
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isImmediateChildren"></a><div data-ext="core"><span>.isImmediateChildren (parent, children)</span> Returns <i>TRUE</i> if <b>children</b> have <b>parent</b> as direct parent.
-                    <span class="where">
-                        where:
-                        <span>parent<span> jQuery object</span></span> the parent <i>LI</i>
-                        <span>children<span> jQuery object</span></span> the child <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isItem"></a><div data-ext="core"><span>.isItem (item)</span> Returns <i>TRUE</i> if <b>item</b> is a valid item.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isLast"></a><div data-ext="core"><span>.isLast (item)</span> Returns <i>TRUE</i> if <b>item</b> is the last item for its parent.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isLocked"></a><div data-ext="core"><span>.isLocked ()</span> Returns <i>TRUE</i> if the treeview control is in the <b>init</b> or <b>destroy</b> operation.
-                </div>
-
-                <a name=".isOpen"></a><div data-ext="core"><span>.isOpen (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is opened.
-                    <span class="where">
-                        where:
-                        <span>item<span> jQuery object</span></span> the <i>LI</i>
-                    </span>
-                </div>
-
-                <a name=".isOpenPath"></a><div data-ext="core"><span>.isOpenPath (item)</span> Returns <i>TRUE</i> if the path to <b>item</b> is open (all the parent nodes are open).
+                <a name=".isClosed"></a><div style="display: block;" data-ext="core"><span>.isClosed (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is closed.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
                 
-                <a name=".isPersist"></a><div data-ext="persist extension"><span>.isPersist () <span>persist extension</span></span> Returns <i>TRUE</i> if there is any saved data.
-                </div>
+                <a name=".isColumn"></a><div style="display: block;" data-ext="column extension"><span>.isColumn (column) <span>column extension</span></span> Returns <i>TRUE</i> if the column is visible.
+                    <span class="where">
+                        where:
+                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                    </span>
+                </div>                    
 
-                <a name=".isSelected"></a><div data-ext="selectable extension"><span>.isSelected (item) <span>selectable extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is selected.
+                <a name=".isEdited"></a><div style="display: block;" data-ext="editable extension"><span>.isEdited (item) <span>editable extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is edited right now.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".isVisible"></a><div data-ext="core"><span>.isVisible (item)</span> Returns <i>TRUE</i> if <b>item</b> is visible (if all parent nodes are opened and the item it's in the visible area).
+                <a name=".isFile"></a><div style="display: block;" data-ext="core"><span>.isFile (item)</span> Returns <i>TRUE</i> if <b>item</b> is a 'file' (does not have any childrens).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".itemFrom"></a><div data-ext="core"><span>.itemFrom (element)</span> Returns the <i>LI</i> that contains the <b>element</b>.
+                <a name=".isFirst"></a><div style="display: block;" data-ext="core"><span>.isFirst (item)</span> Returns <i>TRUE</i> if <b>item</b> is the first item for its parent.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isFolder"></a><div style="display: block;" data-ext="core"><span>.isFolder (item)</span> Returns <i>TRUE</i> if <b>item</b> is a 'folder' (has childrens).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isImmediateChildren"></a><div style="display: block;" data-ext="core"><span>.isImmediateChildren (parent, children)</span> Returns <i>TRUE</i> if <b>children</b> have <b>parent</b> as direct parent.
+                    <span class="where">
+                        where:
+                        <span>parent<span> jQuery object</span></span> the parent <i>LI</i>
+                        <span>children<span> jQuery object</span></span> the child <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isItem"></a><div style="display: block;" data-ext="core"><span>.isItem (item)</span> Returns <i>TRUE</i> if <b>item</b> is a valid item.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isLast"></a><div style="display: block;" data-ext="core"><span>.isLast (item)</span> Returns <i>TRUE</i> if <b>item</b> is the last item for its parent.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isLocked"></a><div style="display: block;" data-ext="core"><span>.isLocked ()</span> Returns <i>TRUE</i> if the treeview control is in the <b>init</b> or <b>destroy</b> operation.
+                </div>
+
+                <a name=".isOpen"></a><div style="display: block;" data-ext="core"><span>.isOpen (item)</span> Returns <i>TRUE</i> if the <b>item</b> node is opened.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isOpenPath"></a><div style="display: block;" data-ext="core"><span>.isOpenPath (item)</span> Returns <i>TRUE</i> if the path to <b>item</b> is open (all the parent nodes are open).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+                
+                <a name=".isPersist"></a><div style="display: block;" data-ext="persist extension"><span>.isPersist () <span>persist extension</span></span> Returns <i>TRUE</i> if there is any saved data.
+                </div>
+
+                <a name=".isSelected"></a><div style="display: block;" data-ext="selectable extension"><span>.isSelected (item) <span>selectable extension</span></span> Returns <i>TRUE</i> if the <b>item</b> is selected.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".isVisible"></a><div style="display: block;" data-ext="core"><span>.isVisible (item)</span> Returns <i>TRUE</i> if <b>item</b> is visible (if all parent nodes are opened and the item it's in the visible area).
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
+
+                <a name=".itemFrom"></a><div style="display: block;" data-ext="core"><span>.itemFrom (element)</span> Returns the <i>LI</i> that contains the <b>element</b>.
                     <span class="where">
                         where:
                         <span>element<span> jQuery object</span></span> a child element for <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".last"></a><div data-ext="core"><span>.last (item)</span> Returns the last children of <b>item</b>.
+                <a name=".last"></a><div style="display: block;" data-ext="core"><span>.last (item)</span> Returns the last children of <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
                     </span>
                 </div>
 
-                <a name=".level"></a><div data-ext="core"><span>.level (item)</span> Returns the <b>item</b> level starting from 0 for the ones in ROOT (or -1 if does not exists).
+                <a name=".level"></a><div style="display: block;" data-ext="core"><span>.level (item)</span> Returns the <b>item</b> level starting from 0 for the ones in ROOT (or -1 if does not exists).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".loadFrom"></a><div data-ext="core"><span>.loadFrom (item, options)</span> Loads a node from a <i>JavaScript</i> variable (if not already loaded).
+                <a name=".loadFrom"></a><div style="display: block;" data-ext="core"><span>.loadFrom (item, options)</span> Loads a node from a <i>JavaScript</i> variable (if not already loaded).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be loaded (or <i>NULL</i> for ROOT)
@@ -678,7 +704,7 @@
                     See <b>.ajaxLoad</b> for loading with AJAX.
                 </div>
 
-                <a name=".moveAfter"></a><div data-ext="utils extension"><span>.moveAfter (item, options) <span>utils extension</span></span> Move <b>item</b> after a specific item.
+                <a name=".moveAfter"></a><div style="display: block;" data-ext="utils extension"><span>.moveAfter (item, options) <span>utils extension</span></span> Move <b>item</b> after a specific item.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -693,7 +719,7 @@
                     The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforemove</em>.
                 </div>   
                 
-                <a name=".moveBefore"></a><div data-ext="utils extension"><span>.moveBefore (item, options) <span>utils extension</span></span> Move <b>item</b> before a specific item.
+                <a name=".moveBefore"></a><div style="display: block;" data-ext="utils extension"><span>.moveBefore (item, options) <span>utils extension</span></span> Move <b>item</b> before a specific item.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -708,7 +734,7 @@
                     The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with <em>beforemove</em>.
                 </div>                 
                 
-                <a name=".moveDown"></a><div data-ext="utils extension"><span>.moveDown (item, options) <span>utils extension</span></span> Move <b>item</b> down with a position (inside the same parent).
+                <a name=".moveDown"></a><div style="display: block;" data-ext="utils extension"><span>.moveDown (item, options) <span>utils extension</span></span> Move <b>item</b> down with a position (inside the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -723,7 +749,7 @@
                     <b>.moveDown</b> calls <b>.setIndex</b> to change item position.
                 </div>
 
-                <a name=".moveFirst"></a><div data-ext="utils extension"><span>.moveFirst (item, options) <span>utils extension</span></span> Move <b>item</b> at the beginning (inside the same parent).
+                <a name=".moveFirst"></a><div style="display: block;" data-ext="utils extension"><span>.moveFirst (item, options) <span>utils extension</span></span> Move <b>item</b> at the beginning (inside the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -738,7 +764,7 @@
                     <b>.moveFirst</b> calls <b>.setIndex</b> to change item position.
                 </div>
 
-                <a name=".moveLast"></a><div data-ext="utils extension"><span>.moveLast (item, options) <span>utils extension</span></span> Move <b>item</b> at the end (inside the same parent).
+                <a name=".moveLast"></a><div style="display: block;" data-ext="utils extension"><span>.moveLast (item, options) <span>utils extension</span></span> Move <b>item</b> at the end (inside the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -753,7 +779,7 @@
                     <b>.moveLast</b> calls <b>.setIndex</b> to change item position.
                 </div>
 
-                <a name=".moveUp"></a><div data-ext="utils extension"><span>.moveUp (item, options) <span>utils extension</span></span> Move <b>item</b> up with a position (inside the same parent).
+                <a name=".moveUp"></a><div style="display: block;" data-ext="utils extension"><span>.moveUp (item, options) <span>utils extension</span></span> Move <b>item</b> up with a position (inside the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -768,14 +794,14 @@
                     <b>.moveUp</b> calls <b>.setIndex</b> to change item position.
                 </div>
 
-                <a name=".next"></a><div data-ext="core"><span>.next (item)</span> Returns the next element from <b>item</b> (belonging to the same parent).
+                <a name=".next"></a><div style="display: block;" data-ext="core"><span>.next (item)</span> Returns the next element from <b>item</b> (belonging to the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".open"></a><div data-ext="core"><span>.open (item, options)</span> Opens the <b>item</b> node and all his childrens (if requested).
+                <a name=".open"></a><div style="display: block;" data-ext="core"><span>.open (item, options)</span> Opens the <b>item</b> node and all his childrens (if requested).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be opened
@@ -793,7 +819,7 @@
                     <em>beforeopen</em>.
                 </div>
 
-                <a name=".openPath"></a><div data-ext="core"><span>.openPath (item, options)</span> Opens the entire path till <b>item</b>.
+                <a name=".openPath"></a><div style="display: block;" data-ext="core"><span>.openPath (item, options)</span> Opens the entire path till <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -807,7 +833,7 @@
                     <b>.openPath</b> calls <b>.open</b> to open the nodes.
                 </div>
 
-                <a name=".option"></a><div data-ext="core"><span>.option (option, value)</span> Set a option at runtime (after init).
+                <a name=".option"></a><div style="display: block;" data-ext="core"><span>.option (option, value)</span> Set a option at runtime (after init).
                     <span class="where">
                         where:
                         <span>option<span> (string)</span></span> the option to change
@@ -815,17 +841,17 @@
                     </span>
                 </div>
 
-                <a name=".options"></a><div data-ext="core"><span>.options ()</span> Returns the init options (including any new value assigned with <b>option</b>).
+                <a name=".options"></a><div style="display: block;" data-ext="core"><span>.options ()</span> Returns the init options (including any new value assigned with <b>option</b>).
                 </div>
 
-                <a name=".parent"></a><div data-ext="core"><span>.parent (item)</span> Returns the parent of <b>item</b>.
+                <a name=".parent"></a><div style="display: block;" data-ext="core"><span>.parent (item)</span> Returns the parent of <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".path"></a><div data-ext="core"><span>.path (item, reverse)</span> Returns a list of parent items till <b>item</b> (starting from ROOT).
+                <a name=".path"></a><div style="display: block;" data-ext="core"><span>.path (item, reverse)</span> Returns a list of parent items till <b>item</b> (starting from ROOT).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -833,14 +859,14 @@
                     </span>
                 </div>
 
-                <a name=".prev"></a><div data-ext="core"><span>.prev (item)</span> Returns the previous element from <b>item</b> (belonging to the same parent).
+                <a name=".prev"></a><div style="display: block;" data-ext="core"><span>.prev (item)</span> Returns the previous element from <b>item</b> (belonging to the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".radios"></a><div data-ext="radio extension"><span>.radios (items, state) <span>radio extension</span></span> Filter <b>items</b> and return only the items with a radio-button.
+                <a name=".radios"></a><div style="display: block;" data-ext="radio extension"><span>.radios (items, state) <span>radio extension</span></span> Filter <b>items</b> and return only the items with a radio-button.
                     <span class="where">
                         where:
                         <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
@@ -848,7 +874,7 @@
                     </span>
                 </div>
 
-                <a name=".remove"></a><div data-ext="core"><span>.remove (item, options)</span> Remove <b>item</b> (including the childrens).
+                <a name=".remove"></a><div style="display: block;" data-ext="core"><span>.remove (item, options)</span> Remove <b>item</b> (including the childrens).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be removed
@@ -864,7 +890,7 @@
                     <em>beforeremove</em>.
                 </div>
 
-                <a name=".sameParent"></a><div data-ext="core"><span>.sameParent (item1, item2)</span> Returns <i>TRUE</i> if <b>item1</b> and <b>item2</b> have the same direct parent.
+                <a name=".sameParent"></a><div style="display: block;" data-ext="core"><span>.sameParent (item1, item2)</span> Returns <i>TRUE</i> if <b>item1</b> and <b>item2</b> have the same direct parent.
                     <span class="where">
                         where:
                         <span>item1<span> jQuery object</span></span> the <i>LI</i>
@@ -872,7 +898,7 @@
                     </span>
                 </div>
 
-                <a name=".sameTopParent"></a><div data-ext="core"><span>.sameTopParent (item1, item2)</span> Returns <i>TRUE</i> if <b>item1</b> and <b>item2</b> have the same parent on level 0.
+                <a name=".sameTopParent"></a><div style="display: block;" data-ext="core"><span>.sameTopParent (item1, item2)</span> Returns <i>TRUE</i> if <b>item1</b> and <b>item2</b> have the same parent on level 0.
                     <span class="where">
                         where:
                         <span>item1<span> jQuery object</span></span> the <i>LI</i>
@@ -880,7 +906,7 @@
                     </span>
                 </div>
 
-                <a name=".searchId"></a><div data-ext="utils extension"><span>.searchId (path, load, options) <span>utils extension</span></span> Searches and returns the <i>LI</i> element with a ID.
+                <a name=".searchId"></a><div style="display: block;" data-ext="utils extension"><span>.searchId (path, load, options) <span>utils extension</span></span> Searches and returns the <i>LI</i> element with a ID.
                     <span class="where">
                         where:
                         <span>path<span> (boolean)</span></span> if <i>TRUE</i> then the search stops to the first branch with the ID inside the searched ID
@@ -896,7 +922,7 @@
                     <b>.searchId</b> calls <b>.ajaxLoad</b> when it needs to load a node.
                 </div>
 
-                <a name=".select"></a><div data-ext="selectable extension"><span>.select (item, options) <span>selectable extension</span></span> Selects/deselects one <b>item</b>.
+                <a name=".select"></a><div style="display: block;" data-ext="selectable extension"><span>.select (item, options) <span>selectable extension</span></span> Selects/deselects one <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be (de)selected
@@ -914,10 +940,10 @@
                     <em>beforeselect</em>.
                 </div>
 
-                <a name=".selected"></a><div data-ext="selectable extension"><span>.selected () <span>selectable extension</span></span> Returns the selected <i>LI</i> element.
+                <a name=".selected"></a><div style="display: block;" data-ext="selectable extension"><span>.selected () <span>selectable extension</span></span> Returns the selected <i>LI</i> element.
                 </div>
 
-                <a name=".setCheckbox"></a><div data-ext="checkbox extension"><span>.setCheckbox (item, options) <span>checkbox extension</span></span> Set <b>item</b> with or without a checkbox.
+                <a name=".setCheckbox"></a><div style="display: block;" data-ext="checkbox extension"><span>.setCheckbox (item, options) <span>checkbox extension</span></span> Set <b>item</b> with or without a checkbox.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -935,7 +961,7 @@
                     <em>beforecheckbox</em>.
                 </div>
 
-                <a name=".setFile"></a><div data-ext="core"><span>.setFile (item, options)</span> Transforms <b>item</b> in a 'file'.
+                <a name=".setFile"></a><div style="display: block;" data-ext="core"><span>.setFile (item, options)</span> Transforms <b>item</b> in a 'file'.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -951,7 +977,7 @@
                     <em>beforefile</em>.
                 </div>
 
-                <a name=".setFolder"></a><div data-ext="core"><span>.setFolder (item, options)</span> Transforms <b>item</b> in a 'folder'.
+                <a name=".setFolder"></a><div style="display: block;" data-ext="core"><span>.setFolder (item, options)</span> Transforms <b>item</b> in a 'folder'.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -967,7 +993,7 @@
                     <em>beforefolder</em>.
                 </div>
 
-                <a name=".setIcon"></a><div data-ext="core"><span>.setIcon (item, options)</span> Set the ICON image for <b>item</b>.
+                <a name=".setIcon"></a><div style="display: block;" data-ext="core"><span>.setIcon (item, options)</span> Set the ICON image for <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -986,7 +1012,7 @@
                     <em>beforeicon</em>.
                 </div>
 
-                <a name=".setId"></a><div data-ext="core"><span>.setId (item, options)</span> Set the <b>item</b> ID.
+                <a name=".setId"></a><div style="display: block;" data-ext="core"><span>.setId (item, options)</span> Set the <b>item</b> ID.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -1006,7 +1032,7 @@
                     <em>beforeid</em>.
                 </div>
 
-                <a name=".setIndex"></a><div data-ext="core"><span>.setIndex (item, options)</span> Set the <b>item</b> index.
+                <a name=".setIndex"></a><div style="display: block;" data-ext="core"><span>.setIndex (item, options)</span> Set the <b>item</b> index.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -1025,7 +1051,7 @@
                     <em>beforeindex</em>.
                 </div>
 
-                <a name=".setLabel"></a><div data-ext="core"><span>.setLabel (item, options)</span> Set the <b>item</b> text content.
+                <a name=".setLabel"></a><div style="display: block;" data-ext="core"><span>.setLabel (item, options)</span> Set the <b>item</b> text content.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -1044,7 +1070,7 @@
                     <em>beforelabel</em>.
                 </div>
 
-                <a name=".setRadio"></a><div data-ext="radio extension"><span>.setRadio (item, options) <span>radio extension</span></span> Set <b>item</b> with or without a radio-button.
+                <a name=".setRadio"></a><div style="display: block;" data-ext="radio extension"><span>.setRadio (item, options) <span>radio extension</span></span> Set <b>item</b> with or without a radio-button.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
@@ -1062,7 +1088,7 @@
                     <em>beforeradio</em>.
                 </div>
 
-                <a name=".setVisible"></a><div data-ext="core"><span>.setVisible (item, options)</span> Brings <b>item</b> into the view.
+                <a name=".setVisible"></a><div style="display: block;" data-ext="core"><span>.setVisible (item, options)</span> Brings <b>item</b> into the view.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
@@ -1079,14 +1105,22 @@
                     <em>beforevisible</em>.
                 </div>
 
-                <a name=".siblings"></a><div data-ext="core"><span>.siblings (item)</span> Returns a list of <b>item</b> siblings (belonging to the same parent).
+                <a name=".setWidth"></a><div style="display: block;" data-ext="column extension"><span>.setWidth (column, width) <span>column extension</span></span> Set the column width (in pixels).
+                    <span class="where">
+                        where:
+                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                        <span>width<span> (numeric)</span></span> the new width
+                    </span>
+                </div>                    
+                
+                <a name=".siblings"></a><div style="display: block;" data-ext="core"><span>.siblings (item)</span> Returns a list of <b>item</b> siblings (belonging to the same parent).
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".swap"></a><div data-ext="utils extension"><span>.swap (options) <span>utils extension</span></span> Exchanges two items (the items can't be child and parent).
+                <a name=".swap"></a><div style="display: block;" data-ext="utils extension"><span>.swap (options) <span>utils extension</span></span> Exchanges two items (the items can't be child and parent).
                     <span class="where">
                         where:
                         <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    item1: the first <i>LI</i> item,</li><li>                                    item2: the second <i>LI</i> item,</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
@@ -1100,7 +1134,7 @@
                     <em>beforeswap</em>.
                 </div>
 
-                <a name=".toggle"></a><div data-ext="core"><span>.toggle (item, options)</span> Opens or closes the <b>item</b> node.
+                <a name=".toggle"></a><div style="display: block;" data-ext="core"><span>.toggle (item, options)</span> Opens or closes the <b>item</b> node.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> to be opened/closed
@@ -1116,14 +1150,22 @@
                     <em>beforetoggle</em>.
                 </div>
 
-                <a name=".topParent"></a><div data-ext="core"><span>.topParent (item)</span> Returns the parent on the level 0 for <b>item</b>.
+                <a name=".toggleColumn"></a><div style="display: block;" data-ext="column extension"><span>.toggleColumn (column, show) <span>column extension</span></span> Show or hide a column.
+                    <span class="where">
+                        where:
+                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                        <span>show<span> (boolean)</span></span> (if set) state changes to this value
+                    </span>
+                </div>                    
+                
+                <a name=".topParent"></a><div style="display: block;" data-ext="core"><span>.topParent (item)</span> Returns the parent on the level 0 for <b>item</b>.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
 
-                <a name=".unload"></a><div data-ext="core"><span>.unload (item, options)</span> Removes all the <b>item</b> childrens.
+                <a name=".unload"></a><div style="display: block;" data-ext="core"><span>.unload (item, options)</span> Removes all the <b>item</b> childrens.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
@@ -1139,10 +1181,10 @@
                     <em>beforeunload</em>.
                 </div>
 
-                <a name=".unpersist"></a><div data-ext="persist extension"><span>.unpersist () <span>persist extension</span></span> Removes the save data (if there is any).
+                <a name=".unpersist"></a><div style="display: block;" data-ext="persist extension"><span>.unpersist () <span>persist extension</span></span> Removes the save data (if there is any).
                 </div>                  
                 
-                <a name=".update"></a><div data-ext="utils extension"><span>.update (item, options) <span>utils extension</span></span> Update the <b>item</b>, changes the ID, text value, the icon and (optional) loads the node
+                <a name=".update"></a><div style="display: block;" data-ext="utils extension"><span>.update (item, options) <span>utils extension</span></span> Update the <b>item</b>, changes the ID, text value, the icon and (optional) loads the node
                     from a JavaScript variable.
                     <span class="where">
                         where:
@@ -1162,7 +1204,7 @@
                     <em>beforeupdate</em>.
                 </div>
 
-                <a name=".visible"></a><div data-ext="core"><span>.visible (items, view)</span> Filter <b>items</b> and return only the visible items (the items with all parent nodes open).
+                <a name=".visible"></a><div style="display: block;" data-ext="core"><span>.visible (items, view)</span> Filter <b>items</b> and return only the visible items (the items with all parent nodes open).
                     <span class="where">
                         where:
                         <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
@@ -1171,19 +1213,19 @@
                     <b>.visible</b> will call <b>.isVisible</b> to find if a item is in view.
                 </div>
 
-                <a name=".wasInit"></a><div data-ext="core"><span>.wasInit ()</span> Returns <i>TRUE</i> if the treeview control was initialized.
+                <a name=".wasInit"></a><div style="display: block;" data-ext="core"><span>.wasInit ()</span> Returns <i>TRUE</i> if the treeview control was initialized.
                 </div>
 
-                <a name=".wasLoad"></a><div data-ext="core"><span>.wasLoad (item)</span> Returns <i>TRUE</i> if <b>item</b> was loaded.
+                <a name=".wasLoad"></a><div style="display: block;" data-ext="core"><span>.wasLoad (item)</span> Returns <i>TRUE</i> if <b>item</b> was loaded.
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> for ROOT)
                     </span>
                 </div>
 
-            </div>            
+            </div>
 
-        <p>aciTree jQuery Plugin v3.1.1</p>
+        <p>aciTree jQuery Plugin v3.2.0</p>
         <p>http://acoderinsights.ro</p>
 
         <p>Copyright (c) 2013 Dragos Ursu</p>
