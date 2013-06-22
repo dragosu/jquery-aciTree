@@ -1,14 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE HTML>
+<html lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="language" content="en" />
-        <meta name="robots" content="index, follow" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="robots" content="index, follow">
         <title>aciTree using the API demo - A treeview control with jQuery</title>
-        <meta name="description" content="A demo to show you how aciTree API can be used" />
-        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery" />
-        <link rel="stylesheet" type="text/css" href="../css/aciTree.css" media="all" />
-        <link rel="stylesheet" type="text/css" href="../css/demo.css" media="all" />
+        <meta name="description" content="A demo to show you how aciTree API can be used">
+        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery">
+        <link rel="stylesheet" type="text/css" href="../css/aciTree.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../css/demo.css" media="all">
         <script type="text/javascript" src="../js/jquery.min.js"></script>
         <script type="text/javascript" src="../js/jquery.aciPlugin.min.js"></script>
         <script type="text/javascript" src="../js/jquery.aciTree.min.js"></script>
@@ -23,7 +22,7 @@
 
             <div id="tree" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />Sample tree</div></div>
+                    <br>Sample tree</div></div>
 
             <div class="log">Tree Log... <a class="clear_log" style="font-size:10px" href="#" title="Clear the LOG" target="_blank">clear log</a>
                 <div></div></div>
@@ -53,7 +52,7 @@
                 as returned in the JSON, practically (with server-side coding) the tree can not only be loaded node-by-node but in an optimised way - many levels at once - 
                 depending on the tree weight.</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>You can init as many trees as you want on a single page:</p>
 
@@ -75,7 +74,7 @@
 
             </script>              
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>And you can init many at once. Because the tree will be init by default - you need to specify
                 the 'autoInit' option (set to FALSE), set the 'jsonUrl' option and - just after that - init the tree:</p>
@@ -108,7 +107,7 @@
                 to the server will be <b>String(jsonUrl + 'node-547')</b>, that's why in my examples there is a <b>?branch=</b> or <b>?node_id=</b> at the end of the URL.
                 Server-side you need to read the GET value and return only the data for whatever node ID was requested (insted of returning the entire tree).</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>Get the aciTree API to use it later (see the docs for all available aciTree API methods):</p>
 
@@ -147,13 +146,13 @@
                 <b>The example here is just to let you know how aciTree behaves and not the correct way to implement things. Do not use in real applications, you will
                     need to use <i>events</i> for that!</b> (see examples a bit lower)</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>Use the 'itemHook' option to set each item in a custom way (just before it is actually added to the DOM):</p>
 
             <div id="tree-custom-label" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />Sample tree</div></div>            
+                    <br>Sample tree</div></div>            
 
             <script class="code" type="text/javascript">
 
@@ -180,13 +179,13 @@
                 'level' is the tree branch level (where the item is located - starting from 0). Inside the <b>itemHook</b> function, <i>this</i> keyword points to the aciTree API
                 (for the current tree).</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>The way to respond to the aciTree changes is using the events, also if you want to do some stuff just after init or when a specific event is fired:</p>
 
             <div id="tree-using-events" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />Sample tree</div></div>   
+                    <br>Sample tree</div></div>   
 
             <script class="code" type="text/javascript">
 
@@ -219,14 +218,14 @@
                     event handler function you need to make sure you will not end in a loop</b>, consult the 
                 docs to see what events are triggered for each API method you want to call.</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>Now that we know how to listen for the aciTree events, the way to go with the example where we used the <i>setTimeout</i> to add a delay
                 and set the selection to the first tree item:</p>
 
             <div id="tree-on-init" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />Sample tree</div></div>               
+                    <br>Sample tree</div></div>               
 
             <script class="code" type="text/javascript">
 
@@ -258,7 +257,7 @@
 
             </script>             
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>Bad way to do things and end up in a loop:</p>
 
@@ -291,13 +290,13 @@
                 need to check the docs and see what events are triggered. Please note that some API methods also internally call other API methods so more events (than expected) can be
                 triggered at a time. In practice any of the API methods can be used by checking the 'eventName' and item states before trying to call the API to do something.</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p><span style="color:red"><b>Important</b></span>: a few words about the 'options' object for the API methods that support this parameter:</p>            
 
             <div id="tree-using-callbacks" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />Sample tree</div></div>               
+                    <br>Sample tree</div></div>               
 
             <script class="code" type="text/javascript">
 
@@ -348,7 +347,7 @@
                 passed to the API method. Note that the 'options' object inside the callbacks can also contain other new properties, some of the API methods
                 are returning values as properties of the 'options' object (check the docs for each API method you want to use).</p>
 
-            <br /><br /><br />
+            <br><br><br>
 
             <p>The 'options' parameter (for the API methods that support this parameter) is passed to all inner API methods and ends up as a parameter to 
                 both the event handler and the 'success' and 'fail' callbacks. There can be new properties set and you can pass your own properties 
@@ -358,9 +357,9 @@
 
             <div id="tree-options" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />Sample tree</div></div>        
+                    <br>Sample tree</div></div>        
 
-            <input id="open-folder" type="button" value="Open Folder" /> (select a closed tree folder item and press open - vs. - open with the [+] button)
+            <input id="open-folder" type="button" value="Open Folder"> (select a closed tree folder item and press open - vs. - open with the [+] button)
 
             <script class="code" type="text/javascript">
 

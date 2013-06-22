@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.2.0
+ * aciTree jQuery Plugin v3.3.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -35,7 +35,8 @@
 
     var options = {
         checkbox: false,                // if TRUE then each item will have a checkbox
-        checkboxName: 'check[]'         // default checkbox field name (the [] need to be included)
+        checkboxName: 'check[]',        // default checkbox field name (the [] need to be included)
+        checkboxChain: true             // when TRUE the checkboxes will be chained together (the selection will propagate to the parents/childrens)
     };
 
     // aciTree checkbox extension
@@ -46,7 +47,7 @@
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
                     case 'loaded':
-                        if (item) {
+                        if (item && api._instance.options.checkboxChain) {
                             api._loadCheckbox(item);
                         }
                         break;
@@ -325,7 +326,9 @@
                             checkboxName: checkboxName
                         });
                         if (checked === undefined) {
-                            this._stateCheckbox(item, options);
+                            if (this._instance.options.checkboxChain) {
+                                this._stateCheckbox(item, options);
+                            }
                         } else {
                             // change state
                             this.check(item, this._inner(options, {
@@ -347,7 +350,9 @@
                     }
                 } else {
                     this._removeCheckbox(item);
-                    this._parentCheckbox(item);
+                    if (this._instance.options.checkboxChain) {
+                        this._parentCheckbox(item);
+                    }
                     this._trigger(item, 'checkboxremoved', options);
                     this._success(item, options);
                 }
@@ -380,8 +385,10 @@
                 }
                 var check = options.check;
                 this._checkbox(item).prop('checked', check);
-                this._childCheckbox(item);
-                this._parentCheckbox(item);
+                if (this._instance.options.checkboxChain) {
+                    this._childCheckbox(item);
+                    this._parentCheckbox(item);
+                }
                 this._trigger(item, check ? 'checked' : 'unchecked', options);
                 this._success(item, options);
             } else {

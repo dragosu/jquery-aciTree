@@ -1,14 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE HTML>
+<html lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="language" content="en" />
-        <meta name="robots" content="index, follow" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="robots" content="index, follow">
         <title>aciTree radio-button demo - A treeview control with jQuery</title>
-        <meta name="description" content="A demo to show you how aciTree can be used with radio-buttons, check the plugin page to see all the functions exposed by the API" />
-        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery" />
-        <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all" />
-        <link rel="stylesheet" type="text/css" href="css/demo.css" media="all" />
+        <meta name="description" content="A demo to show you how aciTree can be used with radio-buttons, check the plugin page to see all the functions exposed by the API">
+        <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery">
+        <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all">
+        <link rel="stylesheet" type="text/css" href="css/demo.css" media="all">
         <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/jquery.aciPlugin.min.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
@@ -21,24 +20,24 @@
         <div>
 
             <p>This is a demo to show you using aciTree with radio-buttons. The <b>isRadio</b> flag need to be set for each item into the JSON data when
-                both radio and checkbox extensions are included.<br />
+                both radio and checkbox extensions are included.<br>
                 By default, all items will have a radio button (if <b>isRadio</b> is missing from the JSON data).</p>
 
             <p>When a radio is checked, first child from each level under the selected one will be checked by default. Also, the parents
-                will be checked all the way up to the root item.<br />All others branches will be unchecked. This functionality will break once there is a missing radio button.
+                will be checked all the way up to the root item.<br>All others branches will be unchecked. This functionality will break once there is a missing radio button.
                 In this way you can form radio button groups.</p>
 
             <p>Note: the radio buttons on the same level (and under a parent) need to have the same field name attribute. If you need to use custom input names for each
-                branch, ensure you keep this in mind when you choose them.<br />
+                branch, ensure you keep this in mind when you choose them.<br>
                 When loading nodes, the checked/unchecked state need to be correctly set in the JSON data.</p>
 
             <div id="tree" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/radio-button.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />The easy way to find a car that's right for you</div></div>
+                    <br>The easy way to find a car that's right for you</div></div>
 
             <div id="tree-combined" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/checkbox-radio-button.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br />With checkbox + radio button sample</div></div>
+                    <br>With checkbox + radio button sample</div></div>
 
             <div class="log">Tree Log... <a class="clear_log" style="font-size:10px" href="#" title="Clear the LOG" target="_blank">clear log</a>
                 <div></div></div>

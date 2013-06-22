@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.2.0
+ * aciTree jQuery Plugin v3.3.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -37,7 +37,8 @@
 
     var options = {
         radio: false,                   // if TRUE then each item will have a radio button
-        radioName: 'radio'              // default radio button field name
+        radioName: 'radio',             // default radio button field name
+        radioChain: true                // when TRUE the radio buttons will be chained together (the selection will propagate to the parents/childrens)
     };
 
     // aciTree radio extension
@@ -48,7 +49,7 @@
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
                     case 'loaded':
-                        if (item) {
+                        if (item && api._instance.options.radioChain) {
                             api._loadRadio(item);
                         }
                         break;
@@ -333,7 +334,9 @@
                             radioName: radioName
                         });
                         if (checked === undefined) {
-                            this._stateRadio(item, options);
+                            if (this._instance.options.radioChain) {
+                                this._stateRadio(item, options);
+                            }
                         } else {
                             // change state
                             this.check(item, this._inner(options, {
@@ -393,8 +396,10 @@
                 }
                 var check = options.check;
                 this._radio(item).prop('checked', check);
-                this._childRadio(item);
-                this._parentRadio(item);
+                if (this._instance.options.radioChain) {
+                    this._childRadio(item);
+                    this._parentRadio(item);
+                }
                 this._trigger(item, check ? 'checked' : 'unchecked', options);
                 this._success(item, options);
             } else {
