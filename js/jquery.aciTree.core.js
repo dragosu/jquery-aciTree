@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.3.0
+ * aciTree jQuery Plugin v3.4.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu

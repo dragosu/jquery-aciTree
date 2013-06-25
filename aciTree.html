@@ -70,8 +70,10 @@
 
                                 <p>Checkboxes: <label><input type="radio" name="checkbox" value="1"> Yes</label>
                                     <label><input type="radio" name="checkbox" value="0"> No</label></p>
-                                <p>(<span style="color:red">new</span>) Chain Checkboxes: <label><input type="radio" name="checkboxChain" value="1"> Yes</label>
-                                    <label><input type="radio" name="checkboxChain" value="0"> No</label></p>                                
+                                <p>(<span style="color:red">new</span>) Chain Checkboxes: <label><input type="radio" name="checkboxChain" value="true"> Yes</label>
+                                    <label><input type="radio" name="checkboxChain" value="-1"> Update Parents</label>
+                                    <label><input type="radio" name="checkboxChain" value="1"> Update Childrens </label>
+                                    <label><input type="radio" name="checkboxChain" value="false"> No</label></p>                                
                                 <p>Radio Buttons: <label><input type="radio" name="radio" value="1"> Yes</label>
                                     <label><input type="radio" name="radio" value="0"> No</label></p>
                                 <p>(<span style="color:red">new</span>) Chain Radio Buttons: <label><input type="radio" name="radioChain" value="1"> Yes</label>
@@ -442,6 +444,16 @@
 
                 // get Tree init options
                 var options = $('#tree').aciTree('options');
+                
+                // get string value from BOOL/numeric
+                function valueBoolNum(mixed){
+                    return (mixed === true) ? 'true' : ((mixed === false) ? 'false' : mixed);
+                }
+                
+                // get BOOL/numeric value from string
+                function boolNumValue(string){
+                    return (string == 'true') ? true : ((string == 'false') ? false : parseInt(string));
+                }
 
                 // init FORM based on options
                 $('[name=branches][value=' + ($('#tree').hasClass('aciTreeNoBranches') ? 0 : 1) + ']').prop('checked', true);
@@ -457,7 +469,7 @@
 
                 $('[name=checkbox][value=' + (options.checkbox ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
-                $('[name=checkboxChain][value=' + (options.checkboxChain ? 1 : 0) + ']').prop('checked', true);
+                $('[name=checkboxChain][value=' + valueBoolNum(options.checkboxChain) + ']').prop('checked', true);
                 $('[name=radioChain][value=' + (options.radioChain ? 1 : 0) + ']').prop('checked', true);
                
                 $('#setCheckbox').attr('disabled', !options.checkbox);
@@ -518,13 +530,18 @@
                     $('#tree').toggleClass('aciTreeColors', $(this).val() == 1);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxChain],[name=radioChain],[name=editable]').click(function() {
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=radioChain],[name=editable]').click(function() {
                     var option = $(this).prop('name');
                     $('#tree').aciTree('option', option, $(this).val() == 1);
                     if (option == 'fullRow') {
                         $('#tree').toggleClass('aciTreeFullRow', $(this).val() == 1);
                     }
                 });
+                
+                $('[name=checkboxChain]').click(function() {
+                    var option = $(this).prop('name');
+                    $('#tree').aciTree('option', option, boolNumValue($(this).val()));
+                });                
 
                 $('[name=cancel_ui]').click(function() {
                     cancelUi = $(this).val() == 1;
@@ -538,9 +555,13 @@
 
                 // update init options based on inputs
                 function updateOptions() {
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=checkboxChain]:checked,[name=radioChain]:checked,[name=editable]:checked').each(function() {
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=radioChain]:checked,[name=editable]:checked').each(function() {
                         var option = $(this).prop('name');
                         $.fn.aciTree.defaults[option] = $(this).val() == 1;
+                    });
+                    $('[name=checkboxChain]:checked').each(function() {
+                        var option = $(this).prop('name');
+                        $.fn.aciTree.defaults[option] = boolNumValue($(this).val());
                     });
                 }
 

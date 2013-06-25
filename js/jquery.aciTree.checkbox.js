@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v3.3.0
+ * aciTree jQuery Plugin v3.4.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -47,7 +47,7 @@
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
                     case 'loaded':
-                        if (item && api._instance.options.checkboxChain) {
+                        if (item && (api._instance.options.checkboxChain !== false)) {
                             api._loadCheckbox(item);
                         }
                         break;
@@ -209,6 +209,10 @@
         },
         // check/uncheck all childrens based on item
         _childCheckbox: function(item) {
+            if (this._instance.options.checkboxChain === -1) {
+                // do not update the childrens
+                return;
+            }
             var state = this._checkbox(item).removeClass('aciTreeTristate').is(':checked');
             var process = this.proxy(function(item) {
                 this.checkboxes(this.childrens(item)).each(this.proxy(function(element) {
@@ -220,6 +224,10 @@
         },
         // check/uncheck parents based on direct childrens
         _parentCheckbox: function(item) {
+            if (this._instance.options.checkboxChain === 1) {
+                // do not update the parents
+                return;
+            }
             this.path(item, true).each(this.proxy(function(element) {
                 if (!this.hasCheckbox($(element))) {
                     // break on missing checkbox
@@ -262,9 +270,11 @@
                             this._parentCheckbox(item);
                         }
                     } else {
-                        this._checkbox(item).prop('checked', true);
+                        if (this._instance.options.checkboxChain !== -1) {
+                            this._checkbox(item).prop('checked', true);
+                        }
                         this._trigger(item, 'checkboxadded', options);
-                        if (list.length && !checked.length) {
+                        if (list.length && !checked.length && (this._instance.options.checkboxChain !== 1)) {
                             this.check(item, this._inner(options, {
                                 check: true
                             }));
@@ -326,8 +336,10 @@
                             checkboxName: checkboxName
                         });
                         if (checked === undefined) {
-                            if (this._instance.options.checkboxChain) {
+                            if (this._instance.options.checkboxChain !== false) {
                                 this._stateCheckbox(item, options);
+                            } else {
+                                this._trigger(item, 'checkboxadded', options);
                             }
                         } else {
                             // change state
@@ -350,7 +362,7 @@
                     }
                 } else {
                     this._removeCheckbox(item);
-                    if (this._instance.options.checkboxChain) {
+                    if (this._instance.options.checkboxChain !== false) {
                         this._parentCheckbox(item);
                     }
                     this._trigger(item, 'checkboxremoved', options);
@@ -385,7 +397,7 @@
                 }
                 var check = options.check;
                 this._checkbox(item).prop('checked', check);
-                if (this._instance.options.checkboxChain) {
+                if (this._instance.options.checkboxChain !== false) {
                     this._childCheckbox(item);
                     this._parentCheckbox(item);
                 }
