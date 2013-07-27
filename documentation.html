@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>aciTree v3.4.0 - A treeview control with jQuery</title>
+        <title>aciTree v3.5.0 - A treeview control with jQuery</title>
         <meta name="description" content="aciTree API documentation">
         <style type="text/css">
             html {
@@ -146,9 +146,9 @@
     </head>
 
     <body>
-        <h1>aciTree API v3.4.0</h1>
+        <h1>aciTree API v3.5.0</h1>
         
-        <p>Please note that here are listed only the public API methods, you need to 
+        <p>Please note: here are listed only the public API methods, you need to 
             <a href="http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery" target="_blank" title="aciTree home">read</a> about the available init options and how to listen
         for the aciTree events before you'll be able to use aciTree. Try out the <a href="aciTree.html" target="_blank" title="aciTree demos">demos</a> to understand how to use the API.</p>
 
@@ -183,7 +183,7 @@
                 </a><br><a title=".isOpenPath (item)" href="#.isOpenPath">.isOpenPath -  Returns TRUE if the path to item is open (all the parent nodes are open)...</a><br><a title=".isPersist () " href="#.isPersist">.isPersist -  Returns TRUE if there is any saved data.
                 </a><br><a title=".isSelected (item) " href="#.isSelected">.isSelected -  Returns TRUE if the item is selected.
                     
-                </a><br><a title=".isVisible (item)" href="#.isVisible">.isVisible -  Returns TRUE if item is visible (if all parent nodes are opened and the item...</a><br><a title=".itemFrom (element)" href="#.itemFrom">.itemFrom -  Returns the LI that contains the element.
+                </a><br><a title=".isVisible (item)" href="#.isVisible">.isVisible -  Returns TRUE if item is visible (if all parent nodes are opened and the item...</a><br><a title=".itemData (item)" href="#.itemData">.itemData -  Returns the related item (updated) properties as defined in the JSON...</a><br><a title=".itemFrom (element)" href="#.itemFrom">.itemFrom -  Returns the LI that contains the element.
                     
                 </a><br><a title=".last (item)" href="#.last">.last -  Returns the last children of item.
                     
@@ -246,7 +246,7 @@
                         loading a node. The node need to be of type <i>folder</i> and not already loaded. If the node was loaded and you want to reload it -
                         you'll need to call <b>.unload</b> before calling <b>.ajaxLoad</b>.
                         The JSON data is requested from the address configured in the init options <b>options.jsonUrl</b> and adding the ID of the node to be loaded at the end.
-                        Are added as many levels as defined in the JSON.
+                        Are added as many levels as defined in the JSON. Each item's data is stored and can be accessed with <b>.itemData</b>.
                         <b>Note</b>: if the operation fails then the node will be made of type <i>file</i> by default.
                     </span>
                     <b>.ajaxLoad</b> calls <b>.append</b> for adding the items.
@@ -660,6 +660,13 @@
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                     </span>
                 </div>
+                
+                <a name=".itemData"></a><div style="display: block;" data-ext="core"><span>.itemData (item)</span> Returns the related <i>item</i> (updated) properties as defined in the JSON.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                    </span>
+                </div>
 
                 <a name=".itemFrom"></a><div style="display: block;" data-ext="core"><span>.itemFrom (element)</span> Returns the <i>LI</i> that contains the <b>element</b>.
                     <span class="where">
@@ -694,6 +701,7 @@
                         <b>.loadFrom</b> can be called to load a node from a <i>JavaScript</i> variable.
                         The node need to be of type <i>folder</i> and not already loaded. If the node was loaded and you want to reload it -
                         you'll need to call <b>.unload</b> before calling <b>.loadFrom</b>. Are added as many levels as defined in the <i>JavaScript</i> variable.
+                        Each item's data is stored and can be accessed with <b>.itemData</b>.
                         <b>Note</b>: if the operation fails then the node will be made of type <i>file</i> by default.
                     </span>
                     <b>.loadFrom</b> calls <b>.append</b> to add the items.
@@ -1224,7 +1232,7 @@
 
             </div>
 
-        <p>aciTree jQuery Plugin v3.4.0</p>
+        <p>aciTree jQuery Plugin v3.5.0</p>
         <p>http://acoderinsights.ro</p>
 
         <p>Copyright (c) 2013 Dragos Ursu</p>

@@ -84,3 +84,33 @@ em {
 pre {
     line-height:150%;
 }
+.drop {
+    width:300px;
+    height:200px;
+    border:1px dashed #000;
+    float:left;
+    margin-right:20px;
+    padding:5px 10px 5px 10px;
+}
+.drop:hover {
+    border:1px dashed red;
+}
+.drop ul {
+    list-style-type:none;
+    height:150px;
+    padding:0;
+    overflow:auto;
+}
+.drop li {
+    line-height:20px;
+    height:20px;
+}
+.drop .aciSortablePlaceholder {
+    background-color:#eee;
+    border:1px dashed #ddd;
+}
+.drop.any .aciSortablePlaceholder {
+    height:0;
+    line-height:0;
+    border:none;
+}

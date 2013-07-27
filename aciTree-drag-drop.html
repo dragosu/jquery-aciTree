@@ -3,8 +3,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="robots" content="index, follow">
-        <title>aciTree drag & drop demo - A treeview control with jQuery</title>
-        <meta name="description" content="A demo to show you how aciTree can be used with checkboxes, check the plugin page to see all the functions exposed by the API">
+        <title>aciTree drag & drop sorting demo - A treeview control with jQuery</title>
+        <meta name="description" content="A demo to show you how aciTree can be used with aciSortable, check the plugin page to see all the functions exposed by the API">
         <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery">
         <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all">
         <link rel="stylesheet" type="text/css" href="css/demo.css" media="all">
@@ -14,7 +14,6 @@
         <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.utils.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.selectable.js"></script>
-        <script type="text/javascript" src="js/jquery.aciTree.column.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.sortable.js"></script>
     </head>
     <body>
@@ -24,6 +23,8 @@
             <p>The <i>sortable</i> extension is using the aciSortable plugin, the available callback init options and the options parameter of the event handler
                 receives the properties as defined by aciSortable (see the docs). aciTree adds a few extra events on top of aciSortable so we can handle
                 with ease the drag start and check for a valid drop target. In this way we can limit what items can be dragged and where they can be dropped.</p>
+            
+            <p>For dragging tree items out of the tree - check <a href="aciTree-drag-outside.html" target="_blank" title="Dragging items outside tree">this</a> demo.</p>
 
             <p>See the examples below for what can be done by responding to only two events: <b>beforedrag</b> and <b>checkdrop</b>.</p>
 
