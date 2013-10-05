@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -130,7 +130,7 @@
         },
         // return the checkbox
         _checkbox: function(item) {
-            return item ? item.first().children('.aciTreeLine').find('input[type=checkbox]') : $([]);
+            return item ? item.children('.aciTreeLine').find('input[type=checkbox]') : $([]);
         },
         // override _initHook
         _initHook: function() {
@@ -169,12 +169,12 @@
         // add item checkbox
         _addCheckbox: function(item, itemData) {
             var name = itemData.checkboxName ? itemData.checkboxName : this._instance.options.checkboxName;
-            item.first().addClass('aciTreeCheckbox').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="checkbox" name="' +
+            item.addClass('aciTreeCheckbox').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="checkbox" name="' +
                     name + '" value="' + this.getId(item) + '"' + (itemData.checked ? ' checked="checked"' : '') + ' />');
         },
         // remove item checkbox
         _removeCheckbox: function(item) {
-            var label = item.first().removeClass('aciTreeCheckbox').children('.aciTreeLine').find('label');
+            var label = item.removeClass('aciTreeCheckbox').children('.aciTreeLine').find('label');
             if (label.length) {
                 label.find('*').not('.aciTreeText').remove();
                 label.find('.aciTreeText').unwrap();

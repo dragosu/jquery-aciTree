@@ -29,7 +29,7 @@
 
             <div style="clear:both"></div>
 
-            <p>Init the aciTree by using a relative path to the JSON provider - the 'jsonUrl' option (see the docs for all available aciTree options):</p>
+            <p>Init the aciTree by using a relative path to the `ajax.url` option (see the docs for all available aciTree options):</p>
 
             <script class="code" type="text/javascript">
 
@@ -37,7 +37,9 @@
 
                     // init the tree
                     $('#tree').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         selectable: true
                     });
 
@@ -45,7 +47,7 @@
 
             </script>
 
-            <p><span style="color:red"><b>Note</b></span>: the option 'jsonUrl' will be used whenever a tree node needs to be loaded, it is used on the initial AJAX request to
+            <p><span style="color:red"><b>Note</b></span>: the `ajax` option will be used whenever a tree node needs to be loaded, it is used on the initial AJAX request to
                 init (load) the tree ROOT (what you first see as the tree when you visit this page) and it it used again when a not-yet-loaded
                 folder node (a node that can have childrens) is opened for the first time. In this demo the entire tree is loaded in one step but the tree
                 can be loaded node by node on request if needed (i.e. when the user clicks on the [+] button to open a node). aciTree will create as many tree levels
@@ -62,12 +64,16 @@
 
                     // init the #tree-1
                     $('#tree-1').aciTree({
-                        jsonUrl: 'json-url-for-tree-1?node_id='
+                        ajax: {
+                            url: 'json-url-for-tree-1?node_id='
+                        }
                     });
 
                     // init the #tree-2
                     $('#tree-2').aciTree({
-                        jsonUrl: 'json-url-for-tree-2?node_id='
+                        ajax: {
+                            url: 'json-url-for-tree-2?node_id='
+                        }
                     });
 
                 });
@@ -77,7 +83,7 @@
             <br><br><br>
 
             <p>And you can init many at once. Because the tree will be init by default - you need to specify
-                the 'autoInit' option (set to FALSE), set the 'jsonUrl' option and - just after that - init the tree:</p>
+                the `autoInit` option (set to FALSE), set the `ajax.url` option and - just after that - init the tree:</p>
 
             <script class="code" type="text/javascript">
 
@@ -89,11 +95,11 @@
                                 // any other options here
                     });
 
-                    // set the jsonUrl for #tree-1
-                    $('#tree-1').aciTree('option', 'jsonUrl', 'json-url-for-tree-1?node_id=');
+                    // set the ajax.url for #tree-1
+                    $('#tree-1').aciTree('option', 'ajax.url', 'json-url-for-tree-1?node_id=');
 
-                    // set the jsonUrl for #tree-2
-                    $('#tree-2').aciTree('option', 'jsonUrl', 'json-url-for-tree-2?node_id=');
+                    // set the ajax.url for #tree-2
+                    $('#tree-2').aciTree('option', 'ajax.url', 'json-url-for-tree-2?node_id=');
 
                     // init them
                     $('#tree-1,#tree-2').aciTree('init');
@@ -102,9 +108,9 @@
 
             </script>            
 
-            <p><span style="color:red"><b>Note</b></span>: when aciTree will make a AJAX request to the 'jsonUrl' option (to load the tree nodes and init them based on the JSON response from the server),
-                the node ID will be appended to the [string] value of the 'jsonUrl', for example - when the tree node with the ID 'node-547' needs to be loaded, the request made
-                to the server will be <b>String(jsonUrl + 'node-547')</b>, that's why in my examples there is a <b>?branch=</b> or <b>?node_id=</b> at the end of the URL.
+            <p><span style="color:red"><b>Note</b></span>: when aciTree will make a AJAX request to the `ajax.url` option (to load the tree nodes and init them based on the JSON response from the server),
+                the node ID will be appended to the [string] value of the `ajax.url`, for example - when the tree node with the ID 'node-547' needs to be loaded, the request made
+                to the server will be <b>String(ajax.url + 'node-547')</b>, that's why in my examples there is a <b>?branch=</b> or <b>?node_id=</b> at the end of the URL.
                 Server-side you need to read the GET value and return only the data for whatever node ID was requested (insted of returning the entire tree).</p>
 
             <br><br><br>
@@ -160,7 +166,9 @@
 
                     // init the tree
                     $('#tree-custom-label').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         selectable: true,
                         itemHook: function(parent, item, itemData, level) {
                             // set a custom item label to show the branch level
@@ -202,7 +210,9 @@
 
                     // init the tree
                     $('#tree-using-events').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         selectable: true
                     });
 
@@ -249,7 +259,9 @@
 
                     // init the tree
                     $('#tree-on-init').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         selectable: true
                     });
 
@@ -278,7 +290,9 @@
 
                     // init the tree
                     $('#tree-bad-way').aciTree({
-                        jsonUrl: 'json-url-for-tree?node='
+                        ajax: {
+                            url: 'json-url-for-tree?node='
+                        }
                     });
 
                 });
@@ -328,7 +342,9 @@
 
                     // init the tree
                     $('#tree-using-callbacks').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         selectable: true
                     });
 
@@ -389,7 +405,9 @@
 
                     // init the tree
                     $('#tree-options').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         selectable: true
                     });
 
@@ -458,7 +476,7 @@
             $(function() {
 
                 $('script.code').each(function() {
-                    $(this).before('<div style="clear:both"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
+                    $(this).before('<div style="clear:both;margin:10px 0 10px 0"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
                     $(this).prev('div').find('pre').text($(this).html());
                 });
 

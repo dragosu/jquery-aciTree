@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -141,7 +141,7 @@
                         save: true
                     });
                 }
-            })).on('dblclick' + this._private.nameSpace, 'input[type=text]', function(e) {
+            })).on('click' + this._private.nameSpace + ' dblclick' + this._private.nameSpace, 'input[type=text]', function(e) {
                 e.stopPropagation();
             });
         },
@@ -155,11 +155,11 @@
         },
         // return the edit field
         _editbox: function(item) {
-            return item ? item.first().children('.aciTreeLine').find('input[type=text]') : $([]);
+            return item ? item.children('.aciTreeLine').find('input[type=text]') : $([]);
         },
         // add item edit field
         _addEditbox: function(item) {
-            var line = item.first().addClass('aciTreeEdited').children('.aciTreeLine');
+            var line = item.addClass('aciTreeEdited').children('.aciTreeLine');
             var id = 'editable_' + window.String(this.getId(item)).replace(/[^a-z0-9_-]/ig, '');
             line.find('.aciTreeText').html('<input id="' + id + '" type="text" value="" />');
             line.find('label').attr('for', id);
@@ -167,7 +167,7 @@
         },
         // remove item edit field
         _removeEditbox: function(item) {
-            var line = item.first().removeClass('aciTreeEdited').children('.aciTreeLine');
+            var line = item.removeClass('aciTreeEdited').children('.aciTreeLine');
             line.find('.aciTreeText').html(this.getLabel(item));
             line.find('label').removeAttr('for');
         },
@@ -177,7 +177,7 @@
         },
         // test if item is edited
         isEdited: function(item) {
-            return item && item.first().hasClass('aciTreeEdited');
+            return item && item.hasClass('aciTreeEdited');
         },
         // set focus to the input
         _focusEdit: function(item) {

@@ -32,6 +32,13 @@ body * {
 .aciTreeItem.selected {
     background-color:#FFDFFF;
 }
+.aciTree .aciTreeLi.aciTreeHidden {
+    display:block;
+    background-color:#ccc;
+}
+.aciTree .aciTreeLi.aciTreeHidden .aciTreeLine {
+    background:none !important;
+}
 form {
     padding:0 10px 0 10px;
 }

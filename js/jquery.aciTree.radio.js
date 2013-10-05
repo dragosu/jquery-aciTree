@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -176,12 +176,12 @@
                 var parentId = this.getId(parent);
                 name = this._instance.options.radioName + '-' + (parentId ? window.String(parentId).replace(/[^a-z0-9_-]/ig, '') : 'root');
             }
-            item.first().addClass('aciTreeRadio').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="radio" name="' +
+            item.addClass('aciTreeRadio').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="radio" name="' +
                     name + '" value="' + this.getId(item) + '"' + (itemData.checked ? ' checked="checked"' : '') + ' />');
         },
         // remove item radio
         _removeRadio: function(item) {
-            var label = item.first().removeClass('aciTreeRadio').children('.aciTreeLine').find('label');
+            var label = item.removeClass('aciTreeRadio').children('.aciTreeLine').find('label');
             if (label.length) {
                 label.find('*').not('.aciTreeText').remove();
                 label.find('.aciTreeText').unwrap();
@@ -360,7 +360,7 @@
                     }
                 } else {
                     checked = this._radio(item).is(':checked');
-                    this._removeRadio(item.first());
+                    this._removeRadio(item);
                     if (checked) {
                         this.check(this.radios(this.siblings(item)).first(), this._inner(options, {
                             check: true

@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -66,7 +66,7 @@
         },
         // restore item states from hash
         _hashRestore: function() {
-            var queue = new this._queue(null, true).context(this);
+            var queue = this._instance.queue;
             var process = function(opened) {
                 // open all hash items
                 for (var i in opened) {
@@ -84,7 +84,7 @@
                                 fail: complete,
                                 id: id
                             });
-                        }, true);
+                        });
                     })(opened[i]);
                 }
             };
@@ -124,11 +124,10 @@
                                 fail: complete,
                                 id: selected
                             });
-                        }, true);
+                        });
                     }
                 }
             }
-            queue.run();
         },
         // test if hash is enabled
         isHash: function() {

@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -143,7 +143,7 @@
                         this._trigger(item, 'dropfail', options);
                     });
                     if (placeholder.parent().length) {
-                        var prev = this.prev(placeholder);
+                        var prev = this.prev(placeholder, true);
                         if (prev.length) {
                             // add after a item
                             placeholder.detach();
@@ -153,7 +153,7 @@
                                 after: prev
                             }));
                         } else {
-                            var next = this.next(placeholder);
+                            var next = this.next(placeholder, true);
                             if (next.length) {
                                 // add before a item
                                 placeholder.detach();

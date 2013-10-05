@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -311,7 +311,7 @@
         },
         // get item height
         _itemHeight: function(item) {
-            var size = item.first().children('.aciTreeLine').find('.aciTreeItem');
+            var size = item.children('.aciTreeLine').find('.aciTreeItem');
             return size.outerHeight(true);
         },
         // get prev visible starting with item (with a 'page' size)
@@ -371,7 +371,7 @@
                 var select = options.select;
                 var unselect = this._instance.jQuery.find('.aciTreeSelected');
                 if (select) {
-                    unselect = unselect.not(item.first());
+                    unselect = unselect.not(item);
                 }
                 options.oldSelected = this.selected();
                 unselect.removeClass('aciTreeSelected').each(this.proxy(function(element) {
@@ -381,7 +381,7 @@
                     if (this.isSelected(item)) {
                         this._trigger(item, 'wasselected', options);
                     } else {
-                        item.first().addClass('aciTreeSelected');
+                        item.addClass('aciTreeSelected');
                         this._selectHook(options.oldSelected, item);
                         this._trigger(item, 'selected', options);
                     }
@@ -397,7 +397,7 @@
         },
         // test if item is selected
         isSelected: function(item) {
-            return item && item.first().hasClass('aciTreeSelected');
+            return item && item.hasClass('aciTreeSelected');
         },
         // test if selectable is enabled
         isSelectable: function() {

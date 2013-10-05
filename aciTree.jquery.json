@@ -1,14 +1,14 @@
 {
     "name": "aciTree",
     "title": "aciTree - A customizable treeview control",
-    "description": "aciTree renders a treeview control based on a simple data structure. The entire tree can be loaded with AJAX in one go or node by node if needed. A simple PHP implementation for a file system tree is provided as an example, but any server-side language can be used. aciTree only needs the data in JSON format. The tree can be manipulated using the aciTree API. The nodes can be added, loaded, updated, removed, their order can be changed, entire branches can be created/loaded in one go, the nodes can be searched by ID ... and much more.",
+    "description": "aciTree renders a treeview control based on a simple data structure. The entire tree can be loaded from a JavaScript variable or with AJAX in one go or node by node when required. A simple PHP implementation for a file system tree is provided as an example, but any server-side language can be used. The tree can be manipulated using the aciTree API. The tree items can be added, loaded, updated, removed, their order can be changed, entire branches can be created/loaded in one go, the nodes can be searched by ID ... and much more.",
     "keywords": [
     "treeview",
     "tree",
     "ui",
     "ajax"
     ],
-    "version": "3.5.0",
+    "version": "3.6.0",
     "author": {
         "name": "Dragos Ursu",
         "email":"dragosu@acoderinsights.ro",
@@ -33,6 +33,6 @@
     "bugs": "https://github.com/dragosu/jquery-aciTree/issues",
     "dependencies": {
         "jquery": ">=1.7.1",
-        "aciPlugin": ">=1.4.0"
+        "aciPlugin": ">=1.5.0"
     }
 }

@@ -19,9 +19,9 @@
 
         <div>
 
-            <p>This is a demo to show you using aciTree with checkboxes. The <b>isCheckbox</b> flag need to be set for each item into the JSON data when
+            <p>This is a demo to show you using aciTree with checkboxes. The <b>checkbox</b> flag need to be set for each item into the JSON data when
                 both checkbox and radio extensions are included.<br>
-                By default, all items will have a checkbox (if <b>isCheckbox</b> is missing from the JSON data).</p>
+                By default, all items will have a checkbox (if <b>checkbox</b> is missing from the JSON data).</p>
 
             <p>When a checkbox is checked, all childs from each level under the selected one will be checked by default. Also, the parents
                 will be checked all the way up to the root item.<br>This functionality will break once there is a missing checkbox.
@@ -40,22 +40,26 @@
             <div class="log">Tree Log... <a class="clear_log" style="font-size:10px" href="#" title="Clear the LOG" target="_blank">clear log</a>
                 <div></div></div>
 
-            <div style="clear:both"><pre style="padding:30px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>
+            <script class="code" type="text/javascript">
 
-            <script id="code" type="text/javascript">
-
-                $(function(){
+                $(function() {
 
                     // init the tree
                     $('#tree').aciTree({
-                        jsonUrl: 'json/checkbox.json?branch=',
+                        ajax: {
+                            url: 'json/checkbox.json',
+                            dataType: 'json'
+                        },
                         checkbox: true,
                         checkboxName: 'checkbox1[]'
                     });
 
                     // init the tree
                     $('#tree-combined').aciTree({
-                        jsonUrl: 'json/checkbox-radio-button.json?branch=',
+                        ajax: {
+                            url: 'json/checkbox-radio-button.json',
+                            dataType: 'json'
+                        },
                         checkbox: true,
                         checkboxName: 'checkbox2[]',
                         radio: true,
@@ -69,20 +73,20 @@
 
             <script type="text/javascript">
 
-                $(function(){
+                $(function() {
 
                     var log = $('.log div');
 
                     // write to log
-                    $('#tree,#tree-combined').on('acitree', function(event, api, item, eventName, options){
-                        if (api.isItem(item)){
+                    $('#tree,#tree-combined').on('acitree', function(event, api, item, eventName, options) {
+                        if (api.isItem(item)) {
                             log.prepend('<p>' + eventName + ' [' + api.getId(item) + ']</p>');
                         } else {
                             log.prepend('<p>' + eventName + ' [tree]</p>');
                         }
                     });
 
-                    $('.clear_log').click(function(){
+                    $('.clear_log').click(function() {
                         $('.log div').html('');
                         return false;
                     });
@@ -95,9 +99,12 @@
 
         <script type="text/javascript">
 
-            $(function(){
+            $(function() {
 
-                $('pre').text($('#code').html());
+                $('script.code').each(function() {
+                    $(this).before('<div style="clear:both;margin:10px 0 10px 0"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
+                    $(this).prev('div').find('pre').text($(this).html());
+                });
 
             });
 

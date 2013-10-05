@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.5.0
+ * aciTree jQuery Plugin v3.6.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.4.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -20,14 +20,6 @@
     // adds item update option, branch processing, moving items & item swapping, item search by ID
 
     var aciTree_utils = {
-        __extend: function() {
-            $.extend(this._private, {
-                // the branch queue
-                branchQueue: new this._queue(this._instance.options.threads, true).context(this)
-            });
-            // call the parent
-            this._super();
-        },
         // update item (create tree branch if requested)
         // if options.itemData have the 'childs' property set then
         // will be like when calling 'loadFrom' for the item
@@ -64,7 +56,7 @@
                     var process = function() {
                         // set item ID/text/icon
                         details.apply(this);
-                        item.first().removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.isFolder ||
+                        item.removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.isFolder ||
                                 (options.itemData.childs && options.itemData.childs.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
                         if (options.itemData.childs) {
                             if (this.wasLoad(item)) {
@@ -119,49 +111,45 @@
                 if (child.length) {
                     if (this.isFolder(child)) {
                         if (this.wasLoad(child)) {
-                            this._private.branchQueue.push(function() {
+                            this._instance.queue.push(function(complete) {
                                 callback.call(this, child);
                                 process(child, callback);
                                 process(child, callback, true);
-                            }).run();
+                                complete();
+                            });
                         } else if (load) {
-                            this._private.branchQueue.push(function(complete) {
-                                this.ajaxLoad(child, {
-                                    success: function() {
-                                        callback.call(this, child);
-                                        process(child, callback);
-                                        process(child, callback, true);
-                                        complete();
-                                    },
-                                    fail: function() {
-                                        process(child, callback, true);
-                                        complete();
-                                    }
-                                });
-                            }, true).run();
+                            //this._instance.queue.push(function(complete) {
+                            //  complete();
+                            this.ajaxLoad(child, {
+                                success: function() {
+                                    callback.call(this, child);
+                                    process(child, callback);
+                                    process(child, callback, true);
+                                    //complete();
+                                },
+                                fail: function() {
+                                    process(child, callback, true);
+                                    //complete();
+                                }
+                            });
+                            //});
                         } else {
-                            this._private.branchQueue.push(function() {
+                            this._instance.queue.push(function(complete) {
                                 callback.call(this, child);
                                 process(child, callback, true);
-                            }).run();
+                                complete();
+                            });
                         }
                     } else {
-                        this._private.branchQueue.push(function() {
+                        this._instance.queue.push(function(complete) {
                             callback.call(this, child);
                             process(child, callback, true);
-                        }).run();
+                            complete();
+                        });
                     }
                 }
             });
             process(item, callback);
-        },
-        // override isBusy to check branchQueue too
-        isBusy: function(item) {
-            if (item) {
-                return this._super(item);
-            } else {
-                return this._super(item) || !this._private.branchQueue.empty();
-            }
         },
         // swap two items (they can't be parent & child)
         // options.item1 & options.item2 are the swapped items
@@ -177,8 +165,6 @@
                     this._fail(null, options);
                     return;
                 }
-                item1 = item1.first();
-                item2 = item2.first();
                 var prev = this.prev(item1);
                 if (prev.length) {
                     if (item2.get(0) == prev.get(0)) {
@@ -205,11 +191,11 @@
                 this._updateLevel(item1);
                 var parent = this.parent(item1);
                 this._updateFirstLast(parent.length ? parent : null, item1);
-                this._updateVisibleState(parent.length ? parent : null, item1);
+                this._updateHidden(item1);
                 this._updateLevel(item2);
                 parent = this.parent(item2);
                 this._updateFirstLast(parent.length ? parent : null, item2);
-                this._updateVisibleState(parent.length ? parent : null, item2);
+                this._updateHidden(item2);
                 this._updateOddEven(item1.add(item2));
                 this._trigger(null, 'swapped', options);
                 this._success(null, options);
@@ -252,21 +238,6 @@
                 this._updateChildLevel(item, found + 1, level + 1);
             }
         },
-        // update item visible state
-        _updateVisibleState: function(parent, item) {
-            if (parent) {
-                if (this.isOpenPath(parent) && this.isOpen(parent)) {
-                    item.first().addClass('aciTreeVisible');
-                    this._updateVisible(item, true);
-                } else {
-                    this._updateVisible(item, false);
-                    item.first().removeClass('aciTreeVisible');
-                }
-            } else {
-                item.first().addClass('aciTreeVisible');
-                this._updateVisible(item, true);
-            }
-        },
         // move item up
         moveUp: function(item, options) {
             options = this._options(options);
@@ -306,25 +277,23 @@
                     this._fail(item, options);
                     return;
                 }
-                if (this.prev(before).get(0) == item.get(0)) {
+                if (this.prev(before, true).get(0) == item.get(0)) {
                     this._notify(item, options);
                 } else {
-                    item = item.first();
-                    before = before.first();
                     var parent = this.parent(item);
-                    var prev = this.prev(item);
+                    var prev = this.prev(item, true);
                     if (!prev.length) {
                         prev = parent.length ? parent : this.first();
                     }
                     item.insertBefore(before);
-                    if (parent.length && !this.hasChildrens(parent)) {
+                    if (parent.length && !this.hasChildrens(parent, true)) {
                         this.setFile(parent);
                     }
                     this._updateLevel(item);
                     this._updateFirstLast(parent.length ? parent : null);
                     parent = this.parent(item);
                     this._updateFirstLast(parent.length ? parent : null, item.add(before));
-                    this._updateVisibleState(parent.length ? parent : null, item);
+                    this._updateHidden(item);
                     this._updateOddEven(item.add(before).add(prev));
                     this._trigger(item, 'moved', options);
                     this._success(item, options);
@@ -348,25 +317,23 @@
                     this._fail(item, options);
                     return;
                 }
-                if (this.next(after).get(0) == item.get(0)) {
+                if (this.next(after, true).get(0) == item.get(0)) {
                     this._notify(item, options);
                 } else {
-                    item = item.first();
-                    after = after.first();
                     var parent = this.parent(item);
-                    var prev = this.prev(item);
+                    var prev = this.prev(item, true);
                     if (!prev.length) {
                         prev = parent.length ? parent : this.first();
                     }
                     item.insertAfter(after);
-                    if (parent.length && !this.hasChildrens(parent)) {
+                    if (parent.length && !this.hasChildrens(parent, true)) {
                         this.setFile(parent);
                     }
                     this._updateLevel(item);
                     this._updateFirstLast(parent.length ? parent : null);
                     parent = this.parent(item);
                     this._updateFirstLast(parent.length ? parent : null, item.add(after));
-                    this._updateVisibleState(parent.length ? parent : null, item);
+                    this._updateHidden(item);
                     this._updateOddEven(item.add(after).add(prev));
                     this._trigger(item, 'moved', options);
                     this._success(item, options);
@@ -382,14 +349,12 @@
                 this._trigger(item, 'childfail', options);
             });
             var parent = options.parent;
-            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildrens(parent) && (item.get(0) != parent.get(0))) {
+            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildrens(parent, true) && (item.get(0) != parent.get(0))) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforechild', options)) {
                     this._fail(item, options);
                     return;
                 }
-                item = item.first();
-                parent = parent.first();
                 var process = function() {
                     var oldParent = this.parent(item);
                     var prev = this.prev(item);
@@ -398,13 +363,13 @@
                     }
                     var container = this._createContainer(parent);
                     container.append(item);
-                    if (oldParent.length && !this.hasChildrens(oldParent)) {
+                    if (oldParent.length && !this.hasChildrens(oldParent, true)) {
                         this.setFile(oldParent);
                     }
                     this._updateLevel(item);
                     this._updateFirstLast(oldParent.length ? oldParent : null);
                     this._updateFirstLast(parent.length ? parent : null, item);
-                    this._updateVisibleState(parent.length ? parent : null, item);
+                    this._updateHidden(item);
                     this._updateOddEven(item.add(prev));
                     this._trigger(item, 'childset', options);
                     this._success(item, options);
@@ -508,14 +473,6 @@
                     this._fail(null, options);
                 }
             }
-        },
-        // override _destroyHook
-        _destroyHook: function(unloaded) {
-            if (!unloaded) {
-                this._private.branchQueue.destroy();
-            }
-            // call the parent
-            this._super(unloaded);
         }
 
     };

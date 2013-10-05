@@ -19,12 +19,20 @@
         <script type="text/javascript" src="js/jquery.aciTree.column.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.editable.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.sortable.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.Xdebug.js"></script>
     </head>
     <body>
 
         <div>
 
-            <p>Here you have a simple implementation of a file system tree (you can find a simple PHP implementation in the download).</p>
+            <p>Here you have a simple implementation of a file system tree with the most features available to be changed at the runtime from the interface.
+                You can find a simple PHP implementation in the download but any server-side language can be used because aciTree needs the data in JSON 
+                format and it's using AJAX to load the childrens of a folder node (once they are needed).</p>
+
+            <p>Note: I recommend checking the code from the other demos as this page can be complex for someone new to aciTree. Also, do not forget to check the API docs
+                before you try using the methods and also check online on the plugin page for extra info (like init options and using the events).</p>
+
+            <p><b>Start <a href="sample/index.html" target="_blank" title="aciTree usage samples"><span style="color:red">here</span></a> first if you are new to aciTree</b> (check <b>using the API</b> demos for a detailed introduction to aciTree)</p>            
 
             <p>See a checkbox tree demo <a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">here</a></p>
             <p>See a radio-button tree demo <a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">here</a></p>
@@ -33,11 +41,11 @@
             <p>Save/restore items state (open/closed/selected) using local storage demo <a href="/demo/aciTree_persist.html" target="_blank" title="aciTree with local storage">here</a></p>
             <p>Select/open items based on the variables stored in the URL fragment demo <a href="/demo/aciTree_hash.html" target="_blank" title="aciTree with aciFragment">here</a></p>
             <p>See how you can use the drag & drop events to sort the tree items and limit the draggable items / drop targets <a href="aciTree-drag-drop.html" target="_blank" title="aciTree drag & drop">here</a></p>
-            <p>(<span style="color:red">new</span>) See how you can add a tooltip for each tree item <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree tooltips">here</a></p>
+            <p>See how you can add a tooltip for each tree item <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree tooltips">here</a></p>
+            <p>(<span style="color:red">new</span>) See how you can use a custom tree data structure <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree custom data">here</a></p>
 
-            <p><b>Start <a href="sample/index.html" target="_blank" title="aciTree usage samples"><span style="color:red">here</span></a> first if you are new to aciTree</b> (check <b>using the API</b> demos for a detailed introduction to aciTree)</p>
-
-            <p>Note: in this demo the node loading it's made with a delay so you can see the loading animation. If you want you can remove the delay from the <i>PHP</i> script ;) ...</p>
+            <p>Note: in the demo below - the node loading it's made with a delay so you can see the loading animation.
+                If you want you can remove the delay from the <i>PHP</i> script ...</p>
 
             <p id="info">Hover over a tree item to show his info (using the aciTree API) ...</p>
 
@@ -112,6 +120,8 @@
                                 <p>Set Radio: <select id="setRadio"><option value="">-- choose --</option>
                                         <option value="yes">Yes</option><option value="No">No</option></select></p>
 
+                                <p>(<span style="color:red">new</span>) Item: <input id="show" type="button" value="Show"> <input id="hide" type="button" value="Hide">
+                                    <input id="hideshow" type="button" value="Toggle"> (<span style="color:blue">note</span>)</p>                                        
                                 <p>Node: <input id="open" type="button" value="Open"> <input id="close" type="button" value="Close">
                                     <input id="toggle" type="button" value="Toggle"></p>
                                 <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files">
@@ -154,6 +164,9 @@
             <p style="clear:both"><br><span style="color:red">Note</span>: the selected pink item does not have anything to do with the <i>selectable</i> option, it's there just to be able to 'select' the
                 entire tree (not only a item).<br>All item based functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item - when the
                 selectable option is used).</p>
+
+            <p><span style="color:blue">Note</span>: for this demo I have changed the default style from `display:none` for `.aciTreeHidden` 
+                so you can have a chance to show again a hidden item. The `hidden` items will have a darker background.</p>
 
         </div>
 
@@ -269,7 +282,10 @@
                 function initTree(type, ui, skip) {
                     treeApi = $('#tree').aciTree({
                         autoInit: false,
-                        jsonUrl: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch=',
+                        ajax: {
+                            url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch=',
+                            dataType: 'json'
+                        },
                         rootData: (type == 'data') ? rootData : null,
                         itemHook: function(parent, item, itemData, level) {
                             // a custom item implementation to show the tree level
@@ -445,14 +461,14 @@
 
                 // get Tree init options
                 var options = $('#tree').aciTree('options');
-                
+
                 // get string value from BOOL/numeric
-                function valueBoolNum(mixed){
+                function valueBoolNum(mixed) {
                     return (mixed === true) ? 'true' : ((mixed === false) ? 'false' : mixed);
                 }
-                
+
                 // get BOOL/numeric value from string
-                function boolNumValue(string){
+                function boolNumValue(string) {
                     return (string == 'true') ? true : ((string == 'false') ? false : parseInt(string));
                 }
 
@@ -472,7 +488,7 @@
                 $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
                 $('[name=checkboxChain][value=' + valueBoolNum(options.checkboxChain) + ']').prop('checked', true);
                 $('[name=radioChain][value=' + (options.radioChain ? 1 : 0) + ']').prop('checked', true);
-               
+
                 $('#setCheckbox').attr('disabled', !options.checkbox);
                 $('#setRadio').attr('disabled', !options.radio);
                 $('[name=direction][value=' + (($('#tree').attr('dir') == 'rtl') ? 0 : 1) + ']').prop('checked', true);
@@ -538,11 +554,11 @@
                         $('#tree').toggleClass('aciTreeFullRow', $(this).val() == 1);
                     }
                 });
-                
+
                 $('[name=checkboxChain]').click(function() {
                     var option = $(this).prop('name');
                     $('#tree').aciTree('option', option, boolNumValue($(this).val()));
-                });                
+                });
 
                 $('[name=cancel_ui]').click(function() {
                     cancelUi = $(this).val() == 1;
@@ -1106,6 +1122,50 @@
                         }
                     }
                     $(this).val('');
+                });
+
+                // show item
+                $('#show').click(function() {
+                    var item = requireItem();
+                    if (item) {
+                        treeApi.show(item, {
+                            uid: 'user-defined',
+                            success: function(item, options) {
+                                alert('The item [' + this.getId(item) + '] was show !');
+                            },
+                            fail: function(item, options) {
+                                alert('Failed to show the item [' + this.getId(item) + '] !');
+                            }
+                        });
+                    }
+                });
+
+                // hide item
+                $('#hide').click(function() {
+                    var item = requireItem();
+                    if (item) {
+                        treeApi.hide(item, {
+                            uid: 'user-defined',
+                            success: function(item, options) {
+                                alert('The item [' + this.getId(item) + '] was hidden !');
+                            },
+                            fail: function(item, options) {
+                                alert('Failed to hide the item [' + this.getId(item) + '] !');
+                            }
+                        });
+                    }
+                });
+
+                // toggle item
+                $('#hideshow').click(function() {
+                    var item = requireItem();
+                    if (item) {
+                        if (treeApi.isHidden(item)) {
+                            $('#show').trigger('click');
+                        } else {
+                            $('#hide').trigger('click');
+                        }
+                    }
                 });
 
                 // open a folder item

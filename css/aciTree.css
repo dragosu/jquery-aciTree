@@ -26,6 +26,10 @@
     white-space:nowrap;
 }
 
+.aciTree .aciTreeLi.aciTreeHidden {
+    display:none;
+}
+
 /* the branch line */
 .aciTree .aciTreeBranch {
     padding-left:20px; /* branch indent */

@@ -34,7 +34,9 @@
 
                     // init the tree
                     $('#tree').aciTree({
-                        jsonUrl: '../json/sample.json?branch=',
+                        ajax: {
+                            url: '../json/sample.json'
+                        },
                         itemHook: function(parent, item, itemData, level) {
                             if (!itemData.isFolder) {
                                 // a custom item implementation to show a link
@@ -80,7 +82,7 @@
             $(function() {
 
                 $('script.code').each(function() {
-                    $(this).before('<div style="clear:both"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
+                    $(this).before('<div style="clear:both;margin:10px 0 10px 0"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
                     $(this).prev('div').find('pre').text($(this).html());
                 });
 
