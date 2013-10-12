@@ -19,7 +19,7 @@ Features:
   be used), in-place item editing (using f2 key or the mouse and enter/escape 
   keys to save/cancel editing), item state (open/selected) persistance using 
   local storage, URL fragment support for item states (open/selected), 
-  drag & drop for sorting items;
+  item search & filter, drag & drop for sorting items;
 
 - supports displaying multiple columns without using tables, with RTL support;
 
@@ -55,11 +55,11 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v3.6.0
+aciTree jQuery Plugin v3.7.0
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu
 Dual licensed under the MIT or GPL Version 2 licenses.
 
 Require jQuery Library >= v1.7.1 http://jquery.com
-+ aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
++ aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin

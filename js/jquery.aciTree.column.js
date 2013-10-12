@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.6.0
+ * aciTree jQuery Plugin v3.7.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -81,7 +81,7 @@
                 } else {
                     var style = '<div class="' + className + '"></div>';
                 }
-                $('body').append('<div id="' + id + '" style="position:relative;width:0px;height:0px;line-height:0px">' + style + '</div>');
+                $('body').append('<div id="' + id + '" style="position:relative;display:inline-block;width:0px;height:0px;line-height:0px;overflow:hidden">' + style + '</div>');
                 test = $('body').find('#' + id);
             }
             var value = test.find('*:last').css(property);

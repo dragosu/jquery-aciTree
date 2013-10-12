@@ -42,7 +42,8 @@
             <p>Select/open items based on the variables stored in the URL fragment demo <a href="/demo/aciTree_hash.html" target="_blank" title="aciTree with aciFragment">here</a></p>
             <p>See how you can use the drag & drop events to sort the tree items and limit the draggable items / drop targets <a href="aciTree-drag-drop.html" target="_blank" title="aciTree drag & drop">here</a></p>
             <p>See how you can add a tooltip for each tree item <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree tooltips">here</a></p>
-            <p>(<span style="color:red">new</span>) See how you can use a custom tree data structure <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree custom data">here</a></p>
+            <p>See how you can use a custom tree data structure <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree custom data">here</a></p>
+            <p>(<span style="color:red">new</span>) See how you can use a custom filter/search <a href="/demo/aciTree-filter-search.html" target="_blank" title="aciTree filter & search">here</a></p>
 
             <p>Note: in the demo below - the node loading it's made with a delay so you can see the loading animation.
                 If you want you can remove the delay from the <i>PHP</i> script ...</p>
@@ -56,6 +57,7 @@
             <div class="form">
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
                     <table cellspacing="0" cellpadding="10" border="0"><tr><td width="300">
+                                <p>(<span style="color:red">new</span>) Filter: <input type="text" id="filter" value=""> (<span style="color:blue">note</span>)</p>
                                 <p>Show Branches: <label><input type="radio" name="branches" value="1"> Yes</label>
                                     <label><input type="radio" name="branches" value="0"> No</label></p>
                                 <p>Use Animations: <label><input type="radio" name="animate" value="1"> Yes</label>
@@ -283,8 +285,7 @@
                     treeApi = $('#tree').aciTree({
                         autoInit: false,
                         ajax: {
-                            url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch=',
-                            dataType: 'json'
+                            url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch='
                         },
                         rootData: (type == 'data') ? rootData : null,
                         itemHook: function(parent, item, itemData, level) {
@@ -379,6 +380,9 @@
                                 // make it visible ;)
                                 api.setVisible(item);
                             }
+                            break;
+                        case 'filtered':
+                            log.prepend('<p>' + eventName + ' [' + options.search + '] first match: [' + api.getId(options.first) + '] [' + options.uid + ']</p>');
                             break;
                         default:
                             if (item) {
@@ -497,6 +501,14 @@
 
                 $('[name=cancel_ui][value=0]').prop('checked', true);
                 $('[name=cancel_user][value=0]').prop('checked', true);
+
+                // filter the tree
+
+                $('#filter').keyup(function() {
+                    treeApi.filter(null, {
+                        search: $(this).val()
+                    });
+                });
 
                 // update options
 
@@ -1692,7 +1704,7 @@
                         id: swap1
                     });
                 });
-
+                
             });
 
         </script>

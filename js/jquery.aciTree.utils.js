@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.6.0
+ * aciTree jQuery Plugin v3.7.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -16,10 +16,30 @@
 
 (function($, window, undefined) {
 
+    // extra default options
+
+    var options = {
+        // called when items need to be filtered, for each tree item
+        // return TRUE/FALSE to include/exclude items on filtering
+        filterHook: function(item, search, regexp) {
+            return search.length ? regexp.test(window.String(this.getLabel(item))) : true;
+        }
+    };
+
     // aciTree utils extension
     // adds item update option, branch processing, moving items & item swapping, item search by ID
 
     var aciTree_utils = {
+        // add extra data
+        __extend: function() {
+            $.extend(this._instance, {
+                filter: new this._queue(this, this._instance.options.queue)
+            });
+            // stop queue until needed
+            this._instance.filter.destroy();
+            // call the parent
+            this._super();
+        },
         // update item (create tree branch if requested)
         // if options.itemData have the 'childs' property set then
         // will be like when calling 'loadFrom' for the item
@@ -106,42 +126,38 @@
         // callback call for each children of item
         // when 'load' is TRUE will also try to load nodes
         branch: function(item, callback, load) {
+            var queue = this._instance.queue;
             var process = this.proxy(function(item, callback, next) {
                 var child = next ? this.next(item) : this.first(item);
                 if (child.length) {
                     if (this.isFolder(child)) {
                         if (this.wasLoad(child)) {
-                            this._instance.queue.push(function(complete) {
+                            queue.push(function(complete) {
                                 callback.call(this, child);
                                 process(child, callback);
                                 process(child, callback, true);
                                 complete();
                             });
                         } else if (load) {
-                            //this._instance.queue.push(function(complete) {
-                            //  complete();
                             this.ajaxLoad(child, {
                                 success: function() {
                                     callback.call(this, child);
                                     process(child, callback);
                                     process(child, callback, true);
-                                    //complete();
                                 },
                                 fail: function() {
                                     process(child, callback, true);
-                                    //complete();
                                 }
                             });
-                            //});
                         } else {
-                            this._instance.queue.push(function(complete) {
+                            queue.push(function(complete) {
                                 callback.call(this, child);
                                 process(child, callback, true);
                                 complete();
                             });
                         }
                     } else {
-                        this._instance.queue.push(function(complete) {
+                        queue.push(function(complete) {
                             callback.call(this, child);
                             process(child, callback, true);
                             complete();
@@ -473,11 +489,222 @@
                     this._fail(null, options);
                 }
             }
+        },
+        // escape string and return RegExp
+        _regexp: function(search) {
+            return new window.RegExp(window.String(search).replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1').replace(/\x08/g, '\\x08'), 'i');
+        },
+        // filter the tree items based on search criteria
+        // options.search is the keyword
+        // options.first will be the first matched item (if any)
+        filter: function(item, options) {
+            options = this._options(options, null, function() {
+                this._trigger(item, 'filterfail', options);
+            });
+            if (!item || this.isItem(item)) {
+                // a way to cancel the operation
+                if (!this._trigger(item, 'beforefilter', options)) {
+                    this._fail(item, options);
+                    return;
+                }
+                var search = window.String(options.search);
+                var regexp = this._regexp(search);
+                var first = null;
+                this._instance.filter.init();
+                var task = new this._task(this._instance.filter, function() {
+                    this._instance.filter.destroy();
+                    options.first = first;
+                    this._updateOddEven();
+                    this._trigger(item, 'filtered', options);
+                    this._success(item, options);
+                });
+                // process childrens
+                var process = this.proxy(function(parent) {
+                    var childs = this.childrens(parent, false, true);
+                    var found = false;
+                    childs.each(this.proxy(function(element) {
+                        var item = $(element);
+                        if (this._instance.options.filterHook.call(this, item, search, regexp)) {
+                            if (!first) {
+                                first = item;
+                            }
+                            found = true;
+                            item.removeClass('aciTreeHidden');
+                        } else {
+                            item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
+                        }
+                        if (this.isFolder(item)) {
+                            task.push(function(complete) {
+                                process(item);
+                                complete();
+                            });
+                        }
+                    }, true));
+                    if (found) {
+                        if (parent && this.isHidden(parent)) {
+                            this._showHidden(parent);
+                        }
+                        if (!parent || (this.isOpenPath(parent) && this.isOpen(parent))) {
+                            childs.not('.aciTreeHidden').addClass('aciTreeVisible');
+                        }
+                        this._updateFirstLast(parent, this._firstLast(parent));
+                    }
+                });
+                task.push(function(complete) {
+                    process(item);
+                    complete();
+                });
+            } else {
+                this._fail(item, options);
+            }
+        },
+        // get first tree item
+        _firstAll: function(callback) {
+            callback.call(this, this.first());
+        },
+        // get last tree item
+        _lastAll: function(item, callback, load) {
+            if (item) {
+                if (this.isFolder(item)) {
+                    if (this.wasLoad(item)) {
+                        this._lastAll(this.last(item), callback, load);
+                        return;
+                    } else if (load) {
+                        this.ajaxLoad(item, {
+                            success: function() {
+                                this._lastAll(this.last(item), callback, load);
+                            },
+                            fail: function() {
+                                callback.call(this, item);
+                            }
+                        });
+                        return;
+                    }
+                }
+                callback.call(this, item);
+            } else {
+                callback.call(this, this.last());
+            }
+        },
+        // get next item from tree
+        // when `load` is TRUE will also try to load nodes
+        _nextAll: function(item, callback, load) {
+            if (item) {
+                if (this.isFolder(item)) {
+                    if (this.wasLoad(item)) {
+                        callback.call(this, this.first(item));
+                        return;
+                    } else if (load) {
+                        this.ajaxLoad(item, {
+                            success: function() {
+                                callback.call(this, this.first(item));
+                            },
+                            fail: function() {
+                                this._nextAll(item, callback, load);
+                            }
+                        });
+                        return;
+                    }
+                }
+                var next = this.next(item);
+                if (next.length) {
+                    callback.call(this, next);
+                } else {
+                    // search next by parents
+                    var search = this.proxy(function(item) {
+                        var parent = this.parent(item);
+                        if (parent.length) {
+                            var next = this.next(parent);
+                            if (next.length) {
+                                return next;
+                            } else {
+                                return search(parent);
+                            }
+                        }
+                        return null;
+                    });
+                    callback.call(this, search(item));
+                }
+            } else {
+                callback.call(this, this.first());
+            }
+        },
+        // get prev item from tree
+        // when `load` is TRUE will also try to load nodes
+        _prevAll: function(item, callback, load) {
+            if (item) {
+                var prev = this.prev(item);
+                if (prev.length) {
+                    if (this.isFolder(prev)) {
+                        this._lastAll(prev, callback, load);
+                    } else {
+                        callback.call(this, prev);
+                    }
+                } else {
+                    var parent = this.parent(item);
+                    callback.call(this, parent.length ? parent : null);
+                }
+            } else {
+                callback.call(this, this.last());
+            }
+        },
+        // find prev item based on search criteria
+        prevMatch: function(item, search, callback) {
+            var regexp = this._regexp(search);
+            this._instance.filter.init();
+            var task = new this._task(this._instance.filter, function() {
+                this._instance.filter.destroy();
+            });
+            var process = function(item) {
+                task.push(function(complete) {
+                    this._prevAll(item, function(item) {
+                        if (item) {
+                            if (this._instance.options.filterHook.call(this, item, search, regexp)) {
+                                callback.call(this, item);
+                            } else {
+                                process(item);
+                            }
+                        } else {
+                            callback.call(this, null);
+                        }
+                        complete();
+                    });
+                });
+            };
+            process(this.isItem(item) ? item : null);
+        },
+        // find next item based on search criteria
+        nextMatch: function(item, search, callback) {
+            var regexp = this._regexp(search);
+            this._instance.filter.init();
+            var task = new this._task(this._instance.filter, function() {
+                this._instance.filter.destroy();
+            });
+            var process = function(item) {
+                task.push(function(complete) {
+                    this._nextAll(item, function(item) {
+                        if (item) {
+                            if (this._instance.options.filterHook.call(this, item, search, regexp)) {
+                                callback.call(this, item);
+                            } else {
+                                process(item);
+                            }
+                        } else {
+                            callback.call(this, null);
+                        }
+                        complete();
+                    });
+                });
+            };
+            process(this.isItem(item) ? item : null);
         }
 
     };
 
     // extend the base aciTree class and add the utils stuff
     aciPluginClass.plugins.aciTree = aciPluginClass.plugins.aciTree.extend(aciTree_utils, 'aciTreeUtils');
+
+    // add extra default options
+    aciPluginClass.defaults('aciTree', options);
 
 })(jQuery, this);

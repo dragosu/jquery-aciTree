@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>aciTree v3.6.0 - A treeview control with jQuery</title>
+        <title>aciTree v3.7.0 - A treeview control with jQuery</title>
         <meta name="description" content="aciTree API documentation">
         <style type="text/css">
             html {
@@ -146,16 +146,16 @@
     </head>
 
     <body>
-        <h1>aciTree API v3.6.0</h1>
+        <h1>aciTree API v3.7.0</h1>
         
         <p>Please note: here are listed only the public API methods, you need to 
             <a href="http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery" target="_blank" title="aciTree home">read</a> about the available init options and how to listen
         for the aciTree events before you'll be able to use aciTree. Try out the <a href="aciTree.html" target="_blank" title="aciTree demos">demos</a> to understand how to use the API.</p>
 
-<div class="api"><span class="toc"><a name="top" title=".after (item, options)" href="#.after">.after -  Add a new item or a list of items after item...</a><br><a title=".ajaxLoad (item, options)" href="#.ajaxLoad">.ajaxLoad -  Loads a node with AJAX (if not already loaded)...</a><br><a title=".append (item, options)" href="#.append">.append -  Add one or more childrens to item, the new items are added at the end...</a><br><a title=".asChild (item, options) " href="#.asChild">.asChild -  Moves item so it becomes child of a parent item...</a><br><a title=".before (item, options)" href="#.before">.before -  Add a new item or a list of items before item...</a><br><a title=".branch (item, callback, load) " href="#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="#.check">.check -  Set a checkbox or radio-button in the checked/unchecked state...</a><br><a title=".checkboxes (items, state) " href="#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".childrens (item, branch, hidden)" href="#.childrens">.childrens -  Returns a list of childrens from item.
+<div class="api"><span class="toc"><a title=".after (item, options)" href="#.after">.after -  Add a new item or a list of items after item...</a><br><a title=".ajaxLoad (item, options)" href="#.ajaxLoad">.ajaxLoad -  Loads a node with AJAX (if not already loaded)...</a><br><a title=".append (item, options)" href="#.append">.append -  Add one or more childrens to item, the new items are added at the end...</a><br><a title=".asChild (item, options) " href="#.asChild">.asChild -  Moves item so it becomes child of a parent item...</a><br><a title=".before (item, options)" href="#.before">.before -  Add a new item or a list of items before item...</a><br><a title=".branch (item, callback, load) " href="#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="#.check">.check -  Set a checkbox or radio-button in the checked/unchecked state...</a><br><a title=".checkboxes (items, state) " href="#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".childrens (item, branch, hidden)" href="#.childrens">.childrens -  Returns a list of childrens from item.
                     
                 </a><br><a title=".close (item, options)" href="#.close">.close -  Closes the item node and all his childrens (if requested)...</a><br><a title=".closeOthers (item, options)" href="#.closeOthers">.closeOthers -  Closes all other nodes less the item...</a><br><a title=".destroy (options)" href="#.destroy">.destroy -  Destroys the treeview control, .isLocked will return TRUE from the start until...</a><br><a title=".edit (item, options) " href="#.edit">.edit -  Enters or exits the editable mode (optionally saving the changes made)...</a><br><a title=".edited () " href="#.edited">.edited -  Returns the edited LI element.
-                </a><br><a title=".files (items)" href="#.files">.files -  Filter items and return only the 'file' items...</a><br><a title=".first (item, hidden)" href="#.first">.first -  Returns the first children of item.
+                </a><br><a title=".files (items)" href="#.files">.files -  Filter items and return only the 'file' items...</a><br><a title=".filter (item, options) " href="#.filter">.filter -  Search &amp; filter the tree items starting from item...</a><br><a title=".first (item, hidden)" href="#.first">.first -  Returns the first children of item.
                     
                 </a><br><a title=".folders (items, state)" href="#.folders">.folders -  Filter items and return only the `folder` items...</a><br><a title=".getIcon (item)" href="#.getIcon">.getIcon -  Returns the item ICON (or NULL if does not exist)...</a><br><a title=".getId (item)" href="#.getId">.getId -  Returns the item ID (or NULL if does not exists)...</a><br><a title=".getIndex (item)" href="#.getIndex">.getIndex -  Returns the index starting from 0 for the item (or NULL if does not exists)...</a><br><a title=".getLabel (item)" href="#.getLabel">.getLabel -  Returns the text value of item (or NULL if does not exists)...</a><br><a title=".getWidth (column) " href="#.getWidth">.getWidth -  Returns the column width (in pixels).
                     
@@ -189,11 +189,11 @@
                     
                 </a><br><a title=".last (item, hidden)" href="#.last">.last -  Returns the last children of item.
                     
-                </a><br><a title=".level (item)" href="#.level">.level -  Returns the item level starting from 0 for the ones in ROOT (or -1 if does not...</a><br><a title=".loadFrom (item, options)" href="#.loadFrom">.loadFrom -  Loads a node from a JavaScript variable (if not already loaded)...</a><br><a title=".moveAfter (item, options) " href="#.moveAfter">.moveAfter -  Move item after a specific item...</a><br><a title=".moveBefore (item, options) " href="#.moveBefore">.moveBefore -  Move item before a specific item...</a><br><a title=".moveDown (item, options) " href="#.moveDown">.moveDown -  Move item down with a position (inside the same parent)...</a><br><a title=".moveFirst (item, options) " href="#.moveFirst">.moveFirst -  Move item at the beginning (inside the same parent)...</a><br><a title=".moveLast (item, options) " href="#.moveLast">.moveLast -  Move item at the end (inside the same parent)...</a><br><a title=".moveUp (item, options) " href="#.moveUp">.moveUp -  Move item up with a position (inside the same parent)...</a><br><a title=".next (item, hidden)" href="#.next">.next -  Returns the next element from item (belonging to the same parent)...</a><br><a title=".open (item, options)" href="#.open">.open -  Opens the item node and all his childrens (if requested)...</a><br><a title=".openPath (item, options)" href="#.openPath">.openPath -  Opens the entire path till item...</a><br><a title=".option (option, value)" href="#.option">.option -  Set a option at runtime (after init).
+                </a><br><a title=".level (item)" href="#.level">.level -  Returns the item level starting from 0 for the ones in ROOT (or -1 if does not...</a><br><a title=".loadFrom (item, options)" href="#.loadFrom">.loadFrom -  Loads a node from a JavaScript variable (if not already loaded)...</a><br><a title=".moveAfter (item, options) " href="#.moveAfter">.moveAfter -  Move item after a specific item...</a><br><a title=".moveBefore (item, options) " href="#.moveBefore">.moveBefore -  Move item before a specific item...</a><br><a title=".moveDown (item, options) " href="#.moveDown">.moveDown -  Move item down with a position (inside the same parent)...</a><br><a title=".moveFirst (item, options) " href="#.moveFirst">.moveFirst -  Move item at the beginning (inside the same parent)...</a><br><a title=".moveLast (item, options) " href="#.moveLast">.moveLast -  Move item at the end (inside the same parent)...</a><br><a title=".moveUp (item, options) " href="#.moveUp">.moveUp -  Move item up with a position (inside the same parent)...</a><br><a title=".next (item, hidden)" href="#.next">.next -  Returns the next element from item (belonging to the same parent)...</a><br><a title=".nextMatch (item, search, callback) " href="#.nextMatch">.nextMatch -  Search for a match starting with the item after item...</a><br><a title=".open (item, options)" href="#.open">.open -  Opens the item node and all his childrens (if requested)...</a><br><a title=".openPath (item, options)" href="#.openPath">.openPath -  Opens the entire path till item...</a><br><a title=".option (option, value)" href="#.option">.option -  Set a option at runtime (after init).
                     
                 </a><br><a title=".options ()" href="#.options">.options -  Returns the init options (including any new value assigned with option)...</a><br><a title=".parent (item)" href="#.parent">.parent -  Returns the parent of item.
                     
-                </a><br><a title=".path (item, reverse)" href="#.path">.path -  Returns a list of parent items till item (starting from ROOT)...</a><br><a title=".prev (item, hidden)" href="#.prev">.prev -  Returns the previous element from item (belonging to the same parent)...</a><br><a title=".radios (items, state) " href="#.radios">.radios -  Filter items and return only the items with a radio-button...</a><br><a title=".remove (item, options)" href="#.remove">.remove -  Remove item (including the childrens)...</a><br><a title=".sameParent (item1, item2)" href="#.sameParent">.sameParent -  Returns TRUE if item1 and item2 have the same direct parent...</a><br><a title=".sameTopParent (item1, item2)" href="#.sameTopParent">.sameTopParent -  Returns TRUE if item1 and item2 have the same parent on level 0...</a><br><a title=".searchId (path, load, options) " href="#.searchId">.searchId -  Searches and returns the LI element with a ID...</a><br><a title=".select (item, options) " href="#.select">.select -  Selects/deselects one item.
+                </a><br><a title=".path (item, reverse)" href="#.path">.path -  Returns a list of parent items till item (starting from ROOT)...</a><br><a title=".prev (item, hidden)" href="#.prev">.prev -  Returns the previous element from item (belonging to the same parent)...</a><br><a title=".prevMatch (item, search, callback) " href="#.prevMatch">.prevMatch -  Search for a match starting with the item before item...</a><br><a title=".radios (items, state) " href="#.radios">.radios -  Filter items and return only the items with a radio-button...</a><br><a title=".remove (item, options)" href="#.remove">.remove -  Remove item (including the childrens)...</a><br><a title=".sameParent (item1, item2)" href="#.sameParent">.sameParent -  Returns TRUE if item1 and item2 have the same direct parent...</a><br><a title=".sameTopParent (item1, item2)" href="#.sameTopParent">.sameTopParent -  Returns TRUE if item1 and item2 have the same parent on level 0...</a><br><a title=".searchId (path, load, options) " href="#.searchId">.searchId -  Searches and returns the LI element with a ID...</a><br><a title=".select (item, options) " href="#.select">.select -  Selects/deselects one item.
                     
                     Notifies...</a><br><a title=".selected () " href="#.selected">.selected -  Returns the selected LI element.
                 </a><br><a title=".setCheckbox (item, options) " href="#.setCheckbox">.setCheckbox -  Set item with or without a checkbox...</a><br><a title=".setFile (item, options)" href="#.setFile">.setFile -  Transforms item in a 'file'.
@@ -216,7 +216,7 @@
                 </a><br><a title=".update (item, options) " href="#.update">.update -  Update the item, changes the ID, text value, the icon and (optional) loads the...</a><br><a title=".visible (items, view)" href="#.visible">.visible -  Filter items and return only the visible items (the items with all parent...</a><br><a title=".wasInit ()" href="#.wasInit">.wasInit -  Returns TRUE if the treeview control was initialized.
                 </a><br><a title=".wasLoad (item)" href="#.wasLoad">.wasLoad -  Returns TRUE if item was loaded.
                     
-                </a><br></span>
+                </a><br><br></span>
 
                 <a name=".after"></a><div style="display: block;" data-ext="core"><span>.after (item, options)<a title="Top" href="#top">[top]</a></span> Add a new item or a list of items after <b>item</b>.
                     <span class="where">
@@ -280,7 +280,7 @@
                 </div>
                 
                 <a name=".asChild"></a><div style="display: block;" data-ext="utils extension"><span>.asChild (item, options) <span>utils extension</span><a title="Top" href="#top">[top]</a></span> Moves <b>item</b> so it becomes child of a parent item.
-                    <span class="where">
+                    <span class="where" style="display: none;">
                         where:
                         <span>item<span> jQuery object</span></span> the <i>LI</i>
                         <span>options<span> <ul><li>object/array {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    parent: (jQuery object) the parent item</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
@@ -317,12 +317,13 @@
                     <span class="where">
                         where:
                         <span>item<span> jQuery object</span></span> the parent <i>LI</i> (or <i>NULL</i> for ROOT)
-                        <span>callback<span> function (api, item)</span></span>
+                        <span>callback<span> function (item)</span></span>
                         <span class="where">where:
                             <span>item<span> the <i>LI</i></span></span>
                         </span>
-                        <span>load<span> (boolean)</span></span> if <i>TRUE</i> then all - not yet loaded - nodes will be loaded and the
-                        <i>callback</i> will be run for their childrens too
+                        <span>load<span> (boolean) if <i>TRUE</i> then all - not yet loaded - nodes will be loaded and the
+                        <i>callback</i> will be run for their childrens too</span></span>
+                        Inside the callback function you can access the aciTree API with <b>this</b> keyword.
                     </span>
                     <b>.branch</b> calls <b>.ajaxLoad</b> when it needs to load a node.
                 </div>
@@ -427,6 +428,27 @@
                         <span>items<span> jQuery object</span></span> a list of <i>LI</i> elements
                     </span>
                 </div>
+                
+                <a name=".filter"></a><div style="display: block;" data-ext="utils extension"><span>.filter (item, options) <span>utils extension</span><a title="Top" href="#top">[top]</a></span> Search &amp; filter the tree items starting from <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the parent <i>LI</i> to start from (NULL to start from ROOT)
+                            <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    search: (string) the searched value</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation
+                            succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.first</b> - the first found item (if any).
+                        <b>Note</b>: the returned first found item it's not in the tree branch order, use <b>.prevMatch</b> and/or <b>.nextMatch</b>
+                        to search and get items in branch order.
+                    </span>
+                    <b>.filter</b> calls <b>options.filterHook</b> for each item and
+                    notifies with the <em>filtered</em> and <em>filterfail</em> events if the operation was successful or not.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforefilter</em>.
+                </div>                
 
                 <a name=".first"></a><div style="display: block;" data-ext="core"><span>.first (item, hidden)<a title="Top" href="#top">[top]</a></span> Returns the first children of <b>item</b>.
                     <span class="where">
@@ -859,6 +881,20 @@
                     </span>
                 </div>
 
+                <a name=".nextMatch"></a><div style="display: block;" data-ext="utils extension"><span>.nextMatch (item, search, callback) <span>utils extension</span><a title="Top" href="#top">[top]</a></span> Search for a match starting with the item after <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> to start with the first item)
+                        <span>search<span> (string)</span></span> the value to search for
+                        <span>callback<span> function (item)</span></span>
+                        <span class="where">where:
+                            <span>item<span> the found <i>LI</i> (if any)</span></span>
+                        </span>
+                        Inside the callback function you can access the aciTree API with <b>this</b> keyword.
+                    </span>
+                    <b>.nextMatch</b> calls <b>options.filterHook</b> for each item.
+                </div>                
+                
                 <a name=".open"></a><div style="display: block;" data-ext="core"><span>.open (item, options)<a title="Top" href="#top">[top]</a></span> Opens the <b>item</b> node and all his childrens (if requested).
                     <span class="where">
                         where:
@@ -925,6 +961,20 @@
                     </span>
                 </div>
 
+                <a name=".prevMatch"></a><div style="display: block;" data-ext="utils extension"><span>.prevMatch (item, search, callback) <span>utils extension</span><a title="Top" href="#top">[top]</a></span> Search for a match starting with the item before <b>item</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> (or <i>NULL</i> to start with the last item)
+                        <span>search<span> (string)</span></span> the value to search for
+                        <span>callback<span> function (item)</span></span>
+                        <span class="where">where:
+                            <span>item<span> the found <i>LI</i> (if any)</span></span>
+                        </span>
+                        Inside the callback function you can access the aciTree API with <b>this</b> keyword.
+                    </span>
+                    <b>.prevMatch</b> calls <b>options.filterHook</b> for each item.
+                </div>                 
+                
                 <a name=".radios"></a><div style="display: block;" data-ext="radio extension"><span>.radios (items, state) <span>radio extension</span><a title="Top" href="#top">[top]</a></span> Filter <b>items</b> and return only the items with a radio-button.
                     <span class="where">
                         where:
@@ -1301,14 +1351,14 @@
 
             </div>        
         
-        <p>aciTree jQuery Plugin v3.6.0</p>
+        <p>aciTree jQuery Plugin v3.7.0</p>
         <p>http://acoderinsights.ro</p>
 
         <p>Copyright (c) 2013 Dragos Ursu</p>
         <p>Dual licensed under the MIT or GPL Version 2 licenses.</p>
 
         <p>Require jQuery Library >= v1.7.1 http://jquery.com</p>
-        <p>+ aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin</p>
+        <p>+ aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin</p>
 
     </body>
 </html>

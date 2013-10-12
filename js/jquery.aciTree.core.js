@@ -1,13 +1,13 @@
 
 /*
- * aciTree jQuery Plugin v3.6.0
+ * aciTree jQuery Plugin v3.7.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.7.1 http://jquery.com
- * + aciPlugin >= v1.5.0 https://github.com/dragosu/jquery-aciPlugin
+ * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
@@ -82,7 +82,7 @@
         queue: {
             async: 4,                   // the number of simultaneous async (AJAX) tasks
             interval: 50,               // interval [ms] after which to insert a `delay`
-            delay: 10                   // how many [ms] delay between tasks (after `interval` expiration)
+            delay: 20                   // how many [ms] delay between tasks (after `interval` expiration)
         },
         loaderDelay: 500,               // how many msec to wait before showing the main loader? (on lengthy operations)
         expand: false,                  // if TRUE then all childrens of a node are expanded when the node is opened
@@ -285,9 +285,10 @@
                 }
             };
             start();
-            // test if its busy
-            this.busy = function() {
-                return (load != 0) || (loadAsync != 0) || (fifo.length != 0) || (fifoAsync.length != 0);
+            this.init = function() {
+                this.destroy();
+                start();
+                return this;
             };
             // push a 'callback' for later call
             this.push = function(callback, async) {
@@ -300,6 +301,10 @@
                 }
                 return this;
             };
+            // test if its busy
+            this.busy = function() {
+                return (load != 0) || (loadAsync != 0) || (fifo.length != 0) || (fifoAsync.length != 0);
+            };
             // destroy queue
             this.destroy = function() {
                 locked = true;
@@ -310,6 +315,26 @@
                 loadAsync = 0;
                 schedule = 0;
                 locked = false;
+                return this;
+            };
+        },
+        // used with a queue to execute something at the end
+        _task: function(queue, endCallback) {
+            var counter = 0, finish = false;
+            // push a 'callback' for later call
+            this.push = function(callback, async) {
+                counter++;
+                queue.push(function(complete) {
+                    var context = this;
+                    callback.call(this, function() {
+                        complete();
+                        counter--;
+                        if ((counter < 1) && !finish) {
+                            finish = true;
+                            endCallback.call(context);
+                        }
+                    });
+                }, async);
             };
         },
         // options object (need to be in this form for all API functions
@@ -471,7 +496,6 @@
                     }
                     this._instance.options.ajaxHook.call(this, item, settings);
                     settings.success = this.proxy(function(itemList) {
-                        //complete();
                         if (itemList && (itemList instanceof Array) && itemList.length) {
                             // the AJAX returned some items
                             var process = function() {
@@ -736,8 +760,8 @@
                     var item = $(this);
                     // queue node opening                    
                     queue.push(function(complete) {
-                        complete();
                         this.open(item, this._inner(options));
+                        complete();
                     });
                 });
                 queue.push(function(complete) {
@@ -817,10 +841,10 @@
                     var item = $(this);
                     // queue node close
                     queue.push(function(complete) {
-                        complete();
                         this.close(item, this._inner(options, {
                             unanimated: true
                         }));
+                        complete();
                     });
                 });
                 queue.push(function(complete) {
@@ -901,12 +925,12 @@
                 var queue = this._instance.queue;
                 var exclude = item.add(this.path(item)).add(this.childrens(item, true));
                 // close all other open nodes (not including this item and his parents)
-                this.folders(this.childrens(null, true), true).not(exclude).each(function() {
+                this.folders(this.childrens(null, true, true), true).not(exclude).each(function() {
                     var item = $(this);
                     // add node to close queue
                     queue.push(function(complete) {
-                        complete();
                         this.close(item, this._inner(options));
+                        complete();
                     });
                 });
                 queue.push(function(complete) {
@@ -951,7 +975,7 @@
         // test if item is in view
         // when 'center' is TRUE will test if it's centered in view
         isVisible: function(item, center) {
-            if (this.isOpenPath(item)) {
+            if (item && this.isOpenPath(item)) {
                 // the item path need to be open
                 var rect = this._instance.jQuery.get(0).getBoundingClientRect();
                 var size = item.children('.aciTreeLine').find('.aciTreeItem');
@@ -976,8 +1000,8 @@
                     var item = $(this);
                     // add node to open queue
                     queue.push(function(complete) {
-                        complete();
                         this.open(item, this._inner(options));
+                        complete();
                     });
                 });
                 queue.push(function(complete) {
@@ -1130,10 +1154,10 @@
                                     // queue the children creation
                                     queue.push(function(complete) {
                                         process(item, itemData.childs);
-                                        complete();
                                         if (itemData.open) {
                                             this.open(item);
                                         }
+                                        complete();
                                     });
                                 })(options.items.eq(i), itemData);
                             } else if (itemData.open) {
@@ -1679,20 +1703,24 @@
             }, function() {
                 this._trigger(item, 'washidden', options);
             });
-            if (this.isHidden(item)) {
-                this._notify(item, options);
-            } else {
+            if (this.isItem(item)) {
                 // a way to cancel the hide
                 if (!this._trigger(item, 'beforehide', options)) {
                     this._fail(item, options);
                     return;
                 }
-                item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
-                this.childrens(item, true).removeClass('aciTreeVisible').addClass('aciTreeHidden');
-                var parent = this.parent(item);
-                this._updateFirstLast(parent.length ? parent : null, item);
-                this._updateOddEven(item);
-                this._success(item, options);
+                if (this.isHidden(item)) {
+                    this._notify(item, options);
+                } else {
+                    item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
+                    this.childrens(item, true).removeClass('aciTreeVisible').addClass('aciTreeHidden');
+                    var parent = this.parent(item);
+                    this._updateFirstLast(parent.length ? parent : null, item);
+                    this._updateOddEven(item);
+                    this._success(item, options);
+                }
+            } else {
+                this._fail(item, options);
             }
         },
         // test if item is hidden
@@ -1720,6 +1748,27 @@
             return items.filter('.aciTreeHidden');
         },
         // show hidden item
+        _showHidden: function(item) {
+            var parent = null;
+            var path = this.path(item);
+            path.each(this.proxy(function(element) {
+                var item = $(element);
+                if (this.isHidden(item)) {
+                    item.removeClass('aciTreeHidden');
+                    if (this.isOpenPath(item) && (!parent || this.isOpen(parent))) {
+                        item.addClass('aciTreeVisible');
+                    }
+                    this._updateFirstLast(parent, this._firstLast(parent));
+                }
+                parent = item;
+            }, true));
+            item.removeClass('aciTreeHidden');
+            if (this.isOpenPath(item) && (!parent || this.isOpen(parent))) {
+                item.addClass('aciTreeVisible');
+            }
+            this._updateFirstLast(parent, this._firstLast(parent));
+        },
+        // show hidden item
         show: function(item, options) {
             options = this._options(options, function() {
                 this._trigger(item, 'shown', options);
@@ -1728,34 +1777,22 @@
             }, function() {
                 this._trigger(item, 'wasshown', options);
             });
-            if (this.isHidden(item)) {
+            if (this.isItem(item)) {
                 // a way to cancel the hide
                 if (!this._trigger(item, 'beforeshow', options)) {
                     this._fail(item, options);
                     return;
                 }
-                var parent = null;
-                var path = this.path(item);
-                path.each(this.proxy(function(element) {
-                    var item = $(element);
-                    if (this.isHidden(item)) {
-                        item.removeClass('aciTreeHidden');
-                        if (this.isOpenPath(item) && (!parent || this.isOpen(parent))) {
-                            item.addClass('aciTreeVisible');
-                        }
-                        this._updateFirstLast(parent, this._firstLast(parent));
-                    }
-                    parent = item;
-                }, true));
-                item.removeClass('aciTreeHidden');
-                if (this.isOpenPath(item) && (!parent || this.isOpen(parent))) {
-                    item.addClass('aciTreeVisible');
+                if (this.isHidden(item)) {
+                    this._showHidden(item);
+                    var parent = this.topParent(item);
+                    this._updateOddEven(parent.length ? parent : item);
+                    this._success(item, options);
+                } else {
+                    this._notify(item, options);
                 }
-                this._updateFirstLast(parent, this._firstLast(parent));
-                this._updateOddEven(path.length ? path.first() : item);
-                this._success(item, options);
             } else {
-                this._notify(item, options);
+                this._fail(item, options);
             }
         },
         // test if item is open
