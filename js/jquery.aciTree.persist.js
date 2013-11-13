@@ -1,12 +1,12 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
@@ -67,7 +67,7 @@
         },
         // override _initHook
         _initHook: function() {
-            if (this.isPersistOn()) {
+            if (this.extPersist()) {
                 this._initPersist();
             }
             // call the parent
@@ -113,7 +113,7 @@
                 }
             }
             // support selectable extension
-            if (this.isSelectable) {
+            if (this.extSelectable) {
                 var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
                 if (selected) {
                     // select item
@@ -142,7 +142,7 @@
         // persist selected item
         _persistSelected: function() {
             // support selectable extension
-            if (this.isSelectable) {
+            if (this.extSelectable) {
                 var selected = this.selected();
                 $.jStorage.set('aciTree_' + this._instance.options.persist + '_selected', this.getId(selected));
             }
@@ -150,14 +150,14 @@
         // persist opened items
         _persistOpen: function() {
             var opened = [];
-            this.visible(this.folders(this.childrens(null, true), true)).each(this.proxy(function(element) {
+            this.visible(this.inodes(this.children(null, true), true)).each(this.proxy(function(element) {
                 opened[opened.length] = this.getId($(element));
             }, true));
             $.jStorage.set('aciTree_' + this._instance.options.persist + '_opened', opened);
         },
         // test if there is any saved data
         isPersist: function() {
-            if (this.isPersistOn()) {
+            if (this.extPersist()) {
                 var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
                 if (selected) {
                     return true;
@@ -171,21 +171,21 @@
         },
         // remove any saved states
         unpersist: function() {
-            if (this.isPersistOn()) {
+            if (this.extPersist()) {
                 $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_selected');
                 $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_opened');
             }
         },
         // test if persist is enabled
-        isPersistOn: function() {
+        extPersist: function() {
             return this._instance.options.persist;
         },
         // override set option
         option: function(option, value) {
-            var persist = this.isPersistOn();
+            var persist = this.extPersist();
             // call the parent
             this._super(option, value);
-            if (this.isPersistOn() != persist) {
+            if (this.extPersist() != persist) {
                 if (persist) {
                     this._donePersist();
                 } else {

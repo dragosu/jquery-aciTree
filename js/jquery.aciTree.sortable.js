@@ -1,12 +1,12 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
@@ -93,7 +93,7 @@
                 }),
                 valid: this.proxy(function(item, hover, before, isContainer, placeholder, helper) {
                     window.clearTimeout(this._private.openTimeout);
-                    if (!isContainer && this.isFolder(hover)) {
+                    if (!isContainer && this.isInode(hover)) {
                         if (!this.isOpen(hover) && !hover.data('opening' + this._private.nameSpace)) {
                             this._private.openTimeout = window.setTimeout(this.proxy(function() {
                                 hover.data('opening' + this._private.nameSpace, true);
@@ -125,7 +125,7 @@
                     return true;
                 }),
                 create: this.proxy(function(api, item, hover) {
-                    if (this.isFile(hover)) {
+                    if (this.isLeaf(hover)) {
                         hover.append(api._instance.options.childHolder);
                         return true;
                     }
@@ -168,8 +168,8 @@
                                 var container = placeholder.parent();
                                 placeholder.detach();
                                 container.remove();
-                                if (this.isFile(parent)) {
-                                    // we can set asChild only for files
+                                if (this.isLeaf(parent)) {
+                                    // we can set asChild only for leaves
                                     this.asChild(item, this._inner(options, {
                                         success: function() {
                                             this._success(item, options);
@@ -210,20 +210,20 @@
         },
         // override _initHook
         _initHook: function() {
-            if (this.isSortable()) {
+            if (this.extSortable()) {
                 this._initSortable();
             }
             // call the parent
             this._super();
         },
         // test if sortable is enabled
-        isSortable: function() {
+        extSortable: function() {
             return this._instance.options.sortable;
         },
         // override set option
         option: function(option, value) {
             if (this.wasInit() && !this.isLocked()) {
-                if ((option == 'sortable') && (value != this.isSortable())) {
+                if ((option == 'sortable') && (value != this.extSortable())) {
                     if (value) {
                         this._initSortable();
                     } else {

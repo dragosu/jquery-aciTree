@@ -49,7 +49,7 @@
 
             <p><span style="color:red"><b>Note</b></span>: the `ajax` option will be used whenever a tree node needs to be loaded, it is used on the initial AJAX request to
                 init (load) the tree ROOT (what you first see as the tree when you visit this page) and it it used again when a not-yet-loaded
-                folder node (a node that can have childrens) is opened for the first time. In this demo the entire tree is loaded in one step but the tree
+                inner node (a node that can have children) is opened for the first time. In this demo the entire tree is loaded in one step but the tree
                 can be loaded node by node on request if needed (i.e. when the user clicks on the [+] button to open a node). aciTree will create as many tree levels
                 as returned in the JSON, practically (with server-side coding) the tree can not only be loaded node-by-node but in an optimised way - many levels at once - 
                 depending on the tree weight.</p>
@@ -158,7 +158,7 @@
 
             <div id="tree-custom-label" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
-                    <br>Sample tree</div></div>            
+                    <br>Sample tree</div></div>
 
             <script class="code" type="text/javascript">
 
@@ -375,7 +375,7 @@
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/sample.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
                     <br>Sample tree</div></div>        
 
-            <input id="open-folder" type="button" value="Open Folder"> (select a closed tree folder item and press open - vs. - open with the [+] button)
+            <input id="open-folder" type="button" value="Open Folder"> (select a closed tree inode item and press open - vs. - open with the [+] button)
 
             <script class="code" type="text/javascript">
 
@@ -415,13 +415,13 @@
                     $('#open-folder').click(function() {
                         var api = $('#tree-options').aciTree('api');
                         var selectedItem = api.selected();
-                        if (api.isFolder(selectedItem)) {
-                            // this is a tree folder 
+                        if (api.isInode(selectedItem)) {
+                            // this is a tree inode 
                             if (api.isOpen(selectedItem)) {
                                 // if already opened
-                                alert('you need to select a closed folder node\nthe current one is already open');
+                                alert('you need to select a closed inner node\nthe current one is already open');
                             } else {
-                                // open the folder item
+                                // open the inner item
                                 api.open(selectedItem, {
                                     uid: 'my-custom-button',
                                     success: function(item, options) {
@@ -436,8 +436,8 @@
                                 });
                             }
                         } else {
-                            // no selected item or not a tree folder item
-                            alert('you need to select a closed folder node first');
+                            // no selected item or not a tree inode item
+                            alert('you need to select a closed inner node first');
                         }
                     });
 

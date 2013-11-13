@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="robots" content="index, follow">
-        <title>aciTree using file links demo - A treeview control with jQuery</title>
+        <title>aciTree using leaves links demo - A treeview control with jQuery</title>
         <meta name="description" content="A demo to show you how aciTree can be used with item links">
         <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery">
         <link rel="stylesheet" type="text/css" href="../css/aciTree.css" media="all">
@@ -16,7 +16,7 @@
 
         <div>
 
-            <p>A demo to show how you can have a link for each tree file (items without childrens).</p>
+            <p>A demo to show how you can have a link for each tree leaf node (item without children).</p>
             <p>Note: a custom property named 'my-url' is used here to hold the URL for each item (see the JSON).</p>
 
             <p><a href="index.html" title="aciTree usage demo">back to index</a></p>
@@ -38,7 +38,7 @@
                             url: '../json/sample.json'
                         },
                         itemHook: function(parent, item, itemData, level) {
-                            if (!itemData.isFolder) {
+                            if (!itemData.inode) {
                                 // a custom item implementation to show a link
                                 this.setLabel(item, {
                                     label: '<a href="' + itemData['my-url'] + '" target="_blank" title="Click to open ' + itemData['my-url'] + '">' + itemData.label + '</a>'

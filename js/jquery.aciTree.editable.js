@@ -1,12 +1,12 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
@@ -68,13 +68,15 @@
                 switch (e.which) {
                     case 113: // F2
                         // support 'selectable' extension
-                        if (this.isSelectable) {
+                        if (this.extSelectable) {
                             var selected = this.selected();
                             if (!this.isEdited(selected)) {
                                 // enable edit on F2 key
                                 this.edit(selected, {
                                     edit: true
                                 });
+                                // prevent F2 key function
+                                e.preventDefault();
                             }
                         }
                         break;
@@ -83,7 +85,7 @@
                 if ($(e.target).is('.aciTreeItem,.aciTreeText')) {
                     var item = this.itemFrom(e.target);
                     // support 'selectable' extension
-                    if (this.isSelectable && this.isSelected(item)) {
+                    if (this.extSelectable && this.isSelected(item)) {
                         // enable edit on selected item
                         this.edit(item, {
                             edit: true
@@ -92,7 +94,7 @@
                 }
             })).on('dblclick' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
                 // support 'selectable' extension
-                if (this.isSelectable && !this.isSelectable()) {
+                if (this.extSelectable && !this.extSelectable()) {
                     var item = this.itemFrom(e.target);
                     // enable edit mode
                     this.edit(item, {
@@ -108,7 +110,7 @@
                             edit: false,
                             save: true
                         });
-                        this._instance.jQuery.focus();
+                        item.focus();
                         e.stopPropagation();
                         break;
                     case 27: // escape
@@ -116,9 +118,10 @@
                         this.edit(item, {
                             edit: false
                         });
-                        this._instance.jQuery.focus();
-                        e.preventDefault();
+                        item.focus();
                         e.stopPropagation();
+                        // prevent default action on ESC
+                        e.preventDefault();
                         break;
                     case 38: // up
                     case 40: // down
@@ -129,11 +132,14 @@
                     case 36: // home
                     case 35: // end
                     case 32: // space
+                    case 107: // numpad [+]
+                    case 109: // numpad [-]
+                    case 106: // numpad [*]
                         e.stopPropagation();
                         break;
                 }
             })).on('blur' + this._private.nameSpace, 'input[type=text]', this.proxy(function() {
-                if (this.isSelectable && !this.isSelectable()) {
+                if (this.extSelectable && !this.extSelectable()) {
                     var edited = this.edited();
                     // cancel edit/save the changes
                     this.edit(edited, {
@@ -246,8 +252,10 @@
                     }
                     if (edit) {
                         // support selectable
-                        if (this.isSelectable && !this.isSelected(item)) {
-                            this.select(item, true);
+                        if (this.extSelectable && !this.isSelected(item)) {
+                            this.select(item, {
+                                select: true
+                            });
                         }
                         this._addEditbox(item);
                         this._focusEdit(item);

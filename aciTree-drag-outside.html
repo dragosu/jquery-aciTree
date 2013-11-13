@@ -52,8 +52,8 @@
                     $('#tree1').on('acitree', function(event, api, item, eventName, options) {
                         switch (eventName) {
                             case 'beforedrag':
-                                if (!api.isFile(item)) {
-                                    // only drag file items
+                                if (!api.isLeaf(item)) {
+                                    // only drag leaf items
                                     return false;
                                 }
                                 var parent = api.parent(item);

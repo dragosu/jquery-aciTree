@@ -16,7 +16,7 @@
 
         <div>
 
-            <p>A demo to show how you can listen for the selected event and do something with the selected item (open the item if it's a folder).</p>
+            <p>A demo to show how you can listen for the selected event and do something with the selected item (open the item if it's a inode).</p>
             <p>Note: a custom property named 'my-url' is used here to hold an extra value for each item (see the JSON).</p>
 
             <p><a href="index.html" title="aciTree usage demo">back to index</a></p>
@@ -37,25 +37,25 @@
                         if (eventName == 'selected') {
                             // do something when a item is selected
                             var itemData = api.itemData(item);
-                            if (api.isFolder(item)) {
-                                alert('You just selected a folder item with the ID: ' + api.getId(item) + '\n' +
+                            if (api.isInode(item)) {
+                                alert('You just selected a inode item with the ID: ' + api.getId(item) + '\n' +
                                         'also the custom property [my-url] equals: ' + itemData['my-url']);
                                 if (api.isOpen(item)) {
-                                    // the folder is already open
-                                    alert('The tree folder was already open');
+                                    // the inode is already open
+                                    alert('The tree inode was already open');
                                 } else {
-                                    // open the folder
+                                    // open the inode
                                     api.open(item, {
                                         success: function() {
-                                            alert('The tree folder node was just opened');
+                                            alert('The tree inner node was just opened');
                                         },
                                         fail: function() {
-                                            alert('Failed to open the tree folder');
+                                            alert('Failed to open the tree inode');
                                         }
                                     });
                                 }
                             } else {
-                                alert('You just selected a tree file item with the ID: ' + api.getId(item) + '\n' +
+                                alert('You just selected a tree leaf node with the ID: ' + api.getId(item) + '\n' +
                                         'also the custom property [my-url] equals: ' + itemData['my-url']);
                             }
                         }

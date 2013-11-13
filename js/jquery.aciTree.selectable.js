@@ -1,17 +1,18 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
- * This extension adds item selection/keyboard navigation to aciTree.
+ * This extension adds item selection/keyboard navigation to aciTree and need to
+ * be always included if you care about accessibility.
  */
 
 (function($, window, undefined) {
@@ -72,7 +73,7 @@
             }), 10);
         },
         // init selectable
-        _initSelectable: function() {
+        _selectableInit: function() {
             if (this._instance.jQuery.attr('tabindex') === undefined) {
                 this._instance.jQuery.attr('tabindex', 0);
             }
@@ -115,7 +116,7 @@
                         break;
                     case 39: // right
                         if (selected.length) {
-                            if (this.isFolder(selected) && this.isClosed(selected)) {
+                            if (this.isInode(selected) && this.isClosed(selected)) {
                                 this.open(selected, {
                                     collapse: this._instance.options.collapse,
                                     expand: this._instance.options.expand,
@@ -141,7 +142,8 @@
                         item = this._lastOpen();
                         break;
                     case 13: // enter
-                        if (selected.length && this.isFolder(selected) && this.isClosed(selected)) {
+                    case 107: // numpad [+]
+                        if (selected.length && this.isInode(selected) && this.isClosed(selected)) {
                             this.open(selected, {
                                 collapse: this._instance.options.collapse,
                                 expand: this._instance.options.expand,
@@ -150,6 +152,7 @@
                         }
                         break;
                     case 27: // escape
+                    case 109: // numpad [-]
                         if (selected.length && this.isOpen(selected)) {
                             this.close(selected, {
                                 collapse: this._instance.options.collapse,
@@ -157,12 +160,27 @@
                                 unique: this._instance.options.unique
                             });
                         }
+                        if (e.which == 27) {
+                            // prevent default action on ESC
+                            e.preventDefault();
+                        }
                         break;
                     case 32: // space
-                        if (selected.length && this.isFolder(selected)) {
+                        if (selected.length && this.isInode(selected)) {
                             this.toggle(selected, {
                                 collapse: this._instance.options.collapse,
                                 expand: this._instance.options.expand,
+                                unique: this._instance.options.unique
+                            });
+                        }
+                        // prevent page scroll
+                        e.preventDefault();
+                        break;
+                    case 106: // numpad [*]
+                        if (selected.length && this.isInode(selected)) {
+                            this.open(selected, {
+                                collapse: this._instance.options.collapse,
+                                expand: true,
                                 unique: this._instance.options.unique
                             });
                         }
@@ -200,7 +218,7 @@
                 }
             })).on('dblclick' + this._private.nameSpace, state ? '.aciTreeLine,.aciTreeItem' : '.aciTreeItem', this.proxy(function(e) {
                 var item = this.itemFrom(e.target);
-                if (this.isFolder(item)) {
+                if (this.isInode(item)) {
                     this.toggle(item, {
                         collapse: this._instance.options.collapse,
                         expand: this._instance.options.expand,
@@ -212,8 +230,8 @@
         },
         // override _initHook
         _initHook: function() {
-            if (this.isSelectable()) {
-                this._initSelectable();
+            if (this.extSelectable()) {
+                this._selectableInit();
             }
             // call the parent
             this._super();
@@ -225,6 +243,16 @@
                 this._selectable(item.children('.aciTreeLine').find('.aciTreeItem'));
             }
             this._super(parent, item, itemData, level);
+        },
+        // low level DOM functions
+        _selectableDOM: {
+            select: function(items, state) {
+                if (state) {
+                    items.first().addClass('aciTreeSelected').attr('aria-selected', true).focus();
+                } else {
+                    items.removeClass('aciTreeSelected').attr('aria-selected', false);
+                }
+            }
         },
         // make element (un)selectable
         _selectable: function(element, state) {
@@ -352,9 +380,6 @@
             } while (now < space);
             return next;
         },
-        _selectHook: function(unselected, selected) {
-            // override this to process after select, return TRUE to skip
-        },
         // select/deselect item
         // options.select is the new state
         // options.oldSelected will keep the old selected item
@@ -362,7 +387,7 @@
             options = this._options(options, null, function() {
                 this._trigger(item, 'selectfail', options);
             });
-            if (this.isSelectable() && this.isItem(item)) {
+            if (this.extSelectable() && this.isItem(item)) {
                 // a way to cancel the select
                 if (!this._trigger(item, 'beforeselect', options)) {
                     this._fail(item, options);
@@ -374,15 +399,15 @@
                     unselect = unselect.not(item);
                 }
                 options.oldSelected = this.selected();
-                unselect.removeClass('aciTreeSelected').each(this.proxy(function(element) {
+                this._selectableDOM.select(unselect, false);
+                unselect.each(this.proxy(function(element) {
                     this._trigger($(element), 'unselected', options);
                 }, true));
                 if (select) {
                     if (this.isSelected(item)) {
                         this._trigger(item, 'wasselected', options);
                     } else {
-                        item.addClass('aciTreeSelected');
-                        this._selectHook(options.oldSelected, item);
+                        this._selectableDOM.select(item, true);
                         this._trigger(item, 'selected', options);
                     }
                 }
@@ -400,17 +425,17 @@
             return item && item.hasClass('aciTreeSelected');
         },
         // test if selectable is enabled
-        isSelectable: function() {
+        extSelectable: function() {
             return this._instance.options.selectable;
         },
         // override set option
         option: function(option, value) {
             if (this.wasInit() && !this.isLocked()) {
-                if ((option == 'selectable') && (value != this.isSelectable())) {
+                if ((option == 'selectable') && (value != this.extSelectable())) {
                     if (value) {
-                        this._initSelectable();
+                        this._selectableInit();
                     } else {
-                        this._doneSelectable();
+                        this._selectableDone();
                     }
                 }
                 if ((option == 'fullRow') && (value != this._instance.options.fullRow)) {
@@ -432,8 +457,8 @@
             this._super(option, value);
         },
         // done selectable
-        _doneSelectable: function(destroy) {
-            if (this._instance.jQuery.attr('tabindex') == '0') {
+        _selectableDone: function(destroy) {
+            if (this._instance.jQuery.attr('tabindex') == 0) {
                 this._instance.jQuery.removeAttr('tabindex');
             }
             this._instance.jQuery.unbind(this._private.nameSpace);
@@ -452,7 +477,7 @@
         // override _destroyHook
         _destroyHook: function(unloaded) {
             if (unloaded) {
-                this._doneSelectable(true);
+                this._selectableDone(true);
             }
             // call the parent
             this._super(unloaded);

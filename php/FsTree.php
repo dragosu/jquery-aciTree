@@ -29,14 +29,14 @@ class FsTree extends Tree {
     }
 
     /**
-     * Return TRUE if it's a TREE folder (have childrens).
+     * Return TRUE if it's a TREE folder (have children).
      * @param string $path
      * @param string $icon - item icon
      */
     private function hasChildren($path, &$icon) {
         if (is_dir($path)) {
             $icon = 'folder';
-            // here we can return NULL instead of checking for childrens
+            // here we can return NULL instead of checking for children
             // return null;
             return !$this->fs->isEmpty($path);
         } else {
@@ -53,7 +53,7 @@ class FsTree extends Tree {
         $itemId = trim($itemId, '/\\');
         if ($this->fs->allow($itemId, $real)) {
             return array_merge(parent::itemProps($itemId), array(
-                        'isFolder' => $this->hasChildren($real, $icon),
+                        'inode' => $this->hasChildren($real, $icon),
                         'icon' => $icon,
                         'random' => mt_rand(0, 99) // just a random property
                     ));
@@ -63,8 +63,7 @@ class FsTree extends Tree {
 
 }
 
-// a little file system helper :)
-// for getting file system folders/files
+// a file system helper for getting file system folders/files
 // and for limiting the listings to the base folder
 
 class Fs {

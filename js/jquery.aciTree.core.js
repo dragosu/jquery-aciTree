@@ -1,12 +1,12 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
@@ -15,44 +15,44 @@
  *
  * A few words about how a item data looks like:
  *
- * for a 'file' item (a item that does not have any childrens):
+ * for a leaf node (a node that does not have any children):
  *
  * {
  *   id: 'some_file_ID',                // unique item ID
  *   label: 'This is a File Item',      // the item label (text value)
- *   isFolder: false,                   // FALSE means it's a 'file' item
+ *   inode: false,                      // FALSE means is a leaf node
  *   icon: 'fileIcon',                  // CSS class name for the icon (if any), can also be a Array ['CSS class name', background-position-x, background-position-y]
  *   random_prop: 'random 1'            // just a random property (you can have any number defined)
  * }
  *
- * for a 'folder' item (a item that have at least a children under it):
+ * for a inner node (a node that have at least a children under it):
  *
  * {
  *   id: 'some_folder_ID',              // unique item ID
  *   label: 'This is a Folder Item',    // the item label (text value)
- *   isFolder: true,                    // can also be NULL meaning not sure if there are any childrens (on load will be transformed in a 'file' if there aren't any childrens)
+ *   inode: true,                       // can also be NULL to find at runtime if its an inode (on load will be transformed in a leaf node if there aren't any children)
  *   open: false,                       // if TRUE then the node will be opened when the tree is loaded
  *   icon: 'folderIcon',                // CSS class name for the icon (if any), can also be a Array ['CSS class name', background-position-x, background-position-y]
  *   random_prop: 'random 2',           // just a random property (you can have any number defined)
- *   childs: [{ ... item data ... }, { ... item data ... }, ...]
+ *   branch: [{ ... item data ... }, { ... item data ... }, ...]
  * }
  *
- * The 'childs' array can be empty, in this case the childrens will be loaded when the node will be opened for the first time.
+ * The `branch` array can be empty, in this case the children will be loaded when the node will be opened for the first time.
  *
  * Please note that the item data should be valid data (in the expected format). No checking is done and errors can appear on invalid data.
  *
  * One note about a item: a item is always the LI element with the class 'aciTreeLi'.
- * The childrens of a node are all added under a UL element with the class 'aciTreeUl'.
+ * The children of a node are all added under a UL element with the class 'aciTreeUl'.
  *
- * All API functions expect only one item. If you need to process more at once then you'll need to loop between all of them yourself.
+ * Almost all API functions expect only one item. If you need to process more at once then you'll need to loop between all of them yourself.
  *
  * The 'options' parameter for all API methods (when there is one) it's a object with the properties (not all are required or used):
  *
  * {
- *   uid: string -> operation UID (defaults to 'ui')
- *   success: function (item, options, data) -> callback to be called on success (you can access plugin API with 'this' keyword inside the callback)
- *   fail: function (item, options, data) -> callback to be called on fail (you can access plugin API with 'this' keyword inside the callback)
- *   notify: function (item, options, data) -> notify callback (internal use for when already in the requested state, will call 'success' by default)
+ *   uid: string -> operation UID (defaults to `ui`)
+ *   success: function (item, options, data) -> callback to be called on success (you can access plugin API with `this` keyword inside the callback)
+ *   fail: function (item, options, data) -> callback to be called on fail (you can access plugin API with `this` keyword inside the callback)
+ *   notify: function (item, options, data) -> notify callback (internal use for when already in the requested state, will call `success` by default)
  *   expand: true/false -> propagate on open/toggle
  *   collapse: true/false -> propagate on close/toggle
  *   unique: true/false -> close other branches (on open/toggle)?
@@ -71,8 +71,6 @@
     // default options
 
     var options = {
-        // jsonUrl is deprecated as of v3.6.0 and will be removed at a lated date, use `options.ajax` instead !
-        jsonUrl: null,                  // URL to the JSON provider, something like 'path/script?node=' (will add the node ID value on load)
         // the AJAX options (see jQuery.ajax) where the `success` and `error` are overridden by aciTree
         ajax: {
             url: null,                  // URL from where to take the data, something like 'path/script?nodeId=' (the node ID value will be added for each request)
@@ -85,10 +83,10 @@
             delay: 20                   // how many [ms] delay between tasks (after `interval` expiration)
         },
         loaderDelay: 500,               // how many msec to wait before showing the main loader? (on lengthy operations)
-        expand: false,                  // if TRUE then all childrens of a node are expanded when the node is opened
-        collapse: false,                // if TRUE then all childrens of a node are collapsed when the node is closed
+        expand: false,                  // if TRUE then all children of a node are expanded when the node is opened
+        collapse: false,                // if TRUE then all children of a node are collapsed when the node is closed
         unique: false,                  // if TRUE then a single tree branch will stay open, the oters are closed when a node is opened
-        empty: false,                   // if TRUE then all childrens of a node are removed when the node is closed
+        empty: false,                   // if TRUE then all children of a node are removed when the node is closed
         show: {// show node/ROOT animation (default is slideDown)
             props: {
                 'height': 'show'
@@ -159,15 +157,7 @@
                 return;
             }
             this._instance.locked = true;
-            this._instance.jQuery.addClass('aciTree' + this._instance.index).bind('mousedown' + this._instance.nameSpace, function(e) {
-                // set focus on the treeview
-                var element = $(e.target);
-                if (element.is('.aciTreeButton,.aciTreeLoad,.aciTreeEntry,.aciTreeIcon')) {
-                    $(this).focus();
-                    // prevent selection
-                    e.preventDefault();
-                }
-            }).on('click' + this._instance.nameSpace, '.aciTreeButton', this.proxy(function(e) {
+            this._instance.jQuery.addClass('aciTree' + this._instance.index).attr('role', 'tree').on('click' + this._instance.nameSpace, '.aciTreeButton', this.proxy(function(e) {
                 // process click on button
                 var item = this.itemFrom(e.target);
                 // skip when busy
@@ -194,7 +184,7 @@
                 element.toggleClass('aciTreeHover', e.type == 'mouseenter');
             });
             this._initHook();
-            // call on success 
+            // call on success
             var success = this.proxy(function() {
                 // call the parent
                 this._super();
@@ -217,7 +207,7 @@
                     fail: fail,
                     itemData: this._instance.options.rootData
                 }));
-            } else if (this._instance.options.jsonUrl || this._instance.options.ajax.url) {
+            } else if (this._instance.options.ajax.url) {
                 // the AJAX url was set, init with AJAX
                 this.ajaxLoad(null, this._inner(options, {
                     success: success,
@@ -233,6 +223,53 @@
         // check locked state
         isLocked: function() {
             return this._instance.locked;
+        },
+        // get a formatted message
+        _format: function(raw, params) {
+            if (!(params instanceof Array)) {
+                return raw;
+            }
+            var parts = raw.split(/(%[0-9]+)/gm);
+            var compile = '', part, index, last = false, len;
+            var test = new window.RegExp('^%[0-9]+$');
+            for (var i in parts) {
+                part = parts[i];
+                len = part.length;
+                if (len) {
+                    if (!last && test.test(part)) {
+                        index = window.parseInt(part.substr(1)) - 1;
+                        if ((index >= 0) && (index < params.length)) {
+                            compile += params[index];
+                            continue;
+                        }
+                    } else {
+                        last = false;
+                        if (part.substr(len - 1) == '%') {
+                            if (part.substr(len - 2) != '%%') {
+                                last = true;
+                            }
+                            part = part.substr(0, len - 1);
+                        }
+                    }
+                    compile += part;
+                }
+            }
+            return compile;
+        },
+        // low level DOM functions
+        _coreDOM: {
+            // set as leaf node
+            leaf: function(items) {
+                items.removeClass('aciTreeInode aciTreeInodeMaybe aciTreeOpen').removeAttr('aria-expanded').addClass('aciTreeLeaf');
+            },
+            // set as inner node
+            inode: function(items, branch) {
+                items.removeClass('aciTreeLeaf').attr('aria-expanded', false).addClass(branch ? 'aciTreeInode' : 'aciTreeInodeMaybe');
+            },
+            // set as open/closed
+            toggle: function(items, state) {
+                items.attr('aria-expanded', state).toggleClass('aciTreeOpen', state);
+            }
         },
         // a small queue implementation
         _queue: function(context, options) {
@@ -452,7 +489,7 @@
         },
         // process item loading with AJAX
         // loaded data need to be array of item objects
-        // each item can have childrens (defined as itemData.childs - array of item objects)
+        // each item can have children (defined as itemData.branch - array of item data objects)
         ajaxLoad: function(item, options) {
             if (item && this.isBusy(item)) {
                 // delay the load if busy
@@ -471,7 +508,7 @@
                 this._loading(item);
                 this._trigger(item, 'wasloaded', options);
             });
-            if (!item || this.isFolder(item)) {
+            if (!item || this.isInode(item)) {
                 // add the task to the queue
                 this._instance.queue.push(function(complete) {
                     // a way to cancel the load
@@ -490,10 +527,6 @@
                     // loaded data need to be array of item objects
                     var settings = $.extend({
                     }, this._instance.options.ajax);
-                    // options.jsonUrl was deprecated and will be removed
-                    if (!settings.url && this._instance.options.jsonUrl) {
-                        settings.url = this._instance.options.jsonUrl;
-                    }
                     this._instance.options.ajaxHook.call(this, item, settings);
                     settings.success = this.proxy(function(itemList) {
                         if (itemList && (itemList instanceof Array) && itemList.length) {
@@ -517,24 +550,24 @@
                                     }));
                                 }
                             };
-                            if (!item || this.isFolder(item)) {
+                            if (!item || this.isInode(item)) {
                                 process.apply(this);
                             } else {
-                                this.setFolder(item, this._inner(options, {
+                                this.setInode(item, this._inner(options, {
                                     success: process,
                                     fail: options.fail
                                 }));
                             }
                         } else {
-                            // the AJAX response was not just right (or not a folder)
+                            // the AJAX response was not just right (or not a inode)
                             var process = function() {
                                 this._fail(item, options);
                                 complete();
                             };
-                            if (!item || this.isFile(item)) {
+                            if (!item || this.isLeaf(item)) {
                                 process.apply(this);
                             } else {
-                                this.setFile(item, this._inner(options, {
+                                this.setLeaf(item, this._inner(options, {
                                     success: process,
                                     fail: process
                                 }));
@@ -554,7 +587,7 @@
         },
         // process item loading
         // options.itemData need to be array of item objects
-        // each item can have childrens (defined as itemData.childs - array of item objects)
+        // each item can have children (defined as itemData.branch - array of item data objects)
         loadFrom: function(item, options) {
             if (item && this.isBusy(item)) {
                 // delay the load if busy
@@ -573,7 +606,7 @@
                 this._loading(item);
                 this._trigger(item, 'wasloaded', options);
             });
-            if (!item || this.isFolder(item)) {
+            if (!item || this.isInode(item)) {
                 // a way to cancel the load
                 if (!this._trigger(item, 'beforeload', options)) {
                     this._fail(item, options);
@@ -595,20 +628,20 @@
                             this._createBranch(item, options);
                         }
                     };
-                    if (!item || this.isFolder(item)) {
+                    if (!item || this.isInode(item)) {
                         process.apply(this);
                     } else {
-                        this.setFolder(item, this._inner(options, {
+                        this.setInode(item, this._inner(options, {
                             success: process,
                             fail: options.fail
                         }));
                     }
                 } else {
-                    // this is not a folder
-                    if (!item || this.isFile(item)) {
+                    // this is not a inode
+                    if (!item || this.isLeaf(item)) {
                         this._fail(item, options);
                     } else {
-                        this.setFile(item, this._inner(options, {
+                        this.setLeaf(item, this._inner(options, {
                             success: options.fail,
                             fail: options.fail
                         }));
@@ -630,7 +663,7 @@
                 this._loading(item);
                 this._trigger(item, 'notloaded', options);
             });
-            if (!item || this.isFolder(item)) {
+            if (!item || this.isInode(item)) {
                 // a way to cancel the unload
                 if (!this._trigger(item, 'beforeunload', options)) {
                     this._fail(item, options);
@@ -643,10 +676,10 @@
                     return;
                 }
                 var cancel = false;
-                var childs = this.childrens(item, true);
-                childs.each(this.proxy(function(element) {
+                var children = this.children(item, true);
+                children.each(this.proxy(function(element) {
                     var item = $(element);
-                    if (this.isFolder(item)) {
+                    if (this.isInode(item)) {
                         if (this.isOpen(item)) {
                             // a way to cancel from beforeclose
                             if (!this._trigger(item, 'beforeclose', options)) {
@@ -673,10 +706,10 @@
                     this._fail(item, options);
                     return;
                 }
-                childs.each(this.proxy(function(element) {
+                children.each(this.proxy(function(element) {
                     // trigger the events before DOM changes
                     var item = $(element);
-                    if (this.isFolder(item)) {
+                    if (this.isInode(item)) {
                         if (this.isOpen(item)) {
                             this._trigger(item, 'closed', options);
                         }
@@ -727,8 +760,8 @@
                     this._fail(item, options);
                     return;
                 }
-                if (this.isFolder(item) && this.wasLoad(item)) {
-                    // unload the folder then remove
+                if (this.isInode(item) && this.wasLoad(item)) {
+                    // unload the inode then remove
                     this.unload(item, this._inner(options, {
                         success: function() {
                             this._success(item, options);
@@ -752,13 +785,13 @@
                 this._fail(item, options);
             }
         },
-        // open item childrens
-        _openChilds: function(item, options) {
+        // open item children
+        _openChildren: function(item, options) {
             if (options.expand) {
                 var queue = this._instance.queue;
-                this.folders(this.childrens(item)).each(function() {
+                this.inodes(this.children(item)).each(function() {
                     var item = $(this);
-                    // queue node opening                    
+                    // queue node opening
                     queue.push(function(complete) {
                         this.open(item, this._inner(options));
                         complete();
@@ -783,13 +816,13 @@
                 options.unique = false;
             }
             // open the node
-            item.addClass('aciTreeOpen');
-            this._updateOddEvenChilds(item);
+            this._coreDOM.toggle(item, true);
+            this._updateOddEvenChildren(item);
             this._animate(item, true, options.unanimated, function() {
-                this._openChilds(item, options);
+                this._openChildren(item, options);
             });
         },
-        // open item and his childs if requested
+        // open item and his children if requested
         open: function(item, options) {
             options = this._options(options, function() {
                 if (this.isOpenPath(item)) {
@@ -803,7 +836,7 @@
             }, function() {
                 this._trigger(item, 'wasopened', options);
             });
-            if (this.isFolder(item)) {
+            if (this.isInode(item)) {
                 // a way to cancel the open
                 if (!this._trigger(item, 'beforeopen', options)) {
                     this._fail(item, options);
@@ -811,7 +844,7 @@
                 }
                 if (this.isOpen(item)) {
                     options.success = options.notify;
-                    this._openChilds(item, options);
+                    this._openChildren(item, options);
                 } else {
                     if (this.wasLoad(item)) {
                         this._openItem(item, options);
@@ -829,15 +862,15 @@
                 this._fail(item, options);
             }
         },
-        // close item childrens
-        _closeChilds: function(item, options) {
+        // close item children
+        _closeChildren: function(item, options) {
             if (this._instance.options.empty) {
                 // unload on close
                 options.unanimated = true;
                 this.unload(item, options);
             } else if (options.collapse) {
                 var queue = this._instance.queue;
-                this.folders(this.childrens(item)).each(function() {
+                this.inodes(this.children(item)).each(function() {
                     var item = $(this);
                     // queue node close
                     queue.push(function(complete) {
@@ -861,12 +894,12 @@
                 options.unanimated = true;
             }
             // close the item
-            item.removeClass('aciTreeOpen');
+            this._coreDOM.toggle(item, false);
             this._animate(item, false, options.unanimated, function() {
-                this._closeChilds(item, options);
+                this._closeChildren(item, options);
             });
         },
-        // close item and his childs if requested
+        // close item and his children if requested
         close: function(item, options) {
             options = this._options(options, function() {
                 if (this.isOpenPath(item)) {
@@ -880,7 +913,7 @@
             }, function() {
                 this._trigger(item, 'wasclosed', options);
             });
-            if (this.isFolder(item)) {
+            if (this.isInode(item)) {
                 // a way to cancel the close
                 if (!this._trigger(item, 'beforeclose', options)) {
                     this._fail(item, options);
@@ -890,7 +923,7 @@
                     this._closeItem(item, options);
                 } else if (this.wasLoad(item)) {
                     options.success = options.notify;
-                    this._closeChilds(item, options);
+                    this._closeChildren(item, options);
                 } else {
                     this._notify(item, options);
                 }
@@ -903,14 +936,14 @@
             if (this.isOpenPath(item)) {
                 if (!item.hasClass('aciTreeHidden')) {
                     item.addClass('aciTreeVisible');
-                    var childs = this.childrens(item);
-                    this.folders(childs, true).each(this.proxy(function(element) {
+                    var children = this.children(item);
+                    this.inodes(children, true).each(this.proxy(function(element) {
                         var item = $(element);
                         if (!item.hasClass('aciTreeVisible')) {
                             this._updateVisible(item);
                         }
                     }, true));
-                    childs.addClass('aciTreeVisible');
+                    children.addClass('aciTreeVisible');
                 }
             } else {
                 if (item.hasClass('aciTreeVisible')) {
@@ -923,9 +956,9 @@
             options = this._options(options);
             if (this.isItem(item)) {
                 var queue = this._instance.queue;
-                var exclude = item.add(this.path(item)).add(this.childrens(item, true));
+                var exclude = item.add(this.path(item)).add(this.children(item, true));
                 // close all other open nodes (not including this item and his parents)
-                this.folders(this.childrens(null, true, true), true).not(exclude).each(function() {
+                this.inodes(this.children(null, true, true), true).not(exclude).each(function() {
                     var item = $(this);
                     // add node to close queue
                     queue.push(function(complete) {
@@ -948,7 +981,7 @@
             }, function() {
                 this._trigger(item, 'togglefail', options);
             });
-            if (this.isFolder(item)) {
+            if (this.isInode(item)) {
                 // a way to cancel the toggle
                 if (!this._trigger(item, 'beforetoggle', options)) {
                     this._fail(item, options);
@@ -996,7 +1029,7 @@
             if (this.isItem(item)) {
                 var queue = this._instance.queue;
                 // process closed nodes
-                this.folders(this.path(item), false).each(function() {
+                this.inodes(this.path(item), false).each(function() {
                     var item = $(this);
                     // add node to open queue
                     queue.push(function(complete) {
@@ -1137,10 +1170,12 @@
         // create tree branch
         // options.itemData need to be the same format as for .append
         _createBranch: function(item, options) {
-            var queue = this._instance.queue;
+            var task = new this._task(this._instance.queue, function() {
+                this._success(item, options);
+            });
             var process = this.proxy(function(item, itemList) {
                 if (item) {
-                    item.first().removeClass('aciTreeFolderMaybe').addClass('aciTreeFolder');
+                    item.first().removeClass('aciTreeInodeMaybe').addClass('aciTreeInode');
                 }
                 // use .append to add new items
                 this.append(item, this._inner(options, {
@@ -1148,12 +1183,12 @@
                         var itemData;
                         for (var i in options.itemData) {
                             itemData = options.itemData[i];
-                            // childs need to be array of item objects
-                            if (itemData.childs && (itemData.childs instanceof Array) && itemData.childs.length) {
+                            // children need to be array of item objects
+                            if (itemData.branch && (itemData.branch instanceof Array) && itemData.branch.length) {
                                 (function(item, itemData) {
                                     // queue the children creation
-                                    queue.push(function(complete) {
-                                        process(item, itemData.childs);
+                                    task.push(function(complete) {
+                                        process(item, itemData.branch);
                                         if (itemData.open) {
                                             this.open(item);
                                         }
@@ -1170,11 +1205,8 @@
                 }));
             });
             // run at least once
-            queue.push(function(complete) {
+            task.push(function(complete) {
                 process(item, options.itemData);
-                complete();
-            }).push(function(complete) {
-                this._success(item, options);
                 complete();
             });
         },
@@ -1219,10 +1251,10 @@
             this._setOddEven(visible, odd);
         },
         // update odd/even row state
-        _updateOddEvenChilds: function(item) {
+        _updateOddEvenChildren: function(item) {
             var odd = item.hasClass('aciTreeOdd');
-            var childs = this.childrens(item);
-            this._setOddEven(childs, odd);
+            var children = this.children(item);
+            this._setOddEven(children, odd);
         },
         // process item before inserting into the DOM
         _itemHook: function(parent, item, itemData, level) {
@@ -1232,9 +1264,9 @@
         },
         // create item by itemData
         _createItem: function(itemData, level) {
-            var item = $('<li class="aciTreeLi aciTreeLevel' + level + '"></li>').data('itemData' + this._instance.nameSpace, $.extend({
+            var item = $('<li class="aciTreeLi aciTreeLevel' + level + '" role="treeitem" aria-level="' + (level + 1) + '" tabindex="-1" aria-selected="false"></li>').data('itemData' + this._instance.nameSpace, $.extend({
             }, itemData, {
-                childs: itemData.childs && itemData.childs.length
+                branch: itemData.branch && itemData.branch.length
             }));
             var start = '<div class="aciTreeLine">', end = '';
             for (var i = 0; i < level; i++) {
@@ -1251,10 +1283,10 @@
                 }
             }
             item.append(start + '<span class="aciTreeText">' + itemData.label + '</span></span></div>' + end + '</div>');
-            if (itemData.isFolder || (itemData.isFolder === null)) {
-                item.addClass((itemData.isFolder || (itemData.childs && itemData.childs.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
+            if (itemData.inode || (itemData.inode === null)) {
+                this._coreDOM.inode(item, itemData.inode || (itemData.branch && itemData.branch.length));
             } else {
-                item.addClass('aciTreeFile');
+                this._coreDOM.leaf(item);
             }
             return item;
         },
@@ -1310,7 +1342,7 @@
             // ensure we have a UL in place
             var container = item.children('.aciTreeUl');
             if (!container.length) {
-                container = $('<ul class="aciTreeUl" style="display:none"></ul>');
+                container = $('<ul class="aciTreeUl" role="group" style="display:none"></ul>');
                 item.append(container);
             }
             return container;
@@ -1332,7 +1364,7 @@
                 this._trigger(item, 'appendfail', options);
             });
             if (item) {
-                if (this.isFolder(item)) {
+                if (this.isInode(item)) {
                     // a way to cancel the append
                     if (!this._trigger(item, 'beforeappend', options)) {
                         this._fail(item, options);
@@ -1343,7 +1375,7 @@
                     var list = this._createItems(container, null, null, options.itemData, this.level(item) + 1);
                     if (list.length) {
                         // some items created
-                        item.addClass('aciTreeFolder').removeClass('aciTreeFolderMaybe');
+                        item.addClass('aciTreeInode').removeClass('aciTreeInodeMaybe');
                         this._updateFirstLast(item, last);
                         if (this.isHidden(item)) {
                             list.addClass('aciTreeHidden');
@@ -1355,7 +1387,7 @@
                         list.each(this.proxy(function(element) {
                             this._trigger($(element), 'added', options);
                         }, true));
-                    } else if (!this.hasChildrens(item, true)) {
+                    } else if (!this.hasChildren(item, true)) {
                         container.remove();
                     }
                     options.items = list;
@@ -1382,7 +1414,7 @@
                         this._trigger($(element), 'added', options);
                     }, true));
                     this._animate(null, true, !this._instance.options.animateRoot || options.unanimated);
-                } else if (!this.hasChildrens(null, true)) {
+                } else if (!this.hasChildren(null, true)) {
                     container.remove();
                 }
                 options.items = list;
@@ -1483,10 +1515,10 @@
             }
             return $([]);
         },
-        // get item childrens
-        // if `branch` is TRUE then all childrens are returned
+        // get item children
+        // if `branch` is TRUE then all children are returned
         // if `hidden` is TRUE then the hidden items will be considered too
-        childrens: function(item, branch, hidden) {
+        children: function(item, branch, hidden) {
             if (!item) {
                 item = this._instance.jQuery;
             }
@@ -1512,57 +1544,57 @@
             }
             return items;
         },
-        // filter only folders from items
+        // filter only inner nodes from items
         // if state is set then filter only open/closed ones
-        folders: function(items, state) {
+        inodes: function(items, state) {
             if (state !== undefined) {
                 if (state) {
                     return items.filter('.aciTreeOpen');
                 } else {
-                    return items.filter('.aciTreeFolder,.aciTreeFolderMaybe').not('.aciTreeOpen');
+                    return items.filter('.aciTreeInode,.aciTreeInodeMaybe').not('.aciTreeOpen');
                 }
             }
-            return items.filter('.aciTreeFolder,.aciTreeFolderMaybe');
+            return items.filter('.aciTreeInode,.aciTreeInodeMaybe');
         },
-        // filter only files from items
-        files: function(items) {
-            return items.filter('.aciTreeFile');
+        // filter only leaf nodes from items
+        leaves: function(items) {
+            return items.filter('.aciTreeLeaf');
         },
-        // test if item is a folder
-        isFolder: function(item) {
-            return item && (item.hasClass('aciTreeFolder') || item.hasClass('aciTreeFolderMaybe'));
+        // test if is a inner node
+        isInode: function(item) {
+            return item && (item.hasClass('aciTreeInode') || item.hasClass('aciTreeInodeMaybe'));
         },
-        // test if item is a file
-        isFile: function(item) {
-            return item && item.hasClass('aciTreeFile');
+        // test if is a leaf node
+        isLeaf: function(item) {
+            return item && item.hasClass('aciTreeLeaf');
         },
         // test if item was loaded
         wasLoad: function(item) {
             if (!item) {
                 return this._instance.jQuery.children('.aciTreeUl').length > 0;
             }
-            if (this.isFolder(item)) {
+            if (this.isInode(item)) {
                 return item.children('.aciTreeUl').length > 0;
             }
             return true;
         },
-        // set item as folder
-        setFolder: function(item, options) {
+        // set item as inner node
+        setInode: function(item, options) {
             options = this._options(options, function() {
-                this._trigger(item, 'folderset', options);
+                this._trigger(item, 'inodeset', options);
             }, function() {
-                this._trigger(item, 'folderfail', options);
+                this._trigger(item, 'inodefail', options);
             }, function() {
-                this._trigger(item, 'wasfolder', options);
+                this._trigger(item, 'wasinode', options);
             });
             if (this.isItem(item)) {
                 // a way to cancel the operation
-                if (!this._trigger(item, 'beforefolder', options)) {
+                if (!this._trigger(item, 'beforeinode', options)) {
                     this._fail(item, options);
                     return;
                 }
-                if (this.isFile(item)) {
-                    item.removeClass('aciTreeFile').addClass('aciTreeFolder');
+                if (this.isLeaf(item)) {
+                    this._coreDOM.inode(item);
                     this._success(item, options);
                 } else {
                     this._notify(item, options);
@@ -1571,24 +1603,24 @@
                 this._fail(item, options);
             }
         },
-        // set item as file
-        setFile: function(item, options) {
+        // set item as leaf node
+        setLeaf: function(item, options) {
             options = this._options(options, function() {
-                this._trigger(item, 'fileset', options);
+                this._trigger(item, 'leafset', options);
             }, function() {
-                this._trigger(item, 'filefail', options);
+                this._trigger(item, 'leaffail', options);
             }, function() {
-                this._trigger(item, 'wasfile', options);
+                this._trigger(item, 'wasleaf', options);
             });
             if (this.isItem(item)) {
                 // a way to cancel the operation
-                if (!this._trigger(item, 'beforefile', options)) {
+                if (!this._trigger(item, 'beforeleaf', options)) {
                     this._fail(item, options);
                     return;
                 }
-                if (this.isFolder(item)) {
+                if (this.isInode(item)) {
                     var process = function() {
-                        item.removeClass('aciTreeFolder aciTreeFolderMaybe aciTreeOpen').addClass('aciTreeFile');
+                        this._coreDOM.leaf(item);
                         this._success(item, options);
                     };
                     if (this.wasLoad(item)) {
@@ -1713,7 +1745,7 @@
                     this._notify(item, options);
                 } else {
                     item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
-                    this.childrens(item, true).removeClass('aciTreeVisible').addClass('aciTreeHidden');
+                    this.children(item, true).removeClass('aciTreeVisible').addClass('aciTreeHidden');
                     var parent = this.parent(item);
                     this._updateFirstLast(parent.length ? parent : null, item);
                     this._updateOddEven(item);
@@ -1803,10 +1835,10 @@
         isClosed: function(item) {
             return !this.isOpen(item);
         },
-        // test if item has childrens
+        // test if item has children
         // if `hidden` is TRUE then the hidden items will be considered too
-        hasChildrens: function(item, hidden) {
-            return this.childrens(item, null, hidden).length > 0;
+        hasChildren: function(item, hidden) {
+            return this.children(item, null, hidden).length > 0;
         },
         // test if item has siblings
         // if `hidden` is TRUE then the hidden items will be considered too
@@ -2012,6 +2044,11 @@
         // set loading state
         _loading: function(item, state) {
             if (item) {
+                if (state) {
+                    item.attr('aria-busy', true);
+                } else {
+                    item.removeAttr('aria-busy');
+                }
                 item.toggleClass('aciTreeLoad', state);
             } else if (state) {
                 this._loader(state);
@@ -2025,10 +2062,10 @@
                         this._loader();
                     }), this._instance.options.loaderDelay);
                 }
-                this._instance.jQuery.toggleClass('aciTreeLoad', true);
+                this._instance.jQuery.addClass('aciTreeLoad');
                 window.clearTimeout(this._private.loaderHide);
                 this._private.loaderHide = window.setTimeout(this.proxy(function() {
-                    this._instance.jQuery.toggleClass('aciTreeLoad', false);
+                    this._instance.jQuery.removeClass('aciTreeLoad');
                 }), this._instance.options.loaderDelay * 2);
             }
         },
@@ -2086,7 +2123,7 @@
                 return;
             }
             this._instance.locked = true;
-            this._instance.jQuery.toggleClass('aciTreeLoad', true);
+            this._instance.jQuery.addClass('aciTreeLoad').attr('aria-busy', true);
             this._instance.queue.destroy();
             this._destroyHook(false);
             // unload the entire treeview
@@ -2096,7 +2133,7 @@
                     window.clearInterval(this._private.loaderInterval);
                     this._destroyHook(true);
                     this._instance.jQuery.unbind(this._instance.nameSpace).off(this._instance.nameSpace, '.aciTreeButton').off(this._instance.nameSpace, '.aciTreeLine');
-                    this._instance.jQuery.removeClass('aciTree' + this._instance.index).toggleClass('aciTreeLoad', false);
+                    this._instance.jQuery.removeClass('aciTree' + this._instance.index + ' aciTreeLoad').removeAttr('role aria-busy');
                     this._instance.locked = false;
                     // call the parent
                     this._super();
@@ -2104,7 +2141,7 @@
                     this._success(null, options);
                 }),
                 fail: function() {
-                    this._instance.jQuery.toggleClass('aciTreeLoad', false);
+                    this._instance.jQuery.removeClass('aciTreeLoad');
                     this._instance.locked = false;
                     this._trigger(null, 'destroyfail', options);
                     this._fail(null, options);

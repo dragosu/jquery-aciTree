@@ -1,12 +1,12 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
@@ -41,8 +41,8 @@
             this._super();
         },
         // update item (create tree branch if requested)
-        // if options.itemData have the 'childs' property set then
-        // will be like when calling 'loadFrom' for the item
+        // if options.itemData have the `branch` property set then
+        // will be like when calling .loadFrom for the item
         update: function(item, options) {
             options = this._options(options, function() {
                 this._trigger(item, 'updated', options);
@@ -72,20 +72,20 @@
                         });
                     }
                 };
-                if (options.itemData.isFolder || (options.itemData.isFolder === null)) {
+                if (options.itemData.inode || (options.itemData.inode === null)) {
                     var process = function() {
                         // set item ID/text/icon
                         details.apply(this);
-                        item.removeClass('aciTreeFolder aciTreeFolderMaybe').addClass((options.itemData.isFolder ||
-                                (options.itemData.childs && options.itemData.childs.length)) ? 'aciTreeFolder' : 'aciTreeFolderMaybe');
-                        if (options.itemData.childs) {
+                        item.removeClass('aciTreeInode aciTreeInodeMaybe').addClass((options.itemData.inode ||
+                                (options.itemData.branch && options.itemData.branch.length)) ? 'aciTreeInode' : 'aciTreeInodeMaybe');
+                        if (options.itemData.branch) {
                             if (this.wasLoad(item)) {
                                 this.unload(item, this._inner(options, {
                                     success: function() {
                                         this.loadFrom(item, this._inner(options, {
                                             success: options.success,
                                             fail: options.fail,
-                                            itemData: options.itemData.childs
+                                            itemData: options.itemData.branch
                                         }));
                                     },
                                     fail: options.fail
@@ -94,26 +94,26 @@
                                 this.loadFrom(item, this._inner(options, {
                                     success: options.success,
                                     fail: options.fail,
-                                    itemData: options.itemData.childs
+                                    itemData: options.itemData.branch
                                 }));
                             }
                         } else {
                             this._success(item, options);
                         }
                     };
-                    if (this.isFolder(item)) {
+                    if (this.isInode(item)) {
                         process.apply(this);
                     } else {
-                        this.setFolder(item, this._inner(options, {
+                        this.setInode(item, this._inner(options, {
                             success: process,
                             fail: options.fail
                         }));
                     }
                 } else {
-                    if (this.isFile(item)) {
+                    if (this.isLeaf(item)) {
                         details.apply(this);
                     } else {
-                        this.setFile(item, this._inner(options, {
+                        this.setLeaf(item, this._inner(options, {
                             success: details,
                             fail: options.fail
                         }));
@@ -130,7 +130,7 @@
             var process = this.proxy(function(item, callback, next) {
                 var child = next ? this.next(item) : this.first(item);
                 if (child.length) {
-                    if (this.isFolder(child)) {
+                    if (this.isInode(child)) {
                         if (this.wasLoad(child)) {
                             queue.push(function(complete) {
                                 callback.call(this, child);
@@ -235,11 +235,11 @@
         },
         // update child level
         _updateChildLevel: function(item, fromLevel, toLevel) {
-            this.childrens(item).each(this.proxy(function(element) {
+            this.children(item).each(this.proxy(function(element) {
                 var item = $(element);
                 this._updateItemLevel(item, fromLevel, toLevel);
-                if (this.isFolder(item)) {
-                    this.childrens(item).each(this.proxy(function(element) {
+                if (this.isInode(item)) {
+                    this.children(item).each(this.proxy(function(element) {
                         this._updateChildLevel($(element), fromLevel + 1, toLevel + 1);
                     }, true));
                 }
@@ -302,8 +302,8 @@
                         prev = parent.length ? parent : this.first();
                     }
                     item.insertBefore(before);
-                    if (parent.length && !this.hasChildrens(parent, true)) {
-                        this.setFile(parent);
+                    if (parent.length && !this.hasChildren(parent, true)) {
+                        this.setLeaf(parent);
                     }
                     this._updateLevel(item);
                     this._updateFirstLast(parent.length ? parent : null);
@@ -342,8 +342,8 @@
                         prev = parent.length ? parent : this.first();
                     }
                     item.insertAfter(after);
-                    if (parent.length && !this.hasChildrens(parent, true)) {
-                        this.setFile(parent);
+                    if (parent.length && !this.hasChildren(parent, true)) {
+                        this.setLeaf(parent);
                     }
                     this._updateLevel(item);
                     this._updateFirstLast(parent.length ? parent : null);
@@ -365,7 +365,7 @@
                 this._trigger(item, 'childfail', options);
             });
             var parent = options.parent;
-            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildrens(parent, true) && (item.get(0) != parent.get(0))) {
+            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildren(parent, true) && (item.get(0) != parent.get(0))) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforechild', options)) {
                     this._fail(item, options);
@@ -379,8 +379,8 @@
                     }
                     var container = this._createContainer(parent);
                     container.append(item);
-                    if (oldParent.length && !this.hasChildrens(oldParent, true)) {
-                        this.setFile(oldParent);
+                    if (oldParent.length && !this.hasChildren(oldParent, true)) {
+                        this.setLeaf(oldParent);
                     }
                     this._updateLevel(item);
                     this._updateFirstLast(oldParent.length ? oldParent : null);
@@ -390,10 +390,10 @@
                     this._trigger(item, 'childset', options);
                     this._success(item, options);
                 };
-                if (this.isFolder(parent)) {
+                if (this.isInode(parent)) {
                     process.apply(this);
                 } else {
-                    this.setFolder(parent, this._inner(options, {
+                    this.setInode(parent, this._inner(options, {
                         success: process,
                         fail: options.fail
                     }));
@@ -404,7 +404,7 @@
         },
         // search a 'path' ID from a parent
         _search: function(parent, pathId) {
-            var items = this.childrens(parent);
+            var items = this.children(parent);
             var item, id, length, found, exact = false;
             for (var i = 0, size = items.length; i < size; i++) {
                 item = items.eq(i);
@@ -420,7 +420,7 @@
             }
             if (found) {
                 if (!exact) {
-                    // try to search childrens
+                    // try to search children
                     var child = this._search(found, pathId);
                     if (child) {
                         return child;
@@ -518,11 +518,11 @@
                     this._trigger(item, 'filtered', options);
                     this._success(item, options);
                 });
-                // process childrens
+                // process children
                 var process = this.proxy(function(parent) {
-                    var childs = this.childrens(parent, false, true);
+                    var children = this.children(parent, false, true);
                     var found = false;
-                    childs.each(this.proxy(function(element) {
+                    children.each(this.proxy(function(element) {
                         var item = $(element);
                         if (this._instance.options.filterHook.call(this, item, search, regexp)) {
                             if (!first) {
@@ -533,7 +533,7 @@
                         } else {
                             item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
                         }
-                        if (this.isFolder(item)) {
+                        if (this.isInode(item)) {
                             task.push(function(complete) {
                                 process(item);
                                 complete();
@@ -545,7 +545,7 @@
                             this._showHidden(parent);
                         }
                         if (!parent || (this.isOpenPath(parent) && this.isOpen(parent))) {
-                            childs.not('.aciTreeHidden').addClass('aciTreeVisible');
+                            children.not('.aciTreeHidden').addClass('aciTreeVisible');
                         }
                         this._updateFirstLast(parent, this._firstLast(parent));
                     }
@@ -565,7 +565,7 @@
         // get last tree item
         _lastAll: function(item, callback, load) {
             if (item) {
-                if (this.isFolder(item)) {
+                if (this.isInode(item)) {
                     if (this.wasLoad(item)) {
                         this._lastAll(this.last(item), callback, load);
                         return;
@@ -590,7 +590,7 @@
         // when `load` is TRUE will also try to load nodes
         _nextAll: function(item, callback, load) {
             if (item) {
-                if (this.isFolder(item)) {
+                if (this.isInode(item)) {
                     if (this.wasLoad(item)) {
                         callback.call(this, this.first(item));
                         return;
@@ -635,7 +635,7 @@
             if (item) {
                 var prev = this.prev(item);
                 if (prev.length) {
-                    if (this.isFolder(prev)) {
+                    if (this.isInode(prev)) {
                         this._lastAll(prev, callback, load);
                     } else {
                         callback.call(this, prev);

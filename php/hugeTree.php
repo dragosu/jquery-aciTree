@@ -42,12 +42,12 @@ class HugeTree extends Tree {
         switch ($type) {
             case 'folder':
                 return array_merge(parent::itemProps($itemId), array(
-                            'isFolder' => true,
+                            'inode' => true,
                             'icon' => 'folder'
                         ));
             case 'file':
                 return array_merge(parent::itemProps($itemId), array(
-                            'isFolder' => false,
+                            'inode' => false,
                             'icon' => 'file'
                         ));
         }

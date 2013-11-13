@@ -8,7 +8,7 @@
     "ui",
     "ajax"
     ],
-    "version": "3.7.0",
+    "version": "4.0.0",
     "author": {
         "name": "Dragos Ursu",
         "email":"dragosu@acoderinsights.ro",
@@ -32,7 +32,7 @@
     "docs": "http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery",
     "bugs": "https://github.com/dragosu/jquery-aciTree/issues",
     "dependencies": {
-        "jquery": ">=1.7.1",
+        "jquery": ">=1.9.0",
         "aciPlugin": ">=1.5.1"
     }
 }

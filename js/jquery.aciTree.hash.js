@@ -1,18 +1,18 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
 /*
  * This extension adds hash/fragment support using aciFragment, it opens/select item(s) based on variables stored in the fragment part of the URL.
- * The states are loaded from the URL fragment and set on treeview init. Multiple item IDs separated with ";" are supported for 
+ * The states are loaded from the URL fragment and set on treeview init. Multiple item IDs separated with ";" are supported for
  * opening/selecting deep items (if loading nodes is required).
  * Require aciFragment https://github.com/dragosu/jquery-aciFragment and the utils extension for finding items by ID.
  */
@@ -58,7 +58,7 @@
         },
         // override _initHook
         _initHook: function() {
-            if (this.isHash()) {
+            if (this.extHast()) {
                 this._initHash();
             }
             // call the parent
@@ -97,7 +97,7 @@
                 }
             }
             // support selectable extension
-            if (this._instance.options.selectHash && this.isSelectable) {
+            if (this._instance.options.selectHash && this.extSelectable) {
                 var hash = this._private.hashApi.get(this._instance.options.selectHash, '');
                 if (hash.length && (hash != this._private.lastSelect)) {
                     this._private.lastSelect = hash;
@@ -130,15 +130,15 @@
             }
         },
         // test if hash is enabled
-        isHash: function() {
+        extHast: function() {
             return this._instance.options.selectHash || this._instance.options.openHash;
         },
         // override set option
         option: function(option, value) {
-            var hash = this.isHash();
+            var hash = this.extHast();
             // call the parent
             this._super(option, value);
-            if (this.isHash() != hash) {
+            if (this.extHast() != hash) {
                 if (hash) {
                     this._doneHash();
                 } else {

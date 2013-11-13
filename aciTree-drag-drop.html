@@ -33,7 +33,7 @@
                 For the default implementation - check the source code of the <i>sortable</i> extension.</p>
 
             <p>The default implementation (<b>options.sortable</b> needs to be active), you can drag & drop items anywhere, before or after another one,
-                set as a child of a item of type 'file' (it will be transformed in a 'folder' by default), the parent can be changed:</p>
+                set as a child of a leaf node (it will be transformed in a inode by default), the parent can be changed:</p>
 
             <div id="tree1" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/checkbox.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
@@ -83,7 +83,7 @@
                         switch (eventName) {
                             case 'checkdrop':
                                 if (options.isContainer) {
-                                    // a new container was created (for a 'file' item)
+                                    // a new container was created (for a leaf item)
                                     // check the tree level
                                     var target = api.itemFrom(options.hover);
                                     if (api.level(target) >= 2) {
@@ -118,7 +118,7 @@
 
             <br><br><br>
 
-            <p>Limit the items that can be dragged around to just items of type 'file':</p>
+            <p>Limit the items that can be dragged around to just leaf items:</p>
 
             <div id="tree3" class="aciTree"><div>
                     <a style="font-size:10px" href="/source/php/niceJson.php?file=source/aciTree/json/checkbox.json" title="See the JSON data" target="_blank">see the JSON behind this tree</a>
@@ -137,7 +137,7 @@
                     $('#tree3').on('acitree', function(event, api, item, eventName, options) {
                         switch (eventName) {
                             case 'beforedrag':
-                                if (!api.isFile(item)) {
+                                if (!api.isLeaf(item)) {
                                     // mark the item as not draggable
                                     return false;
                                 }

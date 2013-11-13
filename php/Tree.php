@@ -20,7 +20,7 @@ abstract class Tree {
      */
     public function itemProps($itemId) {
         return array(
-            'isFolder' => null, // NULL = maybe a folder, TRUE - is a folder, FALSE - it's not a folder
+            'inode' => null, // NULL = maybe a folder, TRUE - is a folder, FALSE - it's not a folder
             'open' => false, // should open folder?
             'icon' => null // icon CSS class name (if any) can be ARRAY [name, background X, background Y] (in this order)
         );
@@ -30,23 +30,23 @@ abstract class Tree {
         $branch = $this->branch($parentId);
         foreach ($branch as $id => $label) {
             $props = $this->itemProps($id);
-            $childs = array();
+            $list = array();
             if ($children) {
-                $this->_json($id, $childs, $children);
-                if (count($childs) == 0) {
-                    $props['isFolder'] = false;
+                $this->_json($id, $list, $children);
+                if (count($list) == 0) {
+                    $props['inode'] = false;
                 }
             }
             $json[] = array_merge(array(
                 'id' => $id,
                 'label' => $label,
-                'childs' => $childs
+                'branch' => $list
             ), $props);
         }
     }
 
     /**
-     * Output tree JSON (array of id/item/props/items with props.isFolder depending if it's a TREE folder or not).
+     * Output tree JSON (array of id/item/props/items with props.inode depending if it's a TREE folder or not).
      * @param string $parentId
      * @param bool $children - include children?
      */

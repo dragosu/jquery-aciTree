@@ -1,12 +1,12 @@
 
 /*
- * aciTree jQuery Plugin v3.7.0
+ * aciTree jQuery Plugin v4.0.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Require jQuery Library >= v1.7.1 http://jquery.com
+ * Require jQuery Library >= v1.9.0 http://jquery.com
  * + aciPlugin >= v1.5.1 https://github.com/dragosu/jquery-aciPlugin
  */
 
@@ -20,15 +20,9 @@
  *   ...
  *   radio: true,                       // TRUE means the item will have a radio button
  *   checked: false,                    // if should be checked or not
- *   radioName: 'radio_field'           // the radio button name attribute ('options.radioName' will be used by default)
  *   ...
  * }
  *
- * Note: the radio button name need to be the same for all direct childrens of a parent.
- * When using the default 'options.radioName' the parent item ID will be added at the end like: '[options.radioName]-[parentId]'.
- * The item ID must be unique.
- *
- * The radio button value is the item ID.
  */
 
 (function($, window, undefined) {
@@ -37,267 +31,225 @@
 
     var options = {
         radio: false,                   // if TRUE then each item will have a radio button
-        radioName: 'radio',             // default radio button field name
-        radioChain: true                // when TRUE the radio buttons will be chained together (the selection will propagate to the parents/childrens)
+        radioChain: true,               // if TRUE the selection will propagate to the parents/children
+        radioBreak: true                // if TRUE then a missing radio button will break the chaining
     };
 
     // aciTree radio extension
 
     var aciTree_radio = {
         // init radio
-        _initRadio: function() {
+        _radioInit: function() {
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
                     case 'loaded':
-                        if (item && api._instance.options.radioChain) {
-                            api._loadRadio(item);
+                        if (item) {
+                            // check/update on item load
+                            api._radioLoad(item);
                         }
-                        break;
-                    case 'focused':
-                        // support 'selectable' extension
-                        api._radio(api.selected()).focus();
-                        break;
-                    case 'selected':
-                        // support 'selectable' extension
-                        api._radio(item).focus();
                         break;
                 }
             }).bind('keydown' + this._private.nameSpace, this.proxy(function(e) {
                 switch (e.which) {
-                    case 9: // tab
                     case 32: // space
                         // support 'selectable' extension
-                        if (this.isSelectable) {
-                            var selected = this.selected();
-                            if (this.hasRadio(selected)) {
-                                if (this._lastFocus().get(0) == this._instance.jQuery.get(0)) {
-                                    this._radio(selected).focus().trigger(e);
+                        if (this.extSelectable) {
+                            var item = this.selected();
+                            if (this.hasRadio(item)) {
+                                if (!this.isChecked(item)) {
+                                    this.check(item, {
+                                        check: true
+                                    });
                                 }
                                 e.stopImmediatePropagation();
+                                // prevent page scroll
+                                e.preventDefault();
                             }
                         }
                         break;
                 }
             })).on('click' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
-                if ($(e.target).hasClass('aciTreeItem')) {
-                    var item = this.itemFrom(e.target);
-                    if (this.hasRadio(item) && !this.isChecked(item)) {
-                        this._radio(item).focus();
+                var item = this.itemFrom(e.target);
+                if (this.hasRadio(item)) {
+                    if (!this.isChecked(item)) {
                         this.check(item, {
                             check: true
                         });
-                        e.preventDefault();
                     }
-                }
-            })).on('focus' + this._private.nameSpace, 'input[type=radio]', this.proxy(function(e) {
-                // support 'selectable' extension
-                var item = this.itemFrom(e.target);
-                if (this.isSelectable && !this.isSelected(item)) {
-                    this.select(item, true);
-                }
-            })).on('click' + this._private.nameSpace, 'input[type=radio]', this.proxy(function(element, e) {
-                // update item states
-                var item = this.itemFrom(e.target);
-                this.check(item, {
-                    check: $(element).is(':checked')
-                });
-            }, true)).on('keydown' + this._private.nameSpace, 'input[type=radio]', this.proxy(function(e) {
-                // prevent key handling
-                switch (e.which) {
-                    case 38: // up
-                    case 40: // down
-                    case 37: // left
-                    case 39: // right
-                    case 33: // pgup
-                    case 34: // pgdown
-                    case 36: // home
-                    case 35: // end
-                    case 13: // enter
-                    case 27: // escape
-                        e.preventDefault();
-                        break;
-                    case 9: // tab
-                    case 32: // space
-                        // support 'selectable' extension
-                        if (this.isSelectable) {
-                            var item = this.itemFrom(e.target);
-                            if (!this.isSelected(item)) {
-                                return false;
-                            }
-                        }
-                        e.stopPropagation();
-                        break;
+                    e.preventDefault();
                 }
             }));
         },
-        // return the radio
-        _radio: function(item) {
-            return item.first().children('.aciTreeLine').find('input[type=radio]');
-        },
         // override _initHook
         _initHook: function() {
-            if (this.isRadio()) {
-                this._initRadio();
+            if (this.extRadio()) {
+                this._radioInit();
             }
             // call the parent
             this._super();
         },
         // override _itemHook
         _itemHook: function(parent, item, itemData, level) {
-            if (this.isRadio()) {
+            if (this.extRadio()) {
                 // support 'checkbox' extension
-                var checkbox = this.isCheckbox && this.hasCheckbox(item);
+                var checkbox = this.extCheckbox && this.hasCheckbox(item);
                 if (!checkbox && (itemData.radio || (itemData.radio === undefined))) {
-                    this._addRadio(parent, item, itemData);
+                    this._radioDOM.add(parent, item, itemData);
                 }
             }
             this._super(parent, item, itemData, level);
         },
-        // support selectable
-        _selectHook: function(unselected, selected) {
-            var result = this._super(unselected, selected);
-            if (result) {
-                return true;
-            }
-            if (this.isRadio() && this.hasRadio(unselected) && !this.hasRadio(selected)) {
-                var radio = this._radio(unselected);
-                if (radio.is(':focus')) {
-                    radio.blur();
-                    this._instance.jQuery.focus();
-                    return true;
+        // low level DOM functions
+        _radioDOM: {
+            // add item radio
+            add: function(parent, item, itemData) {
+                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeRadio' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck">');
+            },
+            // remove item radio
+            remove: function(item) {
+                var label = item.removeAttr('aria-checked').removeClass('aciTreeRadio aciTreeChecked').children('.aciTreeLine').find('label');
+                if (label.length) {
+                    label.find('*').not('.aciTreeText').remove();
+                    label.find('.aciTreeText').unwrap();
                 }
+            },
+            // (un)check items
+            check: function(items, state) {
+                items.attr('aria-checked', state).toggleClass('aciTreeChecked', state);
             }
-        },
-        // add item radio
-        _addRadio: function(parent, item, itemData) {
-            var id = window.String(itemData.id).replace(/[^a-z0-9_-]/ig, '');
-            var name = itemData.radioName ? itemData.radioName : null;
-            if (!name) {
-                var parentId = this.getId(parent);
-                name = this._instance.options.radioName + '-' + (parentId ? window.String(parentId).replace(/[^a-z0-9_-]/ig, '') : 'root');
-            }
-            item.addClass('aciTreeRadio').children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<input type="radio" name="' +
-                    name + '" value="' + this.getId(item) + '"' + (itemData.checked ? ' checked="checked"' : '') + ' />');
-        },
-        // remove item radio
-        _removeRadio: function(item) {
-            var label = item.removeClass('aciTreeRadio').children('.aciTreeLine').find('label');
-            if (label.length) {
-                label.find('*').not('.aciTreeText').remove();
-                label.find('.aciTreeText').unwrap();
-            }
-        },
-        // override setId
-        setId: function(item, options) {
-            options = this._options(options, function(item) {
-                if (this.isRadio() && this.hasRadio(item)) {
-                    // update field value
-                    this._radio(item).attr('value', this.getId(item));
-                }
-            });
-            this._super(item, options);
         },
         // update item on load
-        _loadRadio: function(item) {
+        _radioLoad: function(item) {
+            if (!this._instance.options.radioChain) {
+                // do not update on load
+                return;
+            }
             if (this.hasRadio(item)) {
                 if (this.isChecked(item)) {
-                    if (!this.radios(this.childrens(item), true).length) {
-                        // the item is checked but no childrens are, check them (all loaded childs should be in the correct state)
-                        this._childRadio(item);
+                    if (!this.radios(this.children(item), true).length) {
+                        // the item is checked but no children are, check the children
+                        this._radioUpdate(item, true);
                     }
                 } else {
-                    // the item is not checked, uncheck childrens (all loaded childs should be in the correct state)
-                    this._childRadio(item);
+                    // the item is not checked, uncheck children
+                    this._radioUpdate(item);
                 }
             }
         },
-        // check/uncheck childrens based on item
-        _childRadio: function(item) {
-            var process = this.proxy(function(item, state) {
-                var radios = this.radios(this.childrens(item));
-                if (state) {
-                    var checked = this.radios(radios, true);
+        // get children list
+        _radioChildren: function(item) {
+            if (this._instance.options.radioBreak) {
+                var list = [];
+                var process = this.proxy(function(item) {
+                    var children = this.children(item);
+                    children.each(this.proxy(function(element) {
+                        var item = $(element);
+                        if (this.hasRadio(item)) {
+                            list.push(element);
+                            process(item);
+                        }
+                    }, true));
+                });
+                process(item);
+                return $(list);
+            } else {
+                var children = this.children(item, true);
+                return this.radios(children);
+            }
+        },
+        // get children across items
+        _radioLevel: function(items) {
+            var list = [];
+            items.each(this.proxy(function(element) {
+                var item = $(element);
+                var children = this.children(item);
+                children.each(this.proxy(function(element) {
+                    var item = $(element);
+                    if (!this._instance.options.radioBreak || this.hasRadio(item)) {
+                        list.push(element);
+                    }
+                }, true));
+            }, true));
+            return $(list);
+        },
+        // update radio state
+        _radioUpdate: function(item, state) {
+            // update siblings
+            var siblings = this.proxy(function(item) {
+                var siblings = this.siblings(item);
+                this._radioDOM.check(this.radios(siblings), false);
+                siblings.each(this.proxy(function(element) {
+                    var item = $(element);
+                    if (!this._instance.options.radioBreak || this.hasRadio(item)) {
+                        this._radioDOM.check(this._radioChildren(item), false);
+                    }
+                }, true));
+            });
+            if (state) {
+                siblings(item);
+            }
+            // update children
+            var checkDown = this.proxy(function(item) {
+                var children = this._radioLevel(item);
+                var radios = this.radios(children);
+                if (radios.length) {
+                    var checked = this.radios(children, true);
                     if (checked.length) {
-                        process(checked, true);
-                        radios = radios.not(checked.first());
-                    } else if (radios.length) {
-                        this._radio(radios).prop('checked', true);
-                        process(radios, true);
-                        radios = radios.slice(1);
+                        checked = checked.first();
+                        this._radioDOM.check(checked, true);
+                        siblings(checked);
+                        checkDown(checked);
+                    } else {
+                        checked = radios.first();
+                        this._radioDOM.check(checked, true);
+                        siblings(checked);
+                        checkDown(checked);
+                    }
+                } else if (children.length) {
+                    checkDown(children);
+                }
+            });
+            if (state) {
+                checkDown(item);
+            } else {
+                this._radioDOM.check(this._radioChildren(item), false);
+            }
+            // update parents
+            var checkUp = this.proxy(function(item) {
+                var parent = this.parent(item);
+                if (parent.length) {
+                    if (this.hasRadio(parent)) {
+                        if (state) {
+                            siblings(parent);
+                        }
+                        this._radioDOM.check(parent, state);
+                        checkUp(parent);
+                    } else {
+                        if (!this._instance.options.radioBreak) {
+                            if (state) {
+                                siblings(parent);
+                            }
+                            checkUp(parent);
+                        }
                     }
                 }
-                radios.each(this.proxy(function(element) {
-                    this._radio($(element)).prop('checked', false);
-                    process($(element), false);
-                }, true));
             });
-            var state = this._radio(item).is(':checked');
-            process(item, state);
-        },
-        // check/uncheck parents based on childrens
-        _parentRadio: function(item) {
-            var process = this.proxy(function(item) {
-                // uncheck siblings
-                this.radios(this.siblings(item)).each(this.proxy(function(element) {
-                    this._radio($(element)).prop('checked', false);
-                    this._childRadio($(element));
-                }, true));
-            });
-            process(item);
-            var state = this._radio(item).is(':checked');
-            // update parent items
-            this.path(item, true).each(this.proxy(function(element) {
-                if (!this.hasRadio($(element))) {
-                    // break on missing radio
-                    return false;
-                }
-                this._radio($(element)).prop('checked', state);
-                process($(element));
-            }, true));
+            if (state !== undefined) {
+                checkUp(item);
+            }
         },
         // test if item have a radio
         hasRadio: function(item) {
             return item && item.hasClass('aciTreeRadio');
         },
-        // change new radio state by parents/childrens
-        _stateRadio: function(item, options) {
-            var parent = this.parent(item);
-            var checked = this.radios(this.childrens(item), true);
-            if (this.hasRadio(parent)) {
-                // parent radio exists
-                if (this.isChecked(parent)) {
-                    // if parent is checked
-                    var siblings = this.radios(this.siblings(item), true);
-                    if (siblings.length) {
-                        this._childRadio(item);
-                    } else {
-                        this._trigger(item, 'radioadded', options);
-                        this.check(item, this._inner(options, {
-                            check: true
-                        }));
-                        return;
-                    }
-                } else {
-                    // if parent is not checked
-                    this._childRadio(item);
-                }
-            } else {
-                // there is no parent radio
-                if (checked.length) {
-                    this._parentRadio(checked);
-                }
-            }
-            this._trigger(item, 'radioadded', options);
-        },
         // set item with/without a radio
         // options.radio if there will be a radio-button or not
         // options.checked the new state (if set)
-        // options.radioName the new name (if set)
         setRadio: function(item, options) {
             options = this._options(options, null, function() {
                 this._trigger(item, 'radiofail', options);
             });
-            if (this.isRadio() && this.isItem(item)) {
+            if (this.extRadio() && this.isItem(item)) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforeradio', options)) {
                     this._fail(item, options);
@@ -305,17 +257,8 @@
                 }
                 var radio = !!options.radio;
                 var checked = options.checked;
-                var radioName = options.radioName;
-                if (radio == this.hasRadio(item)) {
+                if (this.hasRadio(item)) {
                     if (radio) {
-                        if (radioName !== undefined) {
-                            // change name
-                            if (!radioName) {
-                                var parentId = this.getId(this.parent(item));
-                                var radioName = this._instance.options.radioName + '-' + (parentId ? window.String(parentId).replace(/[^a-z0-9_-]/ig, '') : 'root');
-                            }
-                            this._radio(item).attr('name', radioName);
-                        }
                         if (checked !== undefined) {
                             // change state
                             this.check(item, this._inner(options, {
@@ -324,50 +267,40 @@
                         }
                         this._trigger(item, 'radioset', options);
                     } else {
-                        this._trigger(item, 'notradio', options);
+                        this._radioDOM.remove(item);
+                        this._trigger(item, 'radioremoved', options);
                     }
                     this._success(item, options);
-                } else if (radio) {
-                    var process = function() {
-                        this._addRadio(this.parent(item), item.first(), {
-                            id: this.getId(item),
-                            radioName: radioName
-                        });
-                        if (checked === undefined) {
-                            if (this._instance.options.radioChain) {
-                                this._stateRadio(item, options);
+                } else {
+                    if (radio) {
+                        var process = function() {
+                            this._radioDOM.add(this.parent(item), item, {
+                            });
+                            if (checked === undefined) {
+                                this._trigger(item, 'radioadded', options);
                             } else {
+                                // change state
+                                this.check(item, this._inner(options, {
+                                    check: checked
+                                }));
                                 this._trigger(item, 'radioadded', options);
                             }
-                        } else {
-                            // change state
-                            this.check(item, this._inner(options, {
-                                check: checked
+                            this._success(item, options);
+                        };
+                        // support 'checkbox' extension
+                        if (this.extCheckbox && this.hasCheckbox(item)) {
+                            this.setCheckbox(item, this._inner(options, {
+                                success: process,
+                                fail: options.fail,
+                                checkbox: false
                             }));
-                            this._trigger(item, 'radioadded', options);
+                        } else {
+                            process.apply(this);
                         }
-                        this._success(item, options);
-                    };
-                    // support 'checkbox' extension
-                    if (this.isCheckbox && this.hasCheckbox(item)) {
-                        this.setCheckbox(item, this._inner(options, {
-                            success: process,
-                            fail: options.fail,
-                            checkbox: false
-                        }));
                     } else {
-                        process.apply(this);
+                        this._trigger(item, 'notradio', options);
+                        this._success(item, options);
                     }
-                } else {
-                    checked = this._radio(item).is(':checked');
-                    this._removeRadio(item);
-                    if (checked) {
-                        this.check(this.radios(this.siblings(item)).first(), this._inner(options, {
-                            check: true
-                        }));
-                    }
-                    this._trigger(item, 'radioremoved', options);
-                    this._success(item, options);
                 }
             } else {
                 this._fail(item, options);
@@ -376,7 +309,7 @@
         // test if it's checked
         isChecked: function(item) {
             if (this.hasRadio(item)) {
-                return this._radio(item).is(':checked');
+                return item.hasClass('aciTreeChecked');
             }
             // support 'checkbox' extension
             if (this._super) {
@@ -390,17 +323,16 @@
             options = this._options(options, null, function() {
                 this._trigger(item, 'checkfail', options);
             });
-            if (this.isRadio() && this.hasRadio(item)) {
+            if (this.extRadio() && this.hasRadio(item)) {
                 // a way to cancel the check
                 if (!this._trigger(item, 'beforecheck', options)) {
                     this._fail(item, options);
                     return;
                 }
                 var check = options.check;
-                this._radio(item).prop('checked', check);
+                this._radioDOM.check(item, check);
                 if (this._instance.options.radioChain) {
-                    this._childRadio(item);
-                    this._parentRadio(item);
+                    this._radioUpdate(item, check);
                 }
                 this._trigger(item, check ? 'checked' : 'unchecked', options);
                 this._success(item, options);
@@ -415,29 +347,28 @@
         },
         // filter items with radio by state (if set)
         radios: function(items, state) {
-            var list = [];
-            if (state === undefined) {
-                return items.filter('.aciTreeRadio');
-            }
-            items.filter('.aciTreeRadio').each(this.proxy(function(element) {
-                if (state == this._radio($(element)).is(':checked')) {
-                    list[list.length] = element;
+            var list = items.filter('.aciTreeRadio');
+            if (state !== undefined) {
+                if (state) {
+                    return list.filter('.aciTreeChecked');
+                } else {
+                    return list.not('.aciTreeChecked');
                 }
-            }, true));
-            return $(list);
+            }
+            return list;
         },
         // test if radio is enabled
-        isRadio: function() {
+        extRadio: function() {
             return this._instance.options.radio;
         },
         // override set option
         option: function(option, value) {
             if (this.wasInit() && !this.isLocked()) {
-                if ((option == 'radio') && (value != this.isRadio())) {
+                if ((option == 'radio') && (value != this.extRadio())) {
                     if (value) {
-                        this._initRadio();
+                        this._radioInit();
                     } else {
-                        this._doneRadio();
+                        this._radioDone();
                     }
                 }
             }
@@ -445,12 +376,11 @@
             this._super(option, value);
         },
         // done radio
-        _doneRadio: function(destroy) {
+        _radioDone: function(destroy) {
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
-            this._instance.jQuery.off(this._private.nameSpace, 'input[type=radio]');
             if (!destroy) {
-                this.radios(this.childrens(null, true)).each(this.proxy(function(element) {
+                this.radios(this.children(null, true)).each(this.proxy(function(element) {
                     this.setRadio($(element), false);
                 }, true));
             }
@@ -458,7 +388,7 @@
         // override _destroyHook
         _destroyHook: function(unloaded) {
             if (unloaded) {
-                this._doneRadio(true);
+                this._radioDone(true);
             }
             // call the parent
             this._super(unloaded);

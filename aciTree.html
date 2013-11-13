@@ -12,6 +12,8 @@
         <script type="text/javascript" src="js/jquery.aciPlugin.min.js"></script>
         <script type="text/javascript" src="js/jquery.aciSortable.min.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
+        <script type="text/javascript" src="js/Xjquery.aciTree.aria.js"></script>
+        <script type="text/javascript" src="js/Xjquery.aciTree.en_EN.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.utils.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.selectable.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.checkbox.js"></script>
@@ -19,20 +21,20 @@
         <script type="text/javascript" src="js/jquery.aciTree.column.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.editable.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.sortable.js"></script>
-        <script type="text/javascript" src="js/jquery.aciTree.Xdebug.js"></script>
+        <script type="text/javascript" src="js/Xjquery.aciTree.debug.js"></script>
     </head>
     <body>
 
         <div>
 
             <p>Here you have a simple implementation of a file system tree with the most features available to be changed at the runtime from the interface.
-                You can find a simple PHP implementation in the download but any server-side language can be used because aciTree needs the data in JSON 
-                format and it's using AJAX to load the childrens of a folder node (once they are needed).</p>
+                You can find a simple PHP implementation in the download but any server-side language can be used because aciTree needs the data in JSON
+                format and it's using AJAX to load the children of a inner node (once they are needed).</p>
 
             <p>Note: I recommend checking the code from the other demos as this page can be complex for someone new to aciTree. Also, do not forget to check the API docs
                 before you try using the methods and also check online on the plugin page for extra info (like init options and using the events).</p>
 
-            <p><b>Start <a href="sample/index.html" target="_blank" title="aciTree usage samples"><span style="color:red">here</span></a> first if you are new to aciTree</b> (check <b>using the API</b> demos for a detailed introduction to aciTree)</p>            
+            <p><b>Start <a href="sample/index.html" target="_blank" title="aciTree usage samples"><span style="color:red">here</span></a> first if you are new to aciTree</b> (check <b>using the API</b> demos for a detailed introduction to aciTree)</p>
 
             <p>See a checkbox tree demo <a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">here</a></p>
             <p>See a radio-button tree demo <a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">here</a></p>
@@ -57,7 +59,7 @@
             <div class="form">
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
                     <table cellspacing="0" cellpadding="10" border="0"><tr><td width="300">
-                                <p>(<span style="color:red">new</span>) Filter: <input type="text" id="filter" value=""> (<span style="color:blue">note</span>)</p>
+                                <p>Filter: <input type="text" id="filter" value=""> (<span style="color:blue">note</span>)</p>
                                 <p>Show Branches: <label><input type="radio" name="branches" value="1"> Yes</label>
                                     <label><input type="radio" name="branches" value="0"> No</label></p>
                                 <p>Use Animations: <label><input type="radio" name="animate" value="1"> Yes</label>
@@ -83,12 +85,16 @@
                                     <label><input type="radio" name="checkbox" value="0"> No</label></p>
                                 <p>Chain Checkboxes: <label><input type="radio" name="checkboxChain" value="true"> Yes</label>
                                     <label><input type="radio" name="checkboxChain" value="-1"> Update Parents</label>
-                                    <label><input type="radio" name="checkboxChain" value="1"> Update Childrens </label>
-                                    <label><input type="radio" name="checkboxChain" value="false"> No</label></p>                                
+                                    <label><input type="radio" name="checkboxChain" value="1"> Update Children </label>
+                                    <label><input type="radio" name="checkboxChain" value="false"> No</label></p>
+                                <p>(<span style="color:red">new</span>) Checkbox Break: <label><input type="radio" name="checkboxBreak" value="1"> Yes</label>
+                                    <label><input type="radio" name="checkboxBreak" value="0"> No</label></p>
                                 <p>Radio Buttons: <label><input type="radio" name="radio" value="1"> Yes</label>
                                     <label><input type="radio" name="radio" value="0"> No</label></p>
                                 <p>Chain Radio Buttons: <label><input type="radio" name="radioChain" value="1"> Yes</label>
                                     <label><input type="radio" name="radioChain" value="0"> No</label></p>
+                                <p>(<span style="color:red">new</span>) Radio Button Break: <label><input type="radio" name="radioBreak" value="1"> Yes</label>
+                                    <label><input type="radio" name="radioBreak" value="0"> No</label></p>
 
                                 <p>Editable: <label><input type="radio" name="editable" value="1"> Yes</label>
                                     <label><input type="radio" name="editable" value="0"> No</label></p>
@@ -103,7 +109,7 @@
                                     <label><input type="radio" name="addMode" value="after" checked="checked"> Add After</label></p>
                                 <p><input id="addFile" type="button" value="Add File">
                                     <input id="addFolder" type="button" value="Add Folder">
-                                    <input id="addChilds" type="button" value="Add Childrens"></p>
+                                    <input id="addChilds" type="button" value="Add Children"></p>
                                 <p><input id="unload" type="button" value="Unload Folder/Tree">
                                     <input id="load" type="button" value="Load Folder/Tree"></p>
                                 <p><input id="setFile" type="button" value="Set as File">
@@ -122,8 +128,8 @@
                                 <p>Set Radio: <select id="setRadio"><option value="">-- choose --</option>
                                         <option value="yes">Yes</option><option value="No">No</option></select></p>
 
-                                <p>(<span style="color:red">new</span>) Item: <input id="show" type="button" value="Show"> <input id="hide" type="button" value="Hide">
-                                    <input id="hideshow" type="button" value="Toggle"> (<span style="color:blue">note</span>)</p>                                        
+                                <p>Item: <input id="show" type="button" value="Show"> <input id="hide" type="button" value="Hide">
+                                    <input id="hideshow" type="button" value="Toggle"> (<span style="color:blue">note</span>)</p>
                                 <p>Node: <input id="open" type="button" value="Open"> <input id="close" type="button" value="Close">
                                     <input id="toggle" type="button" value="Toggle"></p>
                                 <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files">
@@ -167,7 +173,7 @@
                 entire tree (not only a item).<br>All item based functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item - when the
                 selectable option is used).</p>
 
-            <p><span style="color:blue">Note</span>: for this demo I have changed the default style from `display:none` for `.aciTreeHidden` 
+            <p><span style="color:blue">Note</span>: for this demo I have changed the default style from `display:none` for `.aciTreeHidden`
                 so you can have a chance to show again a hidden item. The `hidden` items will have a darker background.</p>
 
         </div>
@@ -181,103 +187,103 @@
 
                 // if we want to init without one initial AJAX request :)
                 var rootData = [{
-                        "id": "\/Item 1",
-                        "label": "Item 1 - From rootData",
-                        "childs": [],
-                        "isFolder": true,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 34
+                        id: "\/Item 1",
+                        label: "Item 1 - From rootData",
+                        branch: [],
+                        inode: true,
+                        open: false,
+                        icon: "folder",
+                        random: 34
                     },
                     {
-                        "id": "\/Item 2",
-                        "label": "Item 2 - very long item text<br>with a brake",
-                        "childs": [],
-                        "isFolder": true,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 9
+                        id: "\/Item 2",
+                        label: "Item 2 - very long item text<br>with a brake",
+                        branch: [],
+                        inode: true,
+                        open: false,
+                        icon: "folder",
+                        random: 9
                     },
                     {
-                        "id": "\/Item 3",
-                        "label": "Item 3",
-                        "childs": [],
-                        "isFolder": false,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 26
+                        id: "\/Item 3",
+                        label: "Item 3",
+                        branch: [],
+                        inode: false,
+                        open: false,
+                        icon: "folder",
+                        random: 26
                     },
                     {
-                        "id": "\/Item 4",
-                        "label": "Item 4",
-                        "childs": [],
-                        "isFolder": false,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 71
+                        id: "\/Item 4",
+                        label: "Item 4",
+                        branch: [],
+                        inode: false,
+                        open: false,
+                        icon: "folder",
+                        random: 71
                     },
                     {
-                        "id": "\/Item 5",
-                        "label": "Item 5",
-                        "childs": [],
-                        "isFolder": true,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 93
+                        id: "\/Item 5",
+                        label: "Item 5",
+                        branch: [],
+                        inode: true,
+                        open: false,
+                        icon: "folder",
+                        random: 93
                     },
                     {
-                        "id": "\/Item 6",
-                        "label": "Item 6",
-                        "childs": [],
-                        "isFolder": false,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 14
+                        id: "\/Item 6",
+                        label: "Item 6",
+                        branch: [],
+                        inode: false,
+                        open: false,
+                        icon: "folder",
+                        random: 14
                     },
                     {
-                        "id": "\/Item 7",
-                        "label": "Item 7",
-                        "childs": [],
-                        "isFolder": true,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 49
+                        id: "\/Item 7",
+                        label: "Item 7",
+                        branch: [],
+                        inode: true,
+                        open: false,
+                        icon: "folder",
+                        random: 49
                     },
                     {
-                        "id": "\/Item 8",
-                        "label": "Item 8",
-                        "childs": [],
-                        "isFolder": true,
-                        "open": false,
-                        "icon": "folder",
-                        "random": 99
+                        id: "\/Item 8",
+                        label: "Item 8",
+                        branch: [],
+                        inode: true,
+                        open: false,
+                        icon: "folder",
+                        random: 99
                     },
                     {
-                        "id": "\/document a.txt",
-                        "label": "document a.txt",
-                        "childs": [],
-                        "isFolder": false,
-                        "open": false,
-                        "icon": "file",
-                        "random": 86
+                        id: "\/document a.txt",
+                        label: "document a.txt",
+                        branch: [],
+                        inode: false,
+                        open: false,
+                        icon: "file",
+                        random: 86
                     },
                     {
-                        "id": "\/document b.txt",
-                        "label": "document b.txt",
-                        "childs": [],
-                        "isFolder": false,
-                        "open": false,
-                        "icon": "file",
-                        "random": 76
+                        id: "\/document b.txt",
+                        label: "document b.txt",
+                        branch: [],
+                        inode: false,
+                        open: false,
+                        icon: "file",
+                        random: 76
                     },
                     {
-                        "id": "\/document c.txt",
-                        "label": "document c.txt",
-                        "childs": [],
-                        "isFolder": false,
-                        "open": false,
-                        "icon": "file",
-                        "random": 11
+                        id: "\/document c.txt",
+                        label: "document c.txt",
+                        branch: [],
+                        inode: false,
+                        open: false,
+                        icon: "file",
+                        random: 11
                     }];
 
                 // init the Tree
@@ -285,7 +291,24 @@
                     treeApi = $('#tree').aciTree({
                         autoInit: false,
                         ajax: {
-                            url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch='
+                            url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch='/*,
+                            // our custom data processing function (see jQuery.ajax)
+                            converters: {
+                                'text json': function(data) {
+                                    var json = $.parseJSON(data);
+                                    var recursive = function(item) {
+                                        item.inode = item.isFolder;
+                                        item.branch = item.childs;
+                                        for (var i in item.branch) {
+                                            recursive(item.branch[i]);
+                                        }
+                                    };
+                                    for (var i in json) {
+                                        recursive(json[i]);
+                                    }
+                                    return json;
+                                }
+                            }*/
                         },
                         rootData: (type == 'data') ? rootData : null,
                         itemHook: function(parent, item, itemData, level) {
@@ -407,8 +430,8 @@
                     info += 'getLabel: "' + treeApi.getLabel(item) + '"\n';
                     info += 'level: ' + treeApi.level(item) + '\n';
                     info += 'getIndex: ' + treeApi.getIndex(item) + '\n';
-                    info += 'isFile: ' + treeApi.isFile(item) + '\n';
-                    info += 'isFolder: ' + treeApi.isFolder(item) + ' (open: ' + treeApi.isOpen(item) + ')\n';
+                    info += 'isLeaf: ' + treeApi.isLeaf(item) + '\n';
+                    info += 'isInode: ' + treeApi.isInode(item) + ' (open: ' + treeApi.isOpen(item) + ')\n';
                     info += 'wasLoad: ' + treeApi.wasLoad(item) + '\n';
                     info += 'hasParent: ' + treeApi.hasParent(item) + '\n';
                     info += 'parent: [' + treeApi.getId(treeApi.parent(item)) + ']\n';
@@ -420,17 +443,17 @@
                     info += 'hasSiblings: ' + treeApi.hasSiblings(item) + ' count: #' + treeApi.siblings(item).length + '\n';
                     info += 'hasPrev: ' + treeApi.hasPrev(item) + ' [' + treeApi.getId(treeApi.prev(item)) + ']\n';
                     info += 'hasNext: ' + treeApi.hasNext(item) + ' [' + treeApi.getId(treeApi.next(item)) + ']\n';
-                    var childs = treeApi.childrens(item);
-                    info += 'hasChildrens: ' + treeApi.hasChildrens(item) + ' count: #' + childs.length +
-                            ' folders: #' + treeApi.folders(childs).length + ' (open: #' + treeApi.folders(childs, true).length +
-                            ' closed: #' + treeApi.folders(childs, false).length + ') files: #' + treeApi.files(childs).length + '\n';
+                    var children = treeApi.children(item);
+                    info += 'hasChildren: ' + treeApi.hasChildren(item) + ' count: #' + children.length +
+                            ' inodes: #' + treeApi.inodes(children).length + ' (open: #' + treeApi.inodes(children, true).length +
+                            ' closed: #' + treeApi.inodes(children, false).length + ') leaves: #' + treeApi.leaves(children).length + '\n';
                     info += 'first [' + treeApi.getId(treeApi.first(item)) + '] isFirst: ' + treeApi.isFirst(item) + '\n';
                     info += 'last [' + treeApi.getId(treeApi.last(item)) + '] isLast: ' + treeApi.isLast(item) + '\n';
                     // the next are commented because of the low performance
-                    //var allChilds = treeApi.childrens(null, true);
-                    info += 'childrens: #' + childs.length + /*' (total: #' + allChilds.length + ')' +*/ '\n';
-                    /*info += 'visible: #' + treeApi.visible(childs).length + ' in view: #' + treeApi.visible(childs, true).length +
-                     ' (total: #' + treeApi.visible(allChilds).length + ' total in view: #' + treeApi.visible(allChilds, true).length + ')\n';*/
+                    //var allChildren = treeApi.children(null, true);
+                    info += 'children: #' + children.length + /*' (total: #' + allChildren.length + ')' +*/ '\n';
+                    /*info += 'visible: #' + treeApi.visible(children).length + ' in view: #' + treeApi.visible(children, true).length +
+                     ' (total: #' + treeApi.visible(allChildren).length + ' total in view: #' + treeApi.visible(allChildren, true).length + ')\n';*/
                     return info;
                 }
 
@@ -491,7 +514,9 @@
                 $('[name=checkbox][value=' + (options.checkbox ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
                 $('[name=checkboxChain][value=' + valueBoolNum(options.checkboxChain) + ']').prop('checked', true);
+                $('[name=checkboxBreak][value=' + (options.checkboxBreak ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radioChain][value=' + (options.radioChain ? 1 : 0) + ']').prop('checked', true);
+                $('[name=radioBreak][value=' + (options.radioBreak ? 1 : 0) + ']').prop('checked', true);
 
                 $('#setCheckbox').attr('disabled', !options.checkbox);
                 $('#setRadio').attr('disabled', !options.radio);
@@ -559,7 +584,7 @@
                     $('#tree').toggleClass('aciTreeColors', $(this).val() == 1);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=radioChain],[name=editable]').click(function() {
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxBreak],[name=radioChain],[name=radioBreak],[name=editable]').click(function() {
                     var option = $(this).prop('name');
                     $('#tree').aciTree('option', option, $(this).val() == 1);
                     if (option == 'fullRow') {
@@ -570,6 +595,11 @@
                 $('[name=checkboxChain]').click(function() {
                     var option = $(this).prop('name');
                     $('#tree').aciTree('option', option, boolNumValue($(this).val()));
+                    $('[name=checkboxBreak]').prop('disabled', $(this).val() == 'false');
+                });
+
+                $('[name=radioChain]').click(function() {
+                    $('[name=radioBreak]').prop('disabled', $(this).val() == '0');
                 });
 
                 $('[name=cancel_ui]').click(function() {
@@ -584,7 +614,7 @@
 
                 // update init options based on inputs
                 function updateOptions() {
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=radioChain]:checked,[name=editable]:checked').each(function() {
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=checkboxBreak]:checked,[name=radioChain]:checked,[name=radioBreak]:checked,[name=editable]:checked').each(function() {
                         var option = $(this).prop('name');
                         $.fn.aciTree.defaults[option] = $(this).val() == 1;
                     });
@@ -720,27 +750,27 @@
                     return null;
                 }
 
-                // test if a folder item is selected, alert if not, return the item if selected
-                function requireFolder() {
+                // test if a inode item is selected, alert if not, return the item if selected
+                function requireInode() {
                     var item = checkIsItem();
-                    if (item && treeApi.isFolder(item)) {
+                    if (item && treeApi.isInode(item)) {
                         return item;
                     }
                     alert('Please select one folder item (with a mouse click, will have a pink background after selection) !');
                     return null;
                 }
 
-                // test if a file item is selected, alert if not, return the item if selected
-                function requireFile() {
+                // test if a leaf item is selected, alert if not, return the item if selected
+                function requireLeaf() {
                     var item = checkIsItem();
-                    if (item && treeApi.isFile(item)) {
+                    if (item && treeApi.isLeaf(item)) {
                         return item;
                     }
                     alert('Please select one file item (with a mouse click, will have a pink background after selection) !');
                     return null;
                 }
 
-                // test if the treeview or the folder was loaded, alert if was loaded, return TRUE if was not loaded
+                // test if the treeview or the inode was loaded, alert if was loaded, return TRUE if was not loaded
                 function requestLoad() {
                     if (checkIsTree()) {
                         if (treeApi.wasLoad()) {
@@ -750,7 +780,7 @@
                         }
                     } else {
                         var item = checkIsItem();
-                        if (item && requireFolder(item)) {
+                        if (item && requireInode(item)) {
                             if (treeApi.wasLoad(item)) {
                                 alert('The folder item was loaded already !');
                             } else {
@@ -763,32 +793,32 @@
                     return false;
                 }
 
-                var fileIndex = 0;
+                var leafIndex = 0;
 
-                // get new file item data
-                function newFile() {
+                // get new leaf item data
+                function newLeaf() {
                     var itemData = {
-                        id: 'a_new_File_ID_' + fileIndex,
-                        label: 'File name ' + fileIndex,
-                        isFolder: false,
+                        id: 'a_new_File_ID_' + leafIndex,
+                        label: 'File name ' + leafIndex,
+                        inode: false,
                         icon: 'file'
                     };
-                    fileIndex++;
+                    leafIndex++;
                     return itemData;
                 }
 
-                var folderIndex = 0;
+                var inodeIndex = 0;
 
-                // get new folder item data
-                function newFolder() {
+                // get new inode item data
+                function newInode() {
                     var itemData = {
-                        id: 'a_new_Folder_ID_' + folderIndex,
-                        label: 'Folder name ' + folderIndex,
-                        isFolder: null,
+                        id: 'a_new_Folder_ID_' + inodeIndex,
+                        label: 'Folder name ' + inodeIndex,
+                        inode: null,
                         open: false,
                         icon: 'folder'
                     };
-                    folderIndex++;
+                    inodeIndex++;
                     return itemData;
                 }
 
@@ -838,14 +868,14 @@
                     }
                 });
 
-                // add a file to the treeview or to the selected folder
+                // add a leaf to the treeview or to the selected inode
                 $('#addFile').click(function() {
                     if (checkIsTree()) {
-                        // the treeview is selected, add a file on the first/last position
-                        var childs = treeApi.childrens();
-                        if (childs.length) {
+                        // the treeview is selected, add a leaf on the first/last position
+                        var children = treeApi.children();
+                        if (children.length) {
                             // already has some items on ROOT
-                            treeAddItem(childs, newFile());
+                            treeAddItem(children, newLeaf());
                         } else {
                             // no items on ROOT
                             treeApi.append(null, {
@@ -856,26 +886,26 @@
                                 fail: function() {
                                     alert('Failed to add the file item on ROOT !');
                                 },
-                                itemData: newFile()
+                                itemData: newLeaf()
                             });
                         }
                     } else {
                         var item = requireSelection();
                         if (item) {
-                            // a item is selected, add a file before/after it
-                            treeAddItem(item, newFile());
+                            // a item is selected, add a leaf before/after it
+                            treeAddItem(item, newLeaf());
                         }
                     }
                 });
 
-                // add a folder to the treeview or to the selected folder
+                // add a inode to the treeview or to the selected inode
                 $('#addFolder').click(function() {
                     if (checkIsTree()) {
-                        // the treeview is selected, add a folder on the first/last position
-                        var childs = treeApi.childrens();
-                        if (childs.length) {
+                        // the treeview is selected, add a inode on the first/last position
+                        var children = treeApi.children();
+                        if (children.length) {
                             // already has some items on ROOT
-                            treeAddItem(childs, newFolder());
+                            treeAddItem(children, newInode());
                         } else {
                             // no items on ROOT
                             treeApi.append(null, {
@@ -886,22 +916,22 @@
                                 fail: function() {
                                     alert('Failed to add the folder item on ROOT !');
                                 },
-                                itemData: newFolder()
+                                itemData: newInode()
                             });
                         }
                     } else {
                         var item = requireSelection();
                         if (item) {
-                            // a item is selected, add a folder before/after it
-                            treeAddItem(item, newFolder());
+                            // a item is selected, add a inode before/after it
+                            treeAddItem(item, newInode());
                         }
                     }
                 });
 
-                // add childrens to the treeview or to the selected folder
+                // add children to the treeview or to the selected inode
                 $('#addChilds').click(function() {
                     if (checkIsTree()) {
-                        // the treeview is selected, add a folder/file
+                        // the treeview is selected, add a inode/leaf
                         treeApi.append(null, {
                             uid: 'user-defined',
                             success: function() {
@@ -910,12 +940,12 @@
                             fail: function() {
                                 alert('Failed to add the folder/file items on ROOT !');
                             },
-                            itemData: [newFolder(), newFile()]
+                            itemData: [newInode(), newLeaf()]
                         });
                     } else {
                         var item = requireSelection();
-                        if (requireFolder()) {
-                            // a item is selected, add a folder/file
+                        if (requireInode()) {
+                            // a item is selected, add a inode/leaf
                             treeApi.append(item, {
                                 uid: 'user-defined',
                                 success: function(item) {
@@ -924,13 +954,13 @@
                                 fail: function(item) {
                                     alert('Failed to add the folder/file items to [' + this.getId(item) + '] !');
                                 },
-                                itemData: [newFolder(), newFile()]
+                                itemData: [newInode(), newLeaf()]
                             });
                         }
                     }
                 });
 
-                // unload the treeview or the selected folder
+                // unload the treeview or the selected inode
                 $('#unload').click(function() {
                     if (checkIsTree()) {
                         // the treeview is selected, unload it >:)
@@ -945,7 +975,7 @@
                         });
                     } else {
                         var item = requireSelection();
-                        if (item && requireFolder()) {
+                        if (item && requireInode()) {
                             // a item is selected, unload it
                             treeApi.unload(item, {
                                 uid: 'user-defined',
@@ -960,7 +990,7 @@
                     }
                 });
 
-                // load the treeview or the selected folder
+                // load the treeview or the selected inode
                 $('#load').click(function() {
                     if (requestLoad()) {
                         if (checkIsTree()) {
@@ -989,11 +1019,11 @@
                     }
                 });
 
-                // set a folder to be a file
+                // set a inode to be a leaf
                 $('#setFile').click(function() {
-                    var item = requireFolder();
+                    var item = requireInode();
                     if (item) {
-                        treeApi.setFile(item, {
+                        treeApi.setLeaf(item, {
                             uid: 'user-defined',
                             success: function(item, options) {
                                 // change the icon
@@ -1009,11 +1039,11 @@
                     }
                 });
 
-                // set a file to be a folder
+                // set a leaf to be a inode
                 $('#setFolder').click(function() {
-                    var item = requireFile();
+                    var item = requireLeaf();
                     if (item) {
-                        treeApi.setFolder(item, {
+                        treeApi.setInode(item, {
                             success: function(item, options) {
                                 // change the icon
                                 this.setIcon(item, {
@@ -1180,9 +1210,9 @@
                     }
                 });
 
-                // open a folder item
+                // open a inode item
                 $('#open').click(function() {
-                    var item = requireFolder();
+                    var item = requireInode();
                     if (item) {
                         treeApi.open(item, {
                             uid: 'user-defined',
@@ -1196,9 +1226,9 @@
                     }
                 });
 
-                // close a folder item
+                // close a inode item
                 $('#close').click(function() {
-                    var item = requireFolder();
+                    var item = requireInode();
                     if (item) {
                         treeApi.close(item, {
                             uid: 'user-defined',
@@ -1212,9 +1242,9 @@
                     }
                 });
 
-                // toggle a folder item
+                // toggle a inode item
                 $('#toggle').click(function() {
-                    var item = requireFolder();
+                    var item = requireInode();
                     if (item) {
                         treeApi.toggle(item, {
                             uid: 'user-defined',
@@ -1230,18 +1260,18 @@
 
                 // time to burn your CPU ;))
 
-                // add 1k file items
+                // add 1k leaf items
                 $('#addFile1k').click(function() {
                     var list = [];
                     for (var i = 0; i < 1000; i++) {
-                        list[list.length] = newFile();
+                        list[list.length] = newLeaf();
                     }
                     if (checkIsTree()) {
                         // the treeview is selected
-                        var childs = treeApi.childrens();
-                        if (childs.length) {
+                        var children = treeApi.children();
+                        if (children.length) {
                             // already has some items on ROOT
-                            treeAddItem(childs, list);
+                            treeAddItem(children, list);
                         } else {
                             // no items on ROOT
                             treeApi.append(null, {
@@ -1264,27 +1294,27 @@
                     }
                 });
 
-                // add 1k folder items
+                // add 1k inode items
                 $('#addFolder1k').click(function() {
                     var list = [];
                     for (var i = 0; i < 1000; i++) {
-                        list[list.length] = newFolder();
+                        list[list.length] = newInode();
                     }
                     if (checkIsTree()) {
                         // the treeview is selected
-                        var childs = treeApi.childrens();
-                        if (childs.length) {
+                        var children = treeApi.children();
+                        if (children.length) {
                             // already has some items on ROOT
-                            treeAddItem(childs, list);
+                            treeAddItem(children, list);
                         } else {
                             // no items on ROOT
                             treeApi.append(null, {
                                 uid: 'user-defined',
                                 success: function(item, options) {
-                                    alert('The 1k folder items where added to the ROOT !');
+                                    alert('The 1k inode items where added to the ROOT !');
                                 },
                                 fail: function(item, options) {
-                                    alert('Failed to add the 1k folders to the ROOT !');
+                                    alert('Failed to add the 1k inodes to the ROOT !');
                                 },
                                 itemData: list
                             });
@@ -1314,8 +1344,8 @@
 
                 // custom open magic happens here
                 var branch_open = function(item) {
-                    if (this.isFolder(item)) {
-                        // check if is a folder just to avoid error notification
+                    if (this.isInode(item)) {
+                        // check if is a inode just to avoid error notification
                         this.open(item, {
                             uid: 'user-defined',
                             success: function(item, options) {
@@ -1336,9 +1366,9 @@
                     if (checkIsTree()) {
                         treeApi.branch(null, branch_open, true);
                     } else {
-                        var item = requireFolder();
+                        var item = requireInode();
                         if (item) {
-                            // need this cause 'branch' is processing only childs (item is not included)
+                            // need this cause .branch is processing only the children (the item is not included)
                             treeApi.open(item, {
                                 success: function() {
                                     this.branch(item, branch_open, true);
@@ -1350,8 +1380,8 @@
 
                 // custom close magic happens here
                 var branch_close = function(item) {
-                    if (this.isFolder(item)) {
-                        // check if is a folder just to avoid error notification
+                    if (this.isInode(item)) {
+                        // check if is a inode just to avoid error notification
                         this.close(item, {
                             uid: 'user-defined',
                             success: function(item, options) {
@@ -1372,9 +1402,9 @@
                     if (checkIsTree()) {
                         treeApi.branch(null, branch_close);
                     } else {
-                        var item = requireFolder();
+                        var item = requireInode();
                         if (item) {
-                            // need this cause 'branch' is processing only childs (item is not included)
+                            // need this cause .branch is processing only the children (the item is not included)
                             treeApi.close(item, {
                                 success: function() {
                                     this.branch(item, branch_close);
@@ -1386,8 +1416,8 @@
 
                 // custom toggle magic happens here
                 var branch_toggle = function(item) {
-                    if (this.isFolder(item)) {
-                        // check if is a folder just to avoid error notification
+                    if (this.isInode(item)) {
+                        // check if is a inode just to avoid error notification
                         this.toggle(item, {
                             uid: 'user-defined',
                             success: function(item, options) {
@@ -1408,9 +1438,9 @@
                     if (checkIsTree()) {
                         treeApi.branch(null, branch_toggle, true);
                     } else {
-                        var item = requireFolder();
+                        var item = requireInode();
                         if (item) {
-                            // need this cause 'branch' is processing only childs (item is not included)
+                            // need this cause .branch is processing only the children (the item is not included)
                             treeApi.toggle(item, {
                                 success: function() {
                                     this.branch(item, branch_toggle, true);
@@ -1470,12 +1500,12 @@
 
                 // update items
 
-                // update to a file
+                // update to a leaf
                 $('#update_file').click(function() {
                     var item = requireItem();
                     if (item) {
-                        var file = newFile();
-                        file.item = 'usign [update] to set the item as a file';
+                        var data = newLeaf();
+                        data.item = 'usign [update] to set the item as a file';
                         treeApi.update(item, {
                             uid: 'user-defined',
                             success: function(item, options) {
@@ -1484,18 +1514,18 @@
                             fail: function(item, options) {
                                 alert('Failed to update the item !');
                             },
-                            itemData: file
+                            itemData: data
                         });
                     }
                 });
 
-                // update to a folder
+                // update to a inode
                 $('#update_folder').click(function() {
                     var item = requireItem();
                     if (item) {
-                        var folder = newFolder();
-                        folder.item = 'usign [update] to set the item as a folder';
-                        folder.items = [newFolder(), newFile()];
+                        var data = newInode();
+                        data.item = 'usign [update] to set the item as a folder';
+                        data.branch = [newInode(), newLeaf()];
                         treeApi.update(item, {
                             uid: 'user-defined',
                             success: function(item, options) {
@@ -1504,7 +1534,7 @@
                             fail: function(item, options) {
                                 alert('Failed to update the item !');
                             },
-                            itemData: folder
+                            itemData: data
                         });
                     }
                 });
@@ -1704,7 +1734,7 @@
                         id: swap1
                     });
                 });
-                
+
             });
 
         </script>
