@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.0.0
+ * aciTree jQuery Plugin v4.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -36,7 +36,8 @@
         // if -1 the selection will propagate only to parents
         // if +1 the selection will propagate only to children
         // if FALSE the selection will not propagate in any way
-        checkboxBreak: true             // if TRUE then a missing checkbox will break the chaining
+        checkboxBreak: true,            // if TRUE then a missing checkbox will break the chaining
+        checkboxClick: false            // if TRUE then a click will trigger a state change only when made over the checkbox itself
     };
 
     // aciTree checkbox extension
@@ -69,12 +70,14 @@
                         break;
                 }
             })).on('click' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
-                var item = this.itemFrom(e.target);
-                if (this.hasCheckbox(item)) {
-                    this.check(item, {
-                        check: !this.isChecked(item)
-                    });
-                    e.preventDefault();
+                if (!this._instance.options.checkboxClick || $(e.target).is('.aciTreeCheck')) {
+                    var item = this.itemFrom(e.target);
+                    if (this.hasCheckbox(item)) {
+                        this.check(item, {
+                            check: !this.isChecked(item)
+                        });
+                        e.preventDefault();
+                    }
                 }
             }));
         },
@@ -352,6 +355,23 @@
                 }
             }
             return list;
+        },
+        // override `serialize`
+        serialize: function(item, what, callback) {
+            if (what == 'checkbox') {
+                var serialized = '';
+                var children = this.children(item, true, true);
+                this.checkboxes(children, true).each(this.proxy(function(element) {
+                    var item = $(element);
+                    if (callback) {
+                        serialized += callback.call(this, item, what, this.getId(item));
+                    } else {
+                        serialized += this._instance.options.serialize.call(this, item, what, this.getId(item));
+                    }
+                }, true));
+                return serialized;
+            }
+            return this._super(item, what, callback);
         },
         // test if item is in tristate
         isTristate: function(item) {

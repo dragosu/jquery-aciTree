@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.0.0
+ * aciTree jQuery Plugin v4.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -32,7 +32,8 @@
     var options = {
         radio: false,                   // if TRUE then each item will have a radio button
         radioChain: true,               // if TRUE the selection will propagate to the parents/children
-        radioBreak: true                // if TRUE then a missing radio button will break the chaining
+        radioBreak: true,               // if TRUE then a missing radio button will break the chaining
+        radioClick: false               // if TRUE then a click will trigger a state change only when made over the radio-button itself
     };
 
     // aciTree radio extension
@@ -69,14 +70,16 @@
                         break;
                 }
             })).on('click' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
-                var item = this.itemFrom(e.target);
-                if (this.hasRadio(item)) {
-                    if (!this.isChecked(item)) {
-                        this.check(item, {
-                            check: true
-                        });
+                if (!this._instance.options.radioClick || $(e.target).is('.aciTreeCheck')) {
+                    var item = this.itemFrom(e.target);
+                    if (this.hasRadio(item)) {
+                        if (!this.isChecked(item)) {
+                            this.check(item, {
+                                check: true
+                            });
+                        }
+                        e.preventDefault();
                     }
-                    e.preventDefault();
                 }
             }));
         },
@@ -356,6 +359,23 @@
                 }
             }
             return list;
+        },
+        // override `serialize`
+        serialize: function(item, what, callback) {
+            if (what == 'radio') {
+                var serialized = '';
+                var children = this.children(item, true, true);
+                this.radios(children, true).each(this.proxy(function(element) {
+                    var item = $(element);
+                    if (callback) {
+                        serialized += callback.call(this, item, what, this.getId(item));
+                    } else {
+                        serialized += this._instance.options.serialize.call(this, item, what, this.getId(item));
+                    }
+                }, true));
+                return serialized;
+            }
+            return this._super(item, what, callback);
         },
         // test if radio is enabled
         extRadio: function() {

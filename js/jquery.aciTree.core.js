@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.0.0
+ * aciTree jQuery Plugin v4.1.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -109,12 +109,18 @@
         // called for each AJAX request when a node needs to be loaded
         // `settings` is the `options.ajax` object
         ajaxHook: function(item, settings) {
-            // the default implemenation changes the URL by adding the item ID at the end
+            // the default implementation changes the URL by adding the item ID at the end
             settings.url += (item ? this.getId(item) : '');
         },
         // called after each item is created but before is inserted into the DOM
         itemHook: function(parent, item, itemData, level) {
             // there is no default implementation
+        },
+        // called for each `value` to be added to the serialized string
+        // `value` is the current serialized value (from the `item`)
+        serialize: function(item, what, value) {
+            // the default implementation uses a `|` (pipe) character to separate values
+            return '|' + value;
         }
     };
 
@@ -2100,6 +2106,12 @@
                 return (!parent1.length && !parent2.length) || (parent1.get(0) == parent2.get(0));
             }
             return false;
+        },
+        // return serialized data
+        // callback(item, what, value)
+        serialize: function(item, what, callback) {
+            // override this to provide serialized data
+            return '';
         },
         // destroy control
         destroy: function(options) {

@@ -45,7 +45,8 @@
             <p>See how you can use the drag & drop events to sort the tree items and limit the draggable items / drop targets <a href="aciTree-drag-drop.html" target="_blank" title="aciTree drag & drop">here</a></p>
             <p>See how you can add a tooltip for each tree item <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree tooltips">here</a></p>
             <p>See how you can use a custom tree data structure <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree custom data">here</a></p>
-            <p>(<span style="color:red">new</span>) See how you can use a custom filter/search <a href="/demo/aciTree-filter-search.html" target="_blank" title="aciTree filter & search">here</a></p>
+            <p>See how you can use a custom filter/search <a href="/demo/aciTree-filter-search.html" target="_blank" title="aciTree filter & search">here</a></p>
+            <p>(<span style="color:red">new</span>) See a demo with a full-sized tree container <a href="/demo/aciTree-full-size.html" target="_blank" title="aciTree full size">here</a></p>
 
             <p>Note: in the demo below - the node loading it's made with a delay so you can see the loading animation.
                 If you want you can remove the delay from the <i>PHP</i> script ...</p>
@@ -87,14 +88,18 @@
                                     <label><input type="radio" name="checkboxChain" value="-1"> Update Parents</label>
                                     <label><input type="radio" name="checkboxChain" value="1"> Update Children </label>
                                     <label><input type="radio" name="checkboxChain" value="false"> No</label></p>
-                                <p>(<span style="color:red">new</span>) Checkbox Break: <label><input type="radio" name="checkboxBreak" value="1"> Yes</label>
+                                <p>Checkbox Break: <label><input type="radio" name="checkboxBreak" value="1"> Yes</label>
                                     <label><input type="radio" name="checkboxBreak" value="0"> No</label></p>
+                                <p>(<span style="color:red">new</span>) Checkbox-Only Click: <label><input type="radio" name="checkboxClick" value="1"> Yes</label>
+                                    <label><input type="radio" name="checkboxClick" value="0"> No</label></p>
                                 <p>Radio Buttons: <label><input type="radio" name="radio" value="1"> Yes</label>
                                     <label><input type="radio" name="radio" value="0"> No</label></p>
                                 <p>Chain Radio Buttons: <label><input type="radio" name="radioChain" value="1"> Yes</label>
                                     <label><input type="radio" name="radioChain" value="0"> No</label></p>
-                                <p>(<span style="color:red">new</span>) Radio Button Break: <label><input type="radio" name="radioBreak" value="1"> Yes</label>
+                                <p>Radio Button Break: <label><input type="radio" name="radioBreak" value="1"> Yes</label>
                                     <label><input type="radio" name="radioBreak" value="0"> No</label></p>
+                                <p>(<span style="color:red">new</span>) Radio-Only Click: <label><input type="radio" name="radioClick" value="1"> Yes</label>
+                                    <label><input type="radio" name="radioClick" value="0"> No</label></p>
 
                                 <p>Editable: <label><input type="radio" name="editable" value="1"> Yes</label>
                                     <label><input type="radio" name="editable" value="0"> No</label></p>
@@ -161,6 +166,10 @@
                                     <label><input type="radio" name="cancel_ui" value="0"> No</label></p>
                                 <p>Cancel User-Defined Tasks : <label><input type="radio" name="cancel_user" value="1"> Yes</label>
                                     <label><input type="radio" name="cancel_user" value="0"> No</label></p>
+
+                                <p>(<span style="color:red">new</span>) Serialize:
+                                    <input id="serialize_checkbox" type="button" value="Checkbox">
+                                    <input id="serialize_radio" type="button" value="Radio"></p>
 
                             </td></tr></table>
                 </form>
@@ -292,23 +301,23 @@
                         autoInit: false,
                         ajax: {
                             url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch='/*,
-                            // our custom data processing function (see jQuery.ajax)
-                            converters: {
-                                'text json': function(data) {
-                                    var json = $.parseJSON(data);
-                                    var recursive = function(item) {
-                                        item.inode = item.isFolder;
-                                        item.branch = item.childs;
-                                        for (var i in item.branch) {
-                                            recursive(item.branch[i]);
-                                        }
-                                    };
-                                    for (var i in json) {
-                                        recursive(json[i]);
-                                    }
-                                    return json;
-                                }
-                            }*/
+                             // our custom data processing function (see jQuery.ajax)
+                             converters: {
+                             'text json': function(data) {
+                             var json = $.parseJSON(data);
+                             var recursive = function(item) {
+                             item.inode = item.isFolder;
+                             item.branch = item.childs;
+                             for (var i in item.branch) {
+                             recursive(item.branch[i]);
+                             }
+                             };
+                             for (var i in json) {
+                             recursive(json[i]);
+                             }
+                             return json;
+                             }
+                             }*/
                         },
                         rootData: (type == 'data') ? rootData : null,
                         itemHook: function(parent, item, itemData, level) {
@@ -515,8 +524,10 @@
                 $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
                 $('[name=checkboxChain][value=' + valueBoolNum(options.checkboxChain) + ']').prop('checked', true);
                 $('[name=checkboxBreak][value=' + (options.checkboxBreak ? 1 : 0) + ']').prop('checked', true);
+                $('[name=checkboxClick][value=' + (options.checkboxClick ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radioChain][value=' + (options.radioChain ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radioBreak][value=' + (options.radioBreak ? 1 : 0) + ']').prop('checked', true);
+                $('[name=radioClick][value=' + (options.radioClick ? 1 : 0) + ']').prop('checked', true);
 
                 $('#setCheckbox').attr('disabled', !options.checkbox);
                 $('#setRadio').attr('disabled', !options.radio);
@@ -584,7 +595,7 @@
                     $('#tree').toggleClass('aciTreeColors', $(this).val() == 1);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxBreak],[name=radioChain],[name=radioBreak],[name=editable]').click(function() {
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxBreak],[name=radioChain],[name=radioBreak],[name=editable],[name=checkboxClick],[name=radioClick]').click(function() {
                     var option = $(this).prop('name');
                     $('#tree').aciTree('option', option, $(this).val() == 1);
                     if (option == 'fullRow') {
@@ -614,7 +625,7 @@
 
                 // update init options based on inputs
                 function updateOptions() {
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=checkboxBreak]:checked,[name=radioChain]:checked,[name=radioBreak]:checked,[name=editable]:checked').each(function() {
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=checkboxBreak]:checked,[name=radioChain]:checked,[name=radioBreak]:checked,[name=editable]:checked,[name=checkboxClick]:checked,[name=radioClick]:checked').each(function() {
                         var option = $(this).prop('name');
                         $.fn.aciTree.defaults[option] = $(this).val() == 1;
                     });
@@ -1733,6 +1744,18 @@
                         },
                         id: swap1
                     });
+                });
+
+                // serialize `checkbox`
+                $('#serialize_checkbox').click(function() {
+                    var serialized = treeApi.serialize(null, 'checkbox');
+                    alert('The serialized checkboxes: ' + serialized);
+                });
+
+                // serialize `radio`
+                $('#serialize_radio').click(function() {
+                    var serialized = treeApi.serialize(null, 'radio');
+                    alert('The serialized radios: ' + serialized);
                 });
 
             });
