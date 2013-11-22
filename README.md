@@ -1,7 +1,7 @@
 
 aciTree - A treeview control with jQuery
 
-Features:
+Features: 
 
 - unlimited number of inner nodes (items that can have one or more children)
   and leaf nodes (items that have no children) and unlimited number
@@ -56,7 +56,7 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v4.1.0
+aciTree jQuery Plugin v4.1.1
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu

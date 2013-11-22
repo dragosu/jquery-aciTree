@@ -83,13 +83,13 @@
     height:auto;
     white-space:normal;
     cursor:pointer;
-    /* margin-right need to be set to icon width [.aciTree .aciTreeIcon = 18] + 
+    /* margin-right need to be set to icon width [.aciTree .aciTreeIcon = 18] +
     item padding [.aciTree .aciTreeItem = 4] (+ the width of all columns, if any) */
     margin-right:22px;
 }
 .aciTree[dir=rtl] .aciTreeItem{
     margin-right:0;
-    /* margin-left need to be set to icon width [.aciTree .aciTreeIcon = 18] + 
+    /* margin-left need to be set to icon width [.aciTree .aciTreeIcon = 18] +
     item padding [.aciTree .aciTreeItem = 4] (+ the width of all columns, if any) */
     margin-left:22px;
 }
@@ -270,12 +270,12 @@
     left:-18px;
 }
 
-.aciTree .aciTreePlaceholder.aciTreeBefore div { 
-    background-position:-32px 0 !important; 
+.aciTree .aciTreePlaceholder.aciTreeBefore div {
+    background-position:-32px 0 !important;
 }
-.aciTree .aciTreePlaceholder.aciTreeAfter div { 
+.aciTree .aciTreePlaceholder.aciTreeAfter div {
     top:-20px;
-    background-position:-16px 0 !important; 
+    background-position:-16px 0 !important;
 }
 
 .aciTree.aciTreeDragDrop .aciTreeItem, .aciTree.aciTreeDragDrop .aciTreeColumn,
@@ -296,7 +296,7 @@
 
 .aciTree[dir=rtl] .aciTreePlaceholder div {
     left:auto;
-    right:4px;    
+    right:4px;
     margin-left:0;
     margin-right:20px;
     background-position:-48px 0;
@@ -322,10 +322,10 @@
     max-width:300px;
     color:#000;
     background-color:#d0e5fe;
-    border:1px dashed #84acdd;    
+    border:1px dashed #84acdd;
     -webkit-border-radius:3px;
     -moz-border-radius:3px;
-    border-radius:3px;    
+    border-radius:3px;
     padding:4px;
     margin:20px 0 0 20px;
 }
@@ -342,11 +342,11 @@
     margin-right:4px;
     background:url(../image/tree-rtl.png) 0 -20px no-repeat;
 }
-.aciTree.aciTreeNoBranches .aciTreeButton { 
-    background:url(../image/tree-no-branches.png) 0 -20px no-repeat; 
+.aciTree.aciTreeNoBranches .aciTreeButton {
+    background:url(../image/tree-no-branches.png) 0 -20px no-repeat;
 }
-.aciTree.aciTreeNoBranches[dir=rtl] .aciTreeButton { 
-    background:url(../image/tree-no-branches-rtl.png) 0 -20px no-repeat; 
+.aciTree.aciTreeNoBranches[dir=rtl] .aciTreeButton {
+    background:url(../image/tree-no-branches-rtl.png) 0 -20px no-repeat;
 }
 
 .aciTree .aciTreeInodeMaybe>.aciTreeLine .aciTreeButton { background-position:-16px -20px; }

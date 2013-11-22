@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.1.0
+ * aciTree jQuery Plugin v4.1.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -104,7 +104,7 @@
         _checkboxDOM: {
             // add item checkbox
             add: function(item, itemData) {
-                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeCheckbox' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck">');
+                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeCheckbox' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck" />');
             },
             // remove item checkbox
             remove: function(item) {
