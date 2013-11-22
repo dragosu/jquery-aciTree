@@ -56,7 +56,7 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v4.1.0
+aciTree jQuery Plugin v4.1.1
 http://acoderinsights.ro
 
 Copyright (c) 2013 Dragos Ursu

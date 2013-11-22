@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.1.0
+ * aciTree jQuery Plugin v4.1.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -106,7 +106,7 @@
         _radioDOM: {
             // add item radio
             add: function(parent, item, itemData) {
-                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeRadio' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck">');
+                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeRadio' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck" />');
             },
             // remove item radio
             remove: function(item) {
