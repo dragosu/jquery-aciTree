@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.1.1
+ * aciTree jQuery Plugin v4.2.0
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -34,7 +34,8 @@
  *   open: false,                       // if TRUE then the node will be opened when the tree is loaded
  *   icon: 'folderIcon',                // CSS class name for the icon (if any), can also be a Array ['CSS class name', background-position-x, background-position-y]
  *   random_prop: 'random 2',           // just a random property (you can have any number defined)
- *   branch: [{ ... item data ... }, { ... item data ... }, ...]
+ *   branch: [{ ... item data ... }, { ... item data ... }, ...],
+ *   source: 'myDataSource'             // the data source name to read the children from (if any), by default `options.ajax` is used
  * }
  *
  * The `branch` array can be empty, in this case the children will be loaded when the node will be opened for the first time.
@@ -76,6 +77,7 @@
             url: null,                  // URL from where to take the data, something like 'path/script?nodeId=' (the node ID value will be added for each request)
             dataType: 'json'
         },
+        dataSource: null,               // a list of data sources to be used (each entry in `options.ajax` format)
         rootData: null,                 // initial ROOT data for the Tree (if NULL then one initial AJAX request is made on init)
         queue: {
             async: 4,                   // the number of simultaneous async (AJAX) tasks
@@ -107,7 +109,7 @@
             easing: 'linear'
         },
         // called for each AJAX request when a node needs to be loaded
-        // `settings` is the `options.ajax` object
+        // `settings` is the `options.ajax` object or an entry from `options.dataSource`
         ajaxHook: function(item, settings) {
             // the default implementation changes the URL by adding the item ID at the end
             settings.url += (item ? this.getId(item) : '');
@@ -119,8 +121,12 @@
         // called for each `value` to be added to the serialized string
         // `value` is the current serialized value (from the `item`)
         serialize: function(item, what, value) {
-            // the default implementation uses a `|` (pipe) character to separate values
-            return '|' + value;
+            if (typeof what == 'object') {
+                return value;
+            } else {
+                // the default implementation uses a `|` (pipe) character to separate values
+                return '|' + value;
+            }
         }
     };
 
@@ -493,6 +499,25 @@
             }
             callback.apply(this);
         },
+        // return the data source for item
+        _dataSource: function(item) {
+            var dataSource = this._instance.options.dataSource;
+            if (dataSource) {
+                var data = this.itemData(item);
+                if (data && data.source && dataSource[data.source]) {
+                    return dataSource[data.source];
+                }
+                var parent;
+                do {
+                    parent = this.parent(item);
+                    data = this.itemData(parent);
+                    if (data && data.source && dataSource[data.source]) {
+                        return dataSource[data.source];
+                    }
+                } while (parent.length);
+            }
+            return this._instance.options.ajax;
+        },
         // process item loading with AJAX
         // loaded data need to be array of item objects
         // each item can have children (defined as itemData.branch - array of item data objects)
@@ -532,7 +557,7 @@
                     }
                     // loaded data need to be array of item objects
                     var settings = $.extend({
-                    }, this._instance.options.ajax);
+                    }, this._dataSource(item));
                     this._instance.options.ajaxHook.call(this, item, settings);
                     settings.success = this.proxy(function(itemList) {
                         if (itemList && (itemList instanceof Array) && itemList.length) {
@@ -2107,10 +2132,71 @@
             }
             return false;
         },
+        // return updated item data
+        _serialize: function(item, callback) {
+            var data = this.itemData(item);
+            if (this.isInode(item)) {
+                data.inode = true;
+                if (this.wasLoad(item)) {
+                    data.open = this.isOpen(item);
+                    data.branch = [];
+                    this.children(item, false, true).each(this.proxy(function(element) {
+                        var entry = this._serialize($(element), callback);
+                        if (callback) {
+                            entry = callback.call(this, $(element), {
+                            }, entry);
+                        } else {
+                            entry = this._instance.options.serialize.call(this, $(element), {
+                            }, entry);
+                        }
+                        if (entry) {
+                            data.branch.push(entry);
+                        }
+                    }, true));
+                } else {
+                    data.open = false;
+                    data.branch = null;
+                }
+            } else {
+                data.inode = false;
+                data.open = null;
+                data.branch = null;
+            }
+            return data;
+        },
         // return serialized data
         // callback(item, what, value)
         serialize: function(item, what, callback) {
             // override this to provide serialized data
+            if (typeof what == 'object') {
+                if (item) {
+                    var data = this._serialize(item, callback);
+                    if (callback) {
+                        data = callback.call(this, item, {
+                        }, data);
+                    } else {
+                        data = this._instance.options.serialize.call(this, item, {
+                        }, data);
+                    }
+                    return data;
+                } else {
+                    var list = [];
+                    this.children(null, false, true).each(this.proxy(function(element) {
+                        var data = this._serialize($(element), callback);
+                        if (callback) {
+                            data = callback.call(this, $(element), {
+                            }, data);
+                        } else {
+                            data = this._instance.options.serialize.call(this, $(element), {
+                            }, data);
+                        }
+                        if (data) {
+                            list.push(data);
+                        }
+                    }, true));
+                    return list;
+                }
+            }
             return '';
         },
         // destroy control

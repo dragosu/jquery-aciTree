@@ -45,8 +45,9 @@
             <p>See how you can use the drag & drop events to sort the tree items and limit the draggable items / drop targets <a href="aciTree-drag-drop.html" target="_blank" title="aciTree drag & drop">here</a></p>
             <p>See how you can add a tooltip for each tree item <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree tooltips">here</a></p>
             <p>See how you can use a custom tree data structure <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree custom data">here</a></p>
+            <p>(<span style="color:red">new</span>) See a demo with a custom/multiple data sources <a href="/demo/aciTree-data-source.html" target="_blank" title="aciTree full size">here</a></p>
             <p>See how you can use a custom filter/search <a href="/demo/aciTree-filter-search.html" target="_blank" title="aciTree filter & search">here</a></p>
-            <p>(<span style="color:red">new</span>) See a demo with a full-sized tree container <a href="/demo/aciTree-full-size.html" target="_blank" title="aciTree full size">here</a></p>
+            <p>See a demo with a full-sized tree container <a href="/demo/aciTree-full-size.html" target="_blank" title="aciTree full size">here</a></p>
 
             <p>Note: in the demo below - the node loading it's made with a delay so you can see the loading animation.
                 If you want you can remove the delay from the <i>PHP</i> script ...</p>
@@ -90,7 +91,7 @@
                                     <label><input type="radio" name="checkboxChain" value="false"> No</label></p>
                                 <p>Checkbox Break: <label><input type="radio" name="checkboxBreak" value="1"> Yes</label>
                                     <label><input type="radio" name="checkboxBreak" value="0"> No</label></p>
-                                <p>(<span style="color:red">new</span>) Checkbox-Only Click: <label><input type="radio" name="checkboxClick" value="1"> Yes</label>
+                                <p>Checkbox-Only Click: <label><input type="radio" name="checkboxClick" value="1"> Yes</label>
                                     <label><input type="radio" name="checkboxClick" value="0"> No</label></p>
                                 <p>Radio Buttons: <label><input type="radio" name="radio" value="1"> Yes</label>
                                     <label><input type="radio" name="radio" value="0"> No</label></p>
@@ -98,7 +99,7 @@
                                     <label><input type="radio" name="radioChain" value="0"> No</label></p>
                                 <p>Radio Button Break: <label><input type="radio" name="radioBreak" value="1"> Yes</label>
                                     <label><input type="radio" name="radioBreak" value="0"> No</label></p>
-                                <p>(<span style="color:red">new</span>) Radio-Only Click: <label><input type="radio" name="radioClick" value="1"> Yes</label>
+                                <p>Radio-Only Click: <label><input type="radio" name="radioClick" value="1"> Yes</label>
                                     <label><input type="radio" name="radioClick" value="0"> No</label></p>
 
                                 <p>Editable: <label><input type="radio" name="editable" value="1"> Yes</label>
@@ -167,9 +168,10 @@
                                 <p>Cancel User-Defined Tasks : <label><input type="radio" name="cancel_user" value="1"> Yes</label>
                                     <label><input type="radio" name="cancel_user" value="0"> No</label></p>
 
-                                <p>(<span style="color:red">new</span>) Serialize:
+                                <p>Serialize:
                                     <input id="serialize_checkbox" type="button" value="Checkbox">
-                                    <input id="serialize_radio" type="button" value="Radio"></p>
+                                    <input id="serialize_radio" type="button" value="Radio">
+                                    <span style="color:red">(new) </span><input id="serialize_json" type="button" value="Item Data"></p>
 
                             </td></tr></table>
                 </form>
@@ -415,6 +417,9 @@
                             break;
                         case 'filtered':
                             log.prepend('<p>' + eventName + ' [' + options.search + '] first match: [' + api.getId(options.first) + '] [' + options.uid + ']</p>');
+                            break;
+                        case 'sorted':
+                            log.prepend('<p>' + eventName + ' [' + api.getId(item) + '] moved inside [' + api.getId(api.parent(item)) + ']</p>');
                             break;
                         default:
                             if (item) {
@@ -1756,6 +1761,12 @@
                 $('#serialize_radio').click(function() {
                     var serialized = treeApi.serialize(null, 'radio');
                     alert('The serialized radios: ' + serialized);
+                });
+
+                // serialize item data
+                $('#serialize_json').click(function() {
+                    var serialized = treeApi.serialize(null, {});
+                    alert('The serialized tree: ' + ((JSON && JSON.stringify) ? JSON.stringify(serialized) : 'JSON.stringify not supported by your browser'));
                 });
 
             });
