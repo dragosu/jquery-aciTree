@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.2.0
+ * aciTree jQuery Plugin v4.2.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -129,7 +129,7 @@
             }
             if (this.hasRadio(item)) {
                 if (this.isChecked(item)) {
-                    if (!this.radios(this.children(item), true).length) {
+                    if (!this.radios(this.children(item, false, true), true).length) {
                         // the item is checked but no children are, check the children
                         this._radioUpdate(item, true);
                     }
@@ -144,7 +144,7 @@
             if (this._instance.options.radioBreak) {
                 var list = [];
                 var process = this.proxy(function(item) {
-                    var children = this.children(item);
+                    var children = this.children(item, false, true);
                     children.each(this.proxy(function(element) {
                         var item = $(element);
                         if (this.hasRadio(item)) {
@@ -156,7 +156,7 @@
                 process(item);
                 return $(list);
             } else {
-                var children = this.children(item, true);
+                var children = this.children(item, true, true);
                 return this.radios(children);
             }
         },
@@ -165,7 +165,7 @@
             var list = [];
             items.each(this.proxy(function(element) {
                 var item = $(element);
-                var children = this.children(item);
+                var children = this.children(item, false, true);
                 children.each(this.proxy(function(element) {
                     var item = $(element);
                     if (!this._instance.options.radioBreak || this.hasRadio(item)) {
@@ -179,7 +179,7 @@
         _radioUpdate: function(item, state) {
             // update siblings
             var siblings = this.proxy(function(item) {
-                var siblings = this.siblings(item);
+                var siblings = this.siblings(item, true);
                 this._radioDOM.check(this.radios(siblings), false);
                 siblings.each(this.proxy(function(element) {
                     var item = $(element);
@@ -369,6 +369,7 @@
                     data.checked = this.isChecked(item);
                 } else {
                     data.radio = false;
+                    data.checked = null;
                 }
             }
             return data;
@@ -413,7 +414,7 @@
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
             if (!destroy) {
-                this.radios(this.children(null, true)).each(this.proxy(function(element) {
+                this.radios(this.children(null, true, true)).each(this.proxy(function(element) {
                     this.setRadio($(element), false);
                 }, true));
             }

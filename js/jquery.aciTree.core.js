@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.2.0
+ * aciTree jQuery Plugin v4.2.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -118,7 +118,7 @@
         itemHook: function(parent, item, itemData, level) {
             // there is no default implementation
         },
-        // called for each `value` to be added to the serialized string
+        // called for each item to serialize its value
         // `value` is the current serialized value (from the `item`)
         serialize: function(item, what, value) {
             if (typeof what == 'object') {

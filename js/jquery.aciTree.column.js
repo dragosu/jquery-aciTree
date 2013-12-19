@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.2.0
+ * aciTree jQuery Plugin v4.2.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -13,8 +13,8 @@
 /*
  * This extension adds multiple column support to aciTree.
  *
- * The 'columnData' option is used to tell what are the columns and show one or
- * more values that will be read from the 'itemData'.
+ * The `columnData` option is used to tell what are the columns and show one or
+ * more values that will be read from the `itemData`.
  *
  * Column data is an array of column definitions, each column definition is
  * one object:
@@ -25,10 +25,10 @@
  *   value: 'default'
  * }
  *
- * where the 'width' is the column width in [px], if undefined - then the value
- * from the CSS will be used; the 'props' is the property name that will be
- * read from the 'itemData', if undefined or the 'itemData[column.props]'
- * is undefined, then a default value will be set for the column: the 'value'.
+ * where the `width` is the column width in [px], if undefined - then the value
+ * from the CSS will be used; the `props` is the property name that will be
+ * read from the `itemData`, if undefined or the `itemData[column.props]`
+ * is undefined, then a default value will be set for the column: the `value`.
  *
  */
 

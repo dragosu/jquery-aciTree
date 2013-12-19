@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.2.0
+ * aciTree jQuery Plugin v4.2.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2013 Dragos Ursu
@@ -132,7 +132,7 @@
             var state = undefined;
             if (this.hasCheckbox(item)) {
                 if (this.isChecked(item)) {
-                    if (!this.checkboxes(this.children(item), true).length) {
+                    if (!this.checkboxes(this.children(item, false, true), true).length) {
                         // the item is checked but no children are, check them all
                         state = true;
                     }
@@ -148,7 +148,7 @@
             if (this._instance.options.checkboxBreak) {
                 var list = [];
                 var process = this.proxy(function(item) {
-                    var children = this.children(item);
+                    var children = this.children(item, false, true);
                     children.each(this.proxy(function(element) {
                         var item = $(element);
                         if (this.hasCheckbox(item)) {
@@ -160,7 +160,7 @@
                 process(item);
                 return $(list);
             } else {
-                var children = this.children(item, true);
+                var children = this.children(item, true, true);
                 return this.checkboxes(children);
             }
         },
@@ -168,7 +168,7 @@
         _checkboxUpdate: function(item, state) {
             // update children
             var checkDown = this.proxy(function(item, count, state) {
-                var children = this.children(item);
+                var children = this.children(item, false, true);
                 var total = 0;
                 var checked = 0;
                 children.each(this.proxy(function(element) {
@@ -365,6 +365,7 @@
                     data.checked = this.isChecked(item);
                 } else {
                     data.checkbox = false;
+                    data.checked = null;
                 }
             }
             return data;
@@ -417,7 +418,7 @@
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
             if (!destroy) {
-                this.checkboxes(this.children(null, true)).each(this.proxy(function(element) {
+                this.checkboxes(this.children(null, true, true)).each(this.proxy(function(element) {
                     this.setCheckbox($(element), false);
                 }, true));
             }
