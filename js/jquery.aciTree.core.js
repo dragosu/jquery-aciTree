@@ -1221,7 +1221,7 @@
                                     task.push(function(complete) {
                                         process(item, itemData.branch);
                                         if (itemData.open) {
-                                            this.open(item, { unanimated: options.unanimated });
+                                            this.open(item, this._inner(options, { itemData: null }));
                                         }
                                         complete();
                                     });
