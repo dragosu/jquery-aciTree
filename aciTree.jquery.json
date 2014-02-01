@@ -1,14 +1,14 @@
 {
     "name": "aciTree",
     "title": "aciTree - A customizable treeview control",
-    "description": "aciTree renders a treeview control based on a simple data structure. The entire tree can be loaded from a JavaScript variable or with AJAX in one go or node by node when required. A simple PHP implementation for a file system tree is provided as an example, but any server-side language can be used. The tree can be manipulated using the aciTree API. The tree items can be added, loaded, updated, removed, their order can be changed, entire branches can be created/loaded in one go, the nodes can be searched by ID ... and much more.",
+    "description": "aciTree renders a treeview control based on a simple data structure. The tree can be lazy loaded node by node through AJAX or the entire tree can be loaded in one go, including directly from a JavaScript variable. A simple PHP implementation for a file system tree is provided as an example, but any server-side language can be used. The tree can be manipulated using the aciTree API. The tree items can be added, loaded, updated, removed, their order can be changed ... and much more.",
     "keywords": [
     "treeview",
     "tree",
     "ui",
     "ajax"
     ],
-    "version": "4.2.1",
+    "version": "4.3.0",
     "author": {
         "name": "Dragos Ursu",
         "email":"dragosu@acoderinsights.ro",
@@ -26,10 +26,10 @@
         "type": "GPLv2",
         "url": "http://acoderinsights.ro/source/aciTree/gpl-v2-licence.txt"
     }],
-    "homepage": "http://acoderinsights.ro",
+    "homepage": "http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery",
     "demo": "http://acoderinsights.ro/source/aciTree/aciTree.html",
     "download": "http://acoderinsights.ro/source/zip/aciTree.zip",
-    "docs": "http://acoderinsights.ro/en/aciTree-tree-view-with-jQuery",
+    "docs": "http://acoderinsights.ro/source/aciTree/documentation.html",
     "bugs": "https://github.com/dragosu/jquery-aciTree/issues",
     "dependencies": {
         "jquery": ">=1.9.0",

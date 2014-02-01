@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -34,15 +34,15 @@
             $.extend(this._private, {
                 lastSelect: null,
                 lastOpen: null,
-                // store aciFragment api
+                // store `aciFragment` api
                 hashApi: null
             });
             // call the parent
             this._super();
         },
         // init hash
-        _initHash: function() {
-            // init aciFragment
+        _hashInit: function() {
+            // init `aciFragment`
             this._instance.jQuery.aciFragment();
             this._private.hashApi = this._instance.jQuery.aciFragment('api');
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
@@ -56,10 +56,10 @@
                 this._hashRestore();
             }));
         },
-        // override _initHook
+        // override `_initHook`
         _initHook: function() {
             if (this.extHast()) {
-                this._initHash();
+                this._hashInit();
             }
             // call the parent
             this._super();
@@ -96,8 +96,8 @@
                     process(opened);
                 }
             }
-            // support selectable extension
-            if (this._instance.options.selectHash && this.extSelectable) {
+            // support `selectable` extension
+            if (this._instance.options.selectHash && this.extSelectable && this.extSelectable()) {
                 var hash = this._private.hashApi.get(this._instance.options.selectHash, '');
                 if (hash.length && (hash != this._private.lastSelect)) {
                     this._private.lastSelect = hash;
@@ -117,8 +117,7 @@
                                             });
                                             complete();
                                         },
-                                        fail: complete,
-                                        select: true
+                                        fail: complete
                                     });
                                 },
                                 fail: complete,
@@ -140,22 +139,22 @@
             this._super(option, value);
             if (this.extHast() != hash) {
                 if (hash) {
-                    this._doneHash();
+                    this._hashDone();
                 } else {
-                    this._initHash();
+                    this._hashInit();
                 }
             }
         },
         // done hash
-        _doneHash: function() {
+        _hashDone: function() {
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._private.hashApi = null;
             this._instance.jQuery.aciFragment('destroy');
         },
-        // override _destroyHook
+        // override `_destroyHook`
         _destroyHook: function(unloaded) {
             if (unloaded) {
-                this._doneHash();
+                this._hashDone();
             }
             // call the parent
             this._super(unloaded);

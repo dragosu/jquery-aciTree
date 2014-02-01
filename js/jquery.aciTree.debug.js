@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -11,7 +11,7 @@
  */
 
 /*
- * This extension adds debug capabilities, for now it will just log the aciTree events.
+ * This extension adds debug capabilities, for now it's just a log of the aciTree events.
  */
 
 (function($, window, undefined) {
@@ -33,7 +33,7 @@
             this._super();
         },
         // init debug
-        _initDebug: function() {
+        _debugInit: function() {
             if (this._instance.options.logTo) {
                 this._private.logTo = $(this._instance.options.logTo);
             }
@@ -50,28 +50,28 @@
                 }
             }));
         },
-        // override _initHook
+        // override `_initHook`
         _initHook: function() {
-            this._initDebug();
+            this._debugInit();
             // call the parent
             this._super();
         },
-        // override set option
+        // override set `option`
         option: function(option, value) {
-            if ((option == 'logTo') && (value != this._instance.options.logTo)) {
+            if (option == 'logTo') {
                 this._private.logTo = value ? $(value) : null;
             }
             // call the parent
             this._super(option, value);
         },
         // done debug
-        _doneDebug: function() {
+        _debugDone: function() {
             this._instance.jQuery.unbind(this._private.nameSpace);
         },
         // override _destroyHook
         _destroyHook: function(unloaded) {
             if (unloaded) {
-                this._doneDebug();
+                this._debugDone();
             }
             // call the parent
             this._super(unloaded);

@@ -50,20 +50,17 @@
                     $('#tree').aciTree({
                         ajax: {
                             url: 'json/radio-button.json'
-                        },  
-                        radio: true,
-                        radioName: 'radio1'
+                        },
+                        radio: true
                     });
 
                     // init the tree
                     $('#tree-combined').aciTree({
                         ajax: {
                             url: 'json/checkbox-radio-button.json'
-                        },   
+                        },
                         checkbox: true,
-                        checkboxName: 'checkbox2[]',
                         radio: true,
-                        radioName: 'radio2',
                         unique: true
                     });
 

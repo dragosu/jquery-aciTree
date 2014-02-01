@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -21,13 +21,14 @@
 
     var options = {
         sortable: false,             // if TRUE then the tree items can be sorted
-        // called by the aciSortable inside the 'drag' callback
+        sortDelay: 750,              // how many [ms] before opening a inode on hovering when in drag
+        // called by the `aciSortable` inside the `drag` callback
         sortDrag: function(item, placeholder, isValid, helper) {
             if (!isValid) {
                 helper.html(this.getLabel(item));
             }
         },
-        // called by the aciSortable inside the 'valid' callback
+        // called by the `aciSortable` inside the `valid` callback
         sortValid: function(item, hover, before, isContainer, placeholder, helper) {
             if (isContainer) {
                 helper.html('move ' + this.getLabel(item) + ' to ' + this.getLabel(this.itemFrom(hover)));
@@ -50,13 +51,14 @@
         __extend: function() {
             // add extra data
             $.extend(this._private, {
-                openTimeout: null
+                openTimeout: null,
+                dragDrop: null // the items used in drag & drop
             });
             // call the parent
             this._super();
         },
         // init sortable
-        _initSortable: function() {
+        _sortableInit: function() {
             this._instance.jQuery.aciSortable({
                 container: '.aciTreeUl',
                 item: '.aciTreeLi',
@@ -67,22 +69,27 @@
                 placeholderSelector: '.aciTreePlaceholder',
                 helper: '<div class="aciTreeHelper"></div>',
                 helperSelector: '.aciTreeHelper',
+                // just before drag start
                 before: this.proxy(function(item) {
-                    this._instance.jQuery.focus();
-                    var options = this._options();
-                    // a way to cancel the drag
-                    if (!this._trigger(item, 'beforedrag', options)) {
-                        this._trigger(item, 'dragfail', options);
+                    // init before drag
+                    if (!this._initDrag(item)) {
+                        return false;
+                    }
+                    // a way to cancel the operation
+                    if (!this._trigger(item, 'beforedrag')) {
+                        this._trigger(item, 'dragfail');
                         return false;
                     }
                     return true;
                 }),
+                // just after drag start, before dragging
                 start: this.proxy(function(item, placeholder, helper) {
                     this._instance.jQuery.addClass('aciTreeDragDrop');
                     helper.css({
                         opacity: 1
                     }).html(this.getLabel(item));
                 }),
+                // when in drag
                 drag: this.proxy(function(item, placeholder, isValid, helper) {
                     if (!isValid) {
                         window.clearTimeout(this._private.openTimeout);
@@ -91,8 +98,23 @@
                         this._instance.options.sortDrag.apply(this, arguments);
                     }
                 }),
+                // to check the drop target (when the placeholder is repositioned)
                 valid: this.proxy(function(item, hover, before, isContainer, placeholder, helper) {
                     window.clearTimeout(this._private.openTimeout);
+                    if (!this._checkDrop(item, hover, before, isContainer, placeholder, helper)) {
+                        return false;
+                    }
+                    var options = this._options({
+                        hover: hover,
+                        before: before,
+                        isContainer: isContainer,
+                        placeholder: placeholder,
+                        helper: helper
+                    });
+                    // a way to cancel the operation
+                    if (!this._trigger(item, 'checkdrop', options)) {
+                        return false;
+                    }
                     if (!isContainer && this.isInode(hover)) {
                         if (!this.isOpen(hover) && !hover.data('opening' + this._private.nameSpace)) {
                             this._private.openTimeout = window.setTimeout(this.proxy(function() {
@@ -105,25 +127,15 @@
                                         item.removeData('opening' + this._private.nameSpace);
                                     }
                                 });
-                            }), 1000);
+                            }), this._instance.options.sortDelay);
                         }
-                    }
-                    var options = this._options({
-                        hover: hover,
-                        before: before,
-                        isContainer: isContainer,
-                        placeholder: placeholder,
-                        helper: helper
-                    });
-                    // a way to cancel the drag
-                    if (!this._trigger(item, 'checkdrop', options)) {
-                        return false;
                     }
                     if (this._instance.options.sortValid) {
                         this._instance.options.sortValid.apply(this, arguments);
                     }
                     return true;
                 }),
+                // when dragged as child
                 create: this.proxy(function(api, item, hover) {
                     if (this.isLeaf(hover)) {
                         hover.append(api._instance.options.childHolder);
@@ -131,37 +143,42 @@
                     }
                     return false;
                 }, true),
+                // on drag end
                 end: this.proxy(function(item, hover, placeholder, helper) {
                     window.clearTimeout(this._private.openTimeout);
                     var options = {
                         placeholder: placeholder,
                         helper: helper
                     };
-                    options = this._options(options, function() {
-                        this._trigger(item, 'sorted', options);
-                    }, function() {
-                        this._trigger(item, 'dropfail', options);
-                    });
+                    options = this._options(options, 'sorted', 'dropfail', null, item);
                     if (placeholder.parent().length) {
                         var prev = this.prev(placeholder, true);
                         if (prev.length) {
                             // add after a item
                             placeholder.detach();
-                            this.moveAfter(item, this._inner(options, {
-                                success: options.success,
-                                fail: options.fail,
-                                after: prev
-                            }));
+                            var items = $(this._private.dragDrop.get().reverse());
+                            this._private.dragDrop = null;
+                            items.each(this.proxy(function(element) {
+                                this.moveAfter($(element), this._inner(options, {
+                                    success: options.success,
+                                    fail: options.fail,
+                                    after: prev
+                                }));
+                            }, true));
                         } else {
                             var next = this.next(placeholder, true);
                             if (next.length) {
                                 // add before a item
                                 placeholder.detach();
-                                this.moveBefore(item, this._inner(options, {
-                                    success: options.success,
-                                    fail: options.fail,
-                                    before: next
-                                }));
+                                var items = $(this._private.dragDrop.get().reverse());
+                                this._private.dragDrop = null;
+                                items.each(this.proxy(function(element) {
+                                    this.moveBefore($(element), this._inner(options, {
+                                        success: options.success,
+                                        fail: options.fail,
+                                        before: next
+                                    }));
+                                }, true));
                             } else {
                                 // add as a child
                                 var parent = this.parent(placeholder);
@@ -170,10 +187,18 @@
                                 container.remove();
                                 if (this.isLeaf(parent)) {
                                     // we can set asChild only for leaves
-                                    this.asChild(item, this._inner(options, {
+                                    var items = this._private.dragDrop;
+                                    this.asChild(items.eq(0), this._inner(options, {
                                         success: function() {
                                             this._success(item, options);
                                             this.open(parent);
+                                            items.filter(':gt(0)').each(this.proxy(function(element) {
+                                                this.moveAfter($(element), this._inner(options, {
+                                                    success: options.success,
+                                                    fail: options.fail,
+                                                    after: this.last(parent)
+                                                }));
+                                            }, true));
                                         },
                                         fail: options.fail,
                                         parent: parent
@@ -186,6 +211,7 @@
                     } else {
                         this._fail(item, options);
                     }
+                    this._private.dragDrop = null;
                     if (helper.parent().length) {
                         // the helper is inserted in the DOM
                         var top = $(window).scrollTop();
@@ -199,7 +225,7 @@
                         },
                         {
                             complete: function() {
-                                // when completed detach the helper
+                                // detach the helper when completed
                                 helper.detach();
                             }
                         });
@@ -208,26 +234,85 @@
                 })
             });
         },
-        // override _initHook
+        // override `_initHook`
         _initHook: function() {
             if (this.extSortable()) {
-                this._initSortable();
+                this._sortableInit();
             }
             // call the parent
             this._super();
+        },
+        // reduce items by removing the childrens
+        _parents: function(items) {
+            var len = items.length, a, b, remove = [];
+            for (var i = 0; i < len - 1; i++) {
+                a = items.eq(i);
+                for (var j = i + 1; j < len; j++) {
+                    b = items.eq(j);
+                    if (this.isChildren(a, b)) {
+                        remove.push(items[j]);
+                    } else if (this.isChildren(b, a)) {
+                        remove.push(items[i]);
+                    }
+                }
+            }
+            return items.not(remove);
+        },
+        // called before drag start
+        _initDrag: function(item) {
+            // support `selectable` extension
+            if (this.extSelectable && this.extSelectable()) {
+                if (!this.hasFocus()) {
+                    this._instance.jQuery.focus();
+                }
+                if (!this.isEnabled(item)) {
+                    return false;
+                }
+                var drag = this.selected();
+                if (drag.length) {
+                    if (!this.isSelected(item)) {
+                        return false;
+                    }
+                } else {
+                    drag = item;
+                }
+                this._private.dragDrop = this._parents(drag);
+            } else {
+                this._instance.jQuery.focus();
+                this._private.dragDrop = item;
+            }
+            return true;
+        },
+        // check the drop target
+        _checkDrop: function(item, hover, before, isContainer, placeholder, helper) {
+            var items = this._private.dragDrop;
+            if (!items) {
+                return false;
+            }
+            var test = this.itemFrom(hover);
+            if (items.is(test) || items.has(test.get(0)).length) {
+                return false;
+            }
+            if (!isContainer) {
+                test = before ? this.prev(hover) : this.next(hover);
+                if (items.is(test)) {
+                    return false;
+                }
+            }
+            return true;
         },
         // test if sortable is enabled
         extSortable: function() {
             return this._instance.options.sortable;
         },
-        // override set option
+        // override set `option`
         option: function(option, value) {
             if (this.wasInit() && !this.isLocked()) {
                 if ((option == 'sortable') && (value != this.extSortable())) {
                     if (value) {
-                        this._initSortable();
+                        this._sortableInit();
                     } else {
-                        this._doneSortable();
+                        this._sortableDone();
                     }
                 }
             }
@@ -235,14 +320,14 @@
             this._super(option, value);
         },
         // done sortable
-        _doneSortable: function() {
+        _sortableDone: function() {
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.aciSortable('destroy');
         },
-        // override _destroyHook
+        // override `_destroyHook`
         _destroyHook: function(unloaded) {
             if (unloaded) {
-                this._doneSortable();
+                this._sortableDone();
             }
             // call the parent
             this._super(unloaded);

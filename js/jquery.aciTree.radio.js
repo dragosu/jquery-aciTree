@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -14,11 +14,11 @@
  * This extension adds radio-button support to aciTree,
  * should be used with the selectable extension.
  *
- * The are a few extra keys for the item data:
+ * The are a few extra properties for the item data:
  *
  * {
  *   ...
- *   radio: true,                       // TRUE means the item will have a radio button
+ *   radio: true,                       // TRUE (default) means the item will have a radio button (can be omitted if the `checkbox` extension is not used)
  *   checked: false,                    // if should be checked or not
  *   ...
  * }
@@ -53,14 +53,12 @@
             }).bind('keydown' + this._private.nameSpace, this.proxy(function(e) {
                 switch (e.which) {
                     case 32: // space
-                        // support 'selectable' extension
-                        if (this.extSelectable) {
-                            var item = this.selected();
-                            if (this.hasRadio(item)) {
+                        // support `selectable` extension
+                        if (this.extSelectable && this.extSelectable() && !e.ctrlKey) {
+                            var item = this.focused();
+                            if (this.hasRadio(item) && this.isEnabled(item)) {
                                 if (!this.isChecked(item)) {
-                                    this.check(item, {
-                                        check: true
-                                    });
+                                    this.check(item);
                                 }
                                 e.stopImmediatePropagation();
                                 // prevent page scroll
@@ -72,18 +70,17 @@
             })).on('click' + this._private.nameSpace, '.aciTreeItem', this.proxy(function(e) {
                 if (!this._instance.options.radioClick || $(e.target).is('.aciTreeCheck')) {
                     var item = this.itemFrom(e.target);
-                    if (this.hasRadio(item)) {
+                    if (this.hasRadio(item) && this.isEnabled(item) && (!this.extSelectable || !this.extSelectable() || (!e.ctrlKey && !e.shiftKey))) {
+                        // change state on click
                         if (!this.isChecked(item)) {
-                            this.check(item, {
-                                check: true
-                            });
+                            this.check(item);
                         }
                         e.preventDefault();
                     }
                 }
             }));
         },
-        // override _initHook
+        // override `_initHook`
         _initHook: function() {
             if (this.extRadio()) {
                 this._radioInit();
@@ -91,21 +88,22 @@
             // call the parent
             this._super();
         },
-        // override _itemHook
+        // override `_itemHook`
         _itemHook: function(parent, item, itemData, level) {
             if (this.extRadio()) {
-                // support 'checkbox' extension
+                // support `checkbox` extension
                 var checkbox = this.extCheckbox && this.hasCheckbox(item);
                 if (!checkbox && (itemData.radio || (itemData.radio === undefined))) {
-                    this._radioDOM.add(parent, item, itemData);
+                    this._radioDOM.add(item, itemData);
                 }
             }
+            // call the parent
             this._super(parent, item, itemData, level);
         },
         // low level DOM functions
         _radioDOM: {
             // add item radio
-            add: function(parent, item, itemData) {
+            add: function(item, itemData) {
                 item.attr('aria-checked', !!itemData.checked).addClass('aciTreeRadio' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck" />');
             },
             // remove item radio
@@ -147,6 +145,7 @@
                     var children = this.children(item, false, true);
                     children.each(this.proxy(function(element) {
                         var item = $(element);
+                        // break on missing radio
                         if (this.hasRadio(item)) {
                             list.push(element);
                             process(item);
@@ -245,65 +244,52 @@
         hasRadio: function(item) {
             return item && item.hasClass('aciTreeRadio');
         },
-        // set item with/without a radio
-        // options.radio if there will be a radio-button or not
-        // options.checked the new state (if set)
-        setRadio: function(item, options) {
-            options = this._options(options, null, function() {
-                this._trigger(item, 'radiofail', options);
-            });
-            if (this.extRadio() && this.isItem(item)) {
+        // add radio button
+        addRadio: function(item, options) {
+            options = this._options(options, 'radioadded', 'addradiofail', 'wasradio', item);
+            if (this.isItem(item)) {
                 // a way to cancel the operation
-                if (!this._trigger(item, 'beforeradio', options)) {
+                if (!this._trigger(item, 'beforeaddradio', options)) {
                     this._fail(item, options);
                     return;
                 }
-                var radio = !!options.radio;
-                var checked = options.checked;
                 if (this.hasRadio(item)) {
-                    if (radio) {
-                        if (checked !== undefined) {
-                            // change state
-                            this.check(item, this._inner(options, {
-                                check: checked
-                            }));
-                        }
-                        this._trigger(item, 'radioset', options);
+                    this._notify(item, options);
+                } else {
+                    var process = function() {
+                        this._radioDOM.add(item, {
+                        });
+                        this._success(item, options);
+                    };
+                    // support `checkbox` extension
+                    if (this.extCheckbox && this.hasCheckbox(item)) {
+                        // remove checkbox first
+                        this.removeCheckbox(item, this._inner(options, {
+                            success: process,
+                            fail: options.fail
+                        }));
                     } else {
-                        this._radioDOM.remove(item);
-                        this._trigger(item, 'radioremoved', options);
+                        process.apply(this);
                     }
+                }
+            } else {
+                this._fail(item, options);
+            }
+        },
+        // remove radio button
+        removeRadio: function(item, options) {
+            options = this._options(options, 'radioremoved', 'removeradiofail', 'notradio', item);
+            if (this.isItem(item)) {
+                // a way to cancel the operation
+                if (!this._trigger(item, 'beforeremoveradio', options)) {
+                    this._fail(item, options);
+                    return;
+                }
+                if (this.hasRadio(item)) {
+                    this._radioDOM.remove(item);
                     this._success(item, options);
                 } else {
-                    if (radio) {
-                        var process = function() {
-                            this._radioDOM.add(this.parent(item), item, {
-                            });
-                            if (checked === undefined) {
-                                this._trigger(item, 'radioadded', options);
-                            } else {
-                                // change state
-                                this.check(item, this._inner(options, {
-                                    check: checked
-                                }));
-                                this._trigger(item, 'radioadded', options);
-                            }
-                            this._success(item, options);
-                        };
-                        // support 'checkbox' extension
-                        if (this.extCheckbox && this.hasCheckbox(item)) {
-                            this.setCheckbox(item, this._inner(options, {
-                                success: process,
-                                fail: options.fail,
-                                checkbox: false
-                            }));
-                        } else {
-                            process.apply(this);
-                        }
-                    } else {
-                        this._trigger(item, 'notradio', options);
-                        this._success(item, options);
-                    }
+                    this._notify(item, options);
                 }
             } else {
                 this._fail(item, options);
@@ -314,34 +300,65 @@
             if (this.hasRadio(item)) {
                 return item.hasClass('aciTreeChecked');
             }
-            // support 'checkbox' extension
+            // support `checkbox` extension
             if (this._super) {
+                // call the parent
                 return this._super(item);
             }
             return false;
         },
-        // (un)check item
-        // options.check is the new state
+        // check radio button
         check: function(item, options) {
-            options = this._options(options, null, function() {
-                this._trigger(item, 'checkfail', options);
-            });
+            options = this._options(options, 'checked', 'checkfail', 'waschecked', item);
             if (this.extRadio() && this.hasRadio(item)) {
-                // a way to cancel the check
+                // a way to cancel the operation
                 if (!this._trigger(item, 'beforecheck', options)) {
                     this._fail(item, options);
                     return;
                 }
-                var check = options.check;
-                this._radioDOM.check(item, check);
-                if (this._instance.options.radioChain) {
-                    this._radioUpdate(item, check);
+                if (this.isChecked(item)) {
+                    this._notify(item, options);
+                } else {
+                    this._radioDOM.check(item, true);
+                    if (this._instance.options.radioChain) {
+                        // chain them
+                        this._radioUpdate(item, true);
+                    }
+                    this._success(item, options);
                 }
-                this._trigger(item, check ? 'checked' : 'unchecked', options);
-                this._success(item, options);
             } else {
-                // support 'checkbox' extension
+                // support `checkbox` extension
                 if (this._super) {
+                    // call the parent
+                    this._super(item, options);
+                } else {
+                    this._fail(item, options);
+                }
+            }
+        },
+        // uncheck radio button
+        uncheck: function(item, options) {
+            options = this._options(options, 'unchecked', 'uncheckfail', 'notchecked', item);
+            if (this.extRadio() && this.hasRadio(item)) {
+                // a way to cancel the operation
+                if (!this._trigger(item, 'beforeuncheck', options)) {
+                    this._fail(item, options);
+                    return;
+                }
+                if (this.isChecked(item)) {
+                    this._radioDOM.check(item, false);
+                    if (this._instance.options.radioChain) {
+                        // chain them
+                        this._radioUpdate(item, false);
+                    }
+                    this._success(item, options);
+                } else {
+                    this._notify(item, options);
+                }
+            } else {
+                // support `checkbox` extension
+                if (this._super) {
+                    // call the parent
                     this._super(item, options);
                 } else {
                     this._fail(item, options);
@@ -352,11 +369,7 @@
         radios: function(items, state) {
             var list = items.filter('.aciTreeRadio');
             if (state !== undefined) {
-                if (state) {
-                    return list.filter('.aciTreeChecked');
-                } else {
-                    return list.not('.aciTreeChecked');
-                }
+                return state ? list.filter('.aciTreeChecked') : list.not('.aciTreeChecked');
             }
             return list;
         },
@@ -364,12 +377,14 @@
         _serialize: function(item, callback) {
             var data = this._super(item, callback);
             if (data && this.extRadio()) {
-                if (this.hasRadio(item)) {
-                    data.radio = true;
+                if (data.hasOwnProperty('radio')) {
+                    data.radio = this.hasRadio(item);
                     data.checked = this.isChecked(item);
-                } else {
-                    data.radio = false;
-                    data.checked = null;
+                } else if (this.hasRadio(item)) {
+                    if (this.extCheckbox && this.extCheckbox()) {
+                        data.radio = true;
+                    }
+                    data.checked = this.isChecked(item);
                 }
             }
             return data;
@@ -395,7 +410,7 @@
         extRadio: function() {
             return this._instance.options.radio;
         },
-        // override set option
+        // override set `option`
         option: function(option, value) {
             if (this.wasInit() && !this.isLocked()) {
                 if ((option == 'radio') && (value != this.extRadio())) {
@@ -414,12 +429,13 @@
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeItem');
             if (!destroy) {
+                // remove radios
                 this.radios(this.children(null, true, true)).each(this.proxy(function(element) {
-                    this.setRadio($(element), false);
+                    this.removeRadio($(element));
                 }, true));
             }
         },
-        // override _destroyHook
+        // override `_destroyHook`
         _destroyHook: function(unloaded) {
             if (unloaded) {
                 this._radioDone(true);

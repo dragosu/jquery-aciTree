@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -32,7 +32,8 @@
             $.extend(this._private, {
                 // timeouts for the save operation
                 selectTimeout: null,
-                stateTimeout: null
+                focusTimeout: null,
+                openTimeout: null
             });
             // call the parent
             this._super();
@@ -49,23 +50,23 @@
                         api._persistRestore();
                         break;
                     case 'selected':
-                        // support 'selectable' extension
-                        api._persistLater(true);
+                    case 'deselected':
+                        // support `selectable` extension
+                        api._persistLater('selected');
                         break;
-                    case 'unselected':
-                        // support 'selectable' extension
-                        api._persistLater(true);
+                    case 'focus':
+                    case 'blur':
+                        // support `selectable` extension
+                        api._persistLater('focused');
                         break;
                     case 'opened':
-                        api._persistLater(false);
-                        break;
                     case 'closed':
-                        api._persistLater(false);
+                        api._persistLater('opened');
                         break;
                 }
             });
         },
-        // override _initHook
+        // override `_initHook`
         _initHook: function() {
             if (this.extPersist()) {
                 this._initPersist();
@@ -74,17 +75,26 @@
             this._super();
         },
         // persist states
-        _persistLater: function(selected) {
-            if (selected) {
-                window.clearTimeout(this._private.selectTimeout);
-                this._private.selectTimeout = window.setTimeout(this.proxy(function() {
-                    this._persistSelected();
-                }), 250);
-            } else {
-                window.clearTimeout(this._private.stateTimeout);
-                this._private.stateTimeout = window.setTimeout(this.proxy(function() {
-                    this._persistOpen();
-                }), 250);
+        _persistLater: function(type) {
+            switch (type) {
+                case 'selected':
+                    window.clearTimeout(this._private.selectTimeout);
+                    this._private.selectTimeout = window.setTimeout(this.proxy(function() {
+                        this._persistSelected();
+                    }), 250);
+                    break;
+                case 'focused':
+                    window.clearTimeout(this._private.focusTimeout);
+                    this._private.focusTimeout = window.setTimeout(this.proxy(function() {
+                        this._persistFocused();
+                    }), 250);
+                    break;
+                case 'opened':
+                    window.clearTimeout(this._private.openTimeout);
+                    this._private.openTimeout = window.setTimeout(this.proxy(function() {
+                        this._persistOpened();
+                    }), 250);
+                    break;
             }
         },
         // restore item states
@@ -112,46 +122,93 @@
                     })(opened[i]);
                 }
             }
-            // support selectable extension
-            if (this.extSelectable) {
+            // support `selectable` extension
+            if (this.extSelectable && this.extSelectable()) {
                 var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
-                if (selected) {
-                    // select item
-                    queue.push(function(complete) {
-                        this.searchId(null, null, {
-                            success: function(item) {
-                                this.select(item, {
-                                    uid: 'ui.persist',
+                if (selected instanceof Array) {
+                    // select all saved items
+                    for (var i in selected) {
+                        (function(id) {
+                            queue.push(function(complete) {
+                                this.searchId(null, null, {
                                     success: function(item) {
-                                        this.setVisible(item, {
-                                            center: true
+                                        this.select(item, {
+                                            uid: 'ui.persist',
+                                            success: function(item) {
+                                                this.setVisible(item, {
+                                                    center: true
+                                                });
+                                                complete();
+                                            },
+                                            fail: complete,
+                                            focus: false
                                         });
-                                        complete();
                                     },
                                     fail: complete,
-                                    select: true
+                                    id: id
                                 });
-                            },
-                            fail: complete,
-                            id: selected
-                        });
-                    });
+                            });
+                        })(selected[i]);
+                        if (!this._instance.options.multiSelectable) {
+                            break;
+                        }
+                    }
+                }
+                var focused = $.jStorage.get('aciTree_' + this._instance.options.persist + '_focused');
+                if (focused instanceof Array) {
+                    // focus all saved items
+                    for (var i in focused) {
+                        (function(id) {
+                            queue.push(function(complete) {
+                                this.searchId(null, null, {
+                                    success: function(item) {
+                                        this.focus(item, {
+                                            uid: 'ui.persist',
+                                            success: function(item) {
+                                                this.setVisible(item, {
+                                                    center: true
+                                                });
+                                                complete();
+                                            },
+                                            fail: complete
+                                        });
+                                    },
+                                    fail: complete,
+                                    id: id
+                                });
+                            });
+                        })(focused[i]);
+                    }
                 }
             }
         },
-        // persist selected item
+        // persist selected items
         _persistSelected: function() {
-            // support selectable extension
-            if (this.extSelectable) {
-                var selected = this.selected();
-                $.jStorage.set('aciTree_' + this._instance.options.persist + '_selected', this.getId(selected));
+            // support `selectable` extension
+            if (this.extSelectable && this.extSelectable()) {
+                var selected = [];
+                this.selected().each(this.proxy(function(element) {
+                    selected.push(this.getId($(element)));
+                }, true));
+                $.jStorage.set('aciTree_' + this._instance.options.persist + '_selected', selected);
+            }
+        },
+        // persist focused item
+        _persistFocused: function() {
+            // support `selectable` extension
+            if (this.extSelectable && this.extSelectable()) {
+                var focused = [];
+                this.focused().each(this.proxy(function(element) {
+                    focused.push(this.getId($(element)));
+                }, true));
+                $.jStorage.set('aciTree_' + this._instance.options.persist + '_focused', focused);
             }
         },
         // persist opened items
-        _persistOpen: function() {
+        _persistOpened: function() {
             var opened = [];
-            this.visible(this.inodes(this.children(null, true), true)).each(this.proxy(function(element) {
-                opened[opened.length] = this.getId($(element));
+            this.inodes(this.children(null, true), true).each(this.proxy(function(element) {
+                opened.push(this.getId($(element)));
             }, true));
             $.jStorage.set('aciTree_' + this._instance.options.persist + '_opened', opened);
         },
@@ -159,7 +216,11 @@
         isPersist: function() {
             if (this.extPersist()) {
                 var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
-                if (selected) {
+                if (selected instanceof Array) {
+                    return true;
+                }
+                var focused = $.jStorage.get('aciTree_' + this._instance.options.persist + '_focused');
+                if (focused instanceof Array) {
                     return true;
                 }
                 var opened = $.jStorage.get('aciTree_' + this._instance.options.persist + '_opened');
@@ -173,6 +234,7 @@
         unpersist: function() {
             if (this.extPersist()) {
                 $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_selected');
+                $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_focused');
                 $.jStorage.deleteKey('aciTree_' + this._instance.options.persist + '_opened');
             }
         },
@@ -180,7 +242,7 @@
         extPersist: function() {
             return this._instance.options.persist;
         },
-        // override set option
+        // override set `option`
         option: function(option, value) {
             var persist = this.extPersist();
             // call the parent
@@ -197,7 +259,7 @@
         _donePersist: function() {
             this._instance.jQuery.unbind(this._private.nameSpace);
         },
-        // override _destroyHook
+        // override `_destroyHook`
         _destroyHook: function(unloaded) {
             if (unloaded) {
                 this._donePersist();

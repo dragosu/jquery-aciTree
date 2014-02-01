@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -30,8 +30,8 @@
     // adds item update option, branch processing, moving items & item swapping, item search by ID
 
     var aciTree_utils = {
-        // add extra data
         __extend: function() {
+            // add extra data
             $.extend(this._instance, {
                 filter: new this._queue(this, this._instance.options.queue)
             });
@@ -40,91 +40,8 @@
             // call the parent
             this._super();
         },
-        // update item (create tree branch if requested)
-        // if options.itemData have the `branch` property set then
-        // will be like when calling .loadFrom for the item
-        update: function(item, options) {
-            options = this._options(options, function() {
-                this._trigger(item, 'updated', options);
-            }, function() {
-                this._trigger(item, 'updatefail', options);
-            });
-            if (this.isItem(item)) {
-                // a way to cancel the operation
-                if (!this._trigger(item, 'beforeupdate', options)) {
-                    this._fail(item, options);
-                    return;
-                }
-                var details = function() {
-                    if (options.itemData.id !== undefined) {
-                        this.setId(item, {
-                            id: options.itemData.id
-                        });
-                    }
-                    if (options.itemData.label !== undefined) {
-                        this.setLabel(item, {
-                            label: options.itemData.label
-                        });
-                    }
-                    if (options.itemData.icon !== undefined) {
-                        this.setIcon(item, {
-                            icon: options.itemData.icon
-                        });
-                    }
-                };
-                if (options.itemData.inode || (options.itemData.inode === null)) {
-                    var process = function() {
-                        // set item ID/text/icon
-                        details.apply(this);
-                        item.removeClass('aciTreeInode aciTreeInodeMaybe').addClass((options.itemData.inode ||
-                                (options.itemData.branch && options.itemData.branch.length)) ? 'aciTreeInode' : 'aciTreeInodeMaybe');
-                        if (options.itemData.branch) {
-                            if (this.wasLoad(item)) {
-                                this.unload(item, this._inner(options, {
-                                    success: function() {
-                                        this.loadFrom(item, this._inner(options, {
-                                            success: options.success,
-                                            fail: options.fail,
-                                            itemData: options.itemData.branch
-                                        }));
-                                    },
-                                    fail: options.fail
-                                }));
-                            } else {
-                                this.loadFrom(item, this._inner(options, {
-                                    success: options.success,
-                                    fail: options.fail,
-                                    itemData: options.itemData.branch
-                                }));
-                            }
-                        } else {
-                            this._success(item, options);
-                        }
-                    };
-                    if (this.isInode(item)) {
-                        process.apply(this);
-                    } else {
-                        this.setInode(item, this._inner(options, {
-                            success: process,
-                            fail: options.fail
-                        }));
-                    }
-                } else {
-                    if (this.isLeaf(item)) {
-                        details.apply(this);
-                    } else {
-                        this.setLeaf(item, this._inner(options, {
-                            success: details,
-                            fail: options.fail
-                        }));
-                    }
-                }
-            } else {
-                this._fail(item, options);
-            }
-        },
-        // callback call for each children of item
-        // when 'load' is TRUE will also try to load nodes
+        // call the `callback` function (item) for each children of item
+        // when `load` is TRUE will also try to load nodes
         branch: function(item, callback, load) {
             var queue = this._instance.queue;
             var process = this.proxy(function(item, callback, next) {
@@ -139,6 +56,7 @@
                                 complete();
                             });
                         } else if (load) {
+                            // load the item first
                             this.ajaxLoad(child, {
                                 success: function() {
                                     callback.call(this, child);
@@ -167,12 +85,10 @@
             });
             process(item, callback);
         },
-        // swap two items (they can't be parent & child)
-        // options.item1 & options.item2 are the swapped items
+        // swap two items (they can't be parent & children)
+        // `options.item1` & `options.item2` are the swapped items
         swap: function(options) {
-            options = this._options(options, null, function() {
-                this._trigger(null, 'swapfail', options);
-            });
+            options = this._options(options, null, 'swapfail', null, null);
             var item1 = options.item1;
             var item2 = options.item2;
             if (this.isItem(item1) && this.isItem(item2) && !this.isChildren(item1, item2) && !this.isChildren(item2, item1) && (item1.get(0) != item2.get(0))) {
@@ -204,15 +120,16 @@
                         parent.append(item2);
                     }
                 }
+                // update item states
                 this._updateLevel(item1);
                 var parent = this.parent(item1);
-                this._updateFirstLast(parent.length ? parent : null, item1);
+                this._setFirstLast(parent.length ? parent : null, item1);
                 this._updateHidden(item1);
                 this._updateLevel(item2);
                 parent = this.parent(item2);
-                this._updateFirstLast(parent.length ? parent : null, item2);
+                this._setFirstLast(parent.length ? parent : null, item2);
                 this._updateHidden(item2);
-                this._updateOddEven(item1.add(item2));
+                this._setOddEven(item1.add(item2));
                 this._trigger(null, 'swapped', options);
                 this._success(null, options);
             } else {
@@ -278,14 +195,10 @@
             options.index = this.siblings(item).length;
             this.setIndex(item, options);
         },
-        // move item before another (they can't be parent & child)
-        // options.before is the element before which the item will be moved
+        // move item before another (they can't be parent & children)
+        // `options.before` is the element before which the item will be moved
         moveBefore: function(item, options) {
-            options = this._options(options, null, function() {
-                this._trigger(item, 'movefail', options);
-            }, function() {
-                this._trigger(item, 'wasbefore', options);
-            });
+            options = this._options(options, null, 'movefail', 'wasbefore', item);
             var before = options.before;
             if (this.isItem(item) && this.isItem(before) && !this.isChildren(item, before) && (item.get(0) != before.get(0))) {
                 // a way to cancel the operation
@@ -306,11 +219,12 @@
                         this.setLeaf(parent);
                     }
                     this._updateLevel(item);
-                    this._updateFirstLast(parent.length ? parent : null);
+                    // update item states
+                    this._setFirstLast(parent.length ? parent : null);
                     parent = this.parent(item);
-                    this._updateFirstLast(parent.length ? parent : null, item.add(before));
+                    this._setFirstLast(parent.length ? parent : null, item.add(before));
                     this._updateHidden(item);
-                    this._updateOddEven(item.add(before).add(prev));
+                    this._setOddEven(item.add(before).add(prev));
                     this._trigger(item, 'moved', options);
                     this._success(item, options);
                 }
@@ -318,14 +232,10 @@
                 this._fail(item, options);
             }
         },
-        // move item after another (they can't be parent & child)
-        // options.after is the element after which the item will be moved
+        // move item after another (they can't be parent & children)
+        // `options.after` is the element after which the item will be moved
         moveAfter: function(item, options) {
-            options = this._options(options, null, function() {
-                this._trigger(item, 'movefail', options);
-            }, function() {
-                this._trigger(item, 'wasafter', options);
-            });
+            options = this._options(options, null, 'movefail', 'wasafter', item);
             var after = options.after;
             if (this.isItem(item) && this.isItem(after) && !this.isChildren(item, after) && (item.get(0) != after.get(0))) {
                 // a way to cancel the operation
@@ -346,11 +256,11 @@
                         this.setLeaf(parent);
                     }
                     this._updateLevel(item);
-                    this._updateFirstLast(parent.length ? parent : null);
+                    this._setFirstLast(parent.length ? parent : null);
                     parent = this.parent(item);
-                    this._updateFirstLast(parent.length ? parent : null, item.add(after));
+                    this._setFirstLast(parent.length ? parent : null, item.add(after));
                     this._updateHidden(item);
-                    this._updateOddEven(item.add(after).add(prev));
+                    this._setOddEven(item.add(after).add(prev));
                     this._trigger(item, 'moved', options);
                     this._success(item, options);
                 }
@@ -358,12 +268,10 @@
                 this._fail(item, options);
             }
         },
-        // move item to be a child of another (they can't be parent & child and the targeted parent item must be empty)
-        // options.parent is the parent element on which the item will be added
+        // move item to be a child of another (they can't be parent & children and the targeted parent item must be empty)
+        // `options.parent` is the parent element on which the item will be added
         asChild: function(item, options) {
-            options = this._options(options, null, function() {
-                this._trigger(item, 'childfail', options);
-            });
+            options = this._options(options, null, 'childfail', null, item);
             var parent = options.parent;
             if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildren(parent, true) && (item.get(0) != parent.get(0))) {
                 // a way to cancel the operation
@@ -380,19 +288,22 @@
                     var container = this._createContainer(parent);
                     container.append(item);
                     if (oldParent.length && !this.hasChildren(oldParent, true)) {
+                        // no more children
                         this.setLeaf(oldParent);
                     }
+                    // update item states
                     this._updateLevel(item);
-                    this._updateFirstLast(oldParent.length ? oldParent : null);
-                    this._updateFirstLast(parent.length ? parent : null, item);
+                    this._setFirstLast(oldParent.length ? oldParent : null);
+                    this._setFirstLast(parent.length ? parent : null, item);
                     this._updateHidden(item);
-                    this._updateOddEven(item.add(prev));
+                    this._setOddEven(item.add(prev));
                     this._trigger(item, 'childset', options);
                     this._success(item, options);
                 };
                 if (this.isInode(parent)) {
                     process.apply(this);
                 } else {
+                    // set as inode first
                     this.setInode(parent, this._inner(options, {
                         success: process,
                         fail: options.fail
@@ -402,7 +313,7 @@
                 this._fail(item, options);
             }
         },
-        // search a 'path' ID from a parent
+        // search a `path` ID from a parent
         _search: function(parent, pathId) {
             var items = this.children(parent);
             var item, id, length, found, exact = false;
@@ -435,11 +346,11 @@
             }
         },
         // search items by ID
-        // options.id is the ID to search for
-        // if 'path' is TRUE then the search will be more optimized
+        // `options.id` is the ID to search for
+        // if `path` is TRUE then the search will be more optimized
         // and reduced to the first branch that matches the ID
         // but the ID must be set like a path otherwise will not work
-        // if 'load' is TRUE will also try to load nodes (works only when 'path' is TRUE)
+        // if `load` is TRUE will also try to load nodes (works only when `path` is TRUE)
         searchId: function(path, load, options) {
             options = this._options(options);
             var id = options.id;
@@ -454,6 +365,7 @@
                                 if (this.wasLoad(found.item)) {
                                     this._fail(item, options);
                                 } else {
+                                    // load the item
                                     this.ajaxLoad(found.item, this._inner(options, {
                                         success: function() {
                                             process(found.item);
@@ -495,12 +407,10 @@
             return new window.RegExp(window.String(search).replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1').replace(/\x08/g, '\\x08'), 'i');
         },
         // filter the tree items based on search criteria
-        // options.search is the keyword
-        // options.first will be the first matched item (if any)
+        // `options.search` is the keyword
+        // `options.first` will be the first matched item (if any)
         filter: function(item, options) {
-            options = this._options(options, null, function() {
-                this._trigger(item, 'filterfail', options);
-            });
+            options = this._options(options, null, 'filterfail', null, item);
             if (!item || this.isItem(item)) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforefilter', options)) {
@@ -512,9 +422,10 @@
                 var first = null;
                 this._instance.filter.init();
                 var task = new this._task(this._instance.filter, function() {
+                    // run this at the end
                     this._instance.filter.destroy();
                     options.first = first;
-                    this._updateOddEven();
+                    this._setOddEven();
                     this._trigger(item, 'filtered', options);
                     this._success(item, options);
                 });
@@ -534,6 +445,7 @@
                             item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
                         }
                         if (this.isInode(item)) {
+                            // continue with the children
                             task.push(function(complete) {
                                 process(item);
                                 complete();
@@ -541,13 +453,14 @@
                         }
                     }, true));
                     if (found) {
+                        // update item states
                         if (parent && this.isHidden(parent)) {
                             this._showHidden(parent);
                         }
                         if (!parent || (this.isOpenPath(parent) && this.isOpen(parent))) {
                             children.not('.aciTreeHidden').addClass('aciTreeVisible');
                         }
-                        this._updateFirstLast(parent, this._firstLast(parent));
+                        this._setFirstLast(parent, this._getFirstLast(parent));
                     }
                 });
                 task.push(function(complete) {
@@ -558,11 +471,12 @@
                 this._fail(item, options);
             }
         },
-        // get first tree item
+        // call the `callback` function (item) for the first item
         _firstAll: function(callback) {
             callback.call(this, this.first());
         },
-        // get last tree item
+        // call the `callback` function (item) for the last item
+        // when `load` is TRUE will also try to load nodes
         _lastAll: function(item, callback, load) {
             if (item) {
                 if (this.isInode(item)) {
@@ -586,7 +500,7 @@
                 callback.call(this, this.last());
             }
         },
-        // get next item from tree
+        // call the `callback` function (item) for the next item from tree
         // when `load` is TRUE will also try to load nodes
         _nextAll: function(item, callback, load) {
             if (item) {
@@ -629,7 +543,7 @@
                 callback.call(this, this.first());
             }
         },
-        // get prev item from tree
+        // call the `callback` function (item) for the previous item from tree
         // when `load` is TRUE will also try to load nodes
         _prevAll: function(item, callback, load) {
             if (item) {
@@ -648,7 +562,8 @@
                 callback.call(this, this.last());
             }
         },
-        // find prev item based on search criteria
+        // call the `callback` function (item) with the previous found item based on search criteria
+        // `search` is the keyword
         prevMatch: function(item, search, callback) {
             var regexp = this._regexp(search);
             this._instance.filter.init();
@@ -673,7 +588,8 @@
             };
             process(this.isItem(item) ? item : null);
         },
-        // find next item based on search criteria
+        // call the `callback` function (item) with the next found item based on search criteria
+        // `search` is the keyword
         nextMatch: function(item, search, callback) {
             var regexp = this._regexp(search);
             this._instance.filter.init();

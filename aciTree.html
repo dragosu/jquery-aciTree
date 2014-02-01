@@ -62,8 +62,6 @@
                 <form action="" enctype="application/x-www-form-urlencoded" method="post" target="_self">
                     <table cellspacing="0" cellpadding="10" border="0"><tr><td width="300">
                                 <p>Filter: <input type="text" id="filter" value=""> (<span style="color:blue">note</span>)</p>
-                                <p>Show Branches: <label><input type="radio" name="branches" value="1"> Yes</label>
-                                    <label><input type="radio" name="branches" value="0"> No</label></p>
                                 <p>Use Animations: <label><input type="radio" name="animate" value="1"> Yes</label>
                                     <label><input type="radio" name="animate" value="0"> No</label></p>
                                 <p>Expand All: <label><input type="radio" name="expand" value="1"> Yes</label>
@@ -76,6 +74,8 @@
                                     <label><input type="radio" name="empty" value="0"> No</label></p>
                                 <p>Selectable: <label><input type="radio" name="selectable" value="1"> Yes</label>
                                     <label><input type="radio" name="selectable" value="0"> No</label></p>
+                                <p><span style="color:red">(new) </span>Multi-Selectable <label><input type="radio" name="multiSelectable" value="1"> Yes</label>
+                                    <label><input type="radio" name="multiSelectable" value="0"> No</label></p>
                                 <p>Full Row: <label><input type="radio" name="fullRow" value="1"> Yes</label>
                                     <label><input type="radio" name="fullRow" value="0"> No</label></p>
                                 <p>Text Selection: <label><input type="radio" name="textSelection" value="1"> Enabled</label>
@@ -122,6 +122,13 @@
                                     <input id="setFolder" type="button" value="Set as Folder">
                                     <input id="remove" type="button" value="Remove"></p>
                             </td><td>
+                                <p><span style="color:red">(new) </span>Size: <label><input type="radio" name="esize" value="small"> Smaller</label>
+                                    <label><input type="radio" name="esize" value="big"> Bigger</label></p>
+                                <p><span style="color:red">(new) </span>Node Button: <label><input type="radio" name="nodebtn" value="square"> Square</label>
+                                    <label><input type="radio" name="nodebtn" value="arrow"> Arrow</label></p>
+                                <p><span style="color:green">(update) </span>Show Branches: <label><input type="radio" name="branches" value="1"> Yes</label>
+                                    <label><input type="radio" name="branches" value="0"> No</label></p>
+
                                 <p>Direction: <label><input type="radio" name="direction" value="1"> LTR</label>
                                     <label><input type="radio" name="direction" value="0"> RTL</label></p>
                                 <p>Odd/Even Rows: <label><input type="radio" name="oddeven" value="1"> Yes</label>
@@ -134,8 +141,10 @@
                                 <p>Set Radio: <select id="setRadio"><option value="">-- choose --</option>
                                         <option value="yes">Yes</option><option value="No">No</option></select></p>
 
-                                <p>Item: <input id="show" type="button" value="Show"> <input id="hide" type="button" value="Hide">
-                                    <input id="hideshow" type="button" value="Toggle"> (<span style="color:blue">note</span>)</p>
+                                <p>Item: <span style="color:red">(new) </span><input id="disable" type="button" value="Disable">
+                                    <input id="enable" type="button" value="Enable">
+                                    (<span style="color:blue">note</span>) <input id="hide" type="button" value="Hide"> <input id="show" type="button" value="Show">
+                                    <input id="hideshow" type="button" value="Toggle"></p>
                                 <p>Node: <input id="open" type="button" value="Open"> <input id="close" type="button" value="Close">
                                     <input id="toggle" type="button" value="Toggle"></p>
                                 <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files">
@@ -149,8 +158,6 @@
                                 <p><label>Item Content:</label>
                                     <textarea name="item_cnt">a long item text haha this is a looooong text to be set for a item<br>with a brake...<br>more lines</textarea>
                                     <input id="set_cnt" type="button" value="Set Content"></p>
-                                <p>Using 'update': <input id="update_file" type="button" value="Update as File">
-                                    <input id="update_folder" type="button" value="Update as Folder"></p>
                                 <p>Move Item: <input id="move_up" type="button" value="Up"> <input id="move_down" type="button" value="Down">
                                     <input id="move_first" type="button" value="First Position"> <input id="move_last" type="button" value="Last Position"></p>
 
@@ -168,10 +175,10 @@
                                 <p>Cancel User-Defined Tasks : <label><input type="radio" name="cancel_user" value="1"> Yes</label>
                                     <label><input type="radio" name="cancel_user" value="0"> No</label></p>
 
-                                <p>Serialize:
+                                <p>Serialize (see the log):
                                     <input id="serialize_checkbox" type="button" value="Checkbox">
                                     <input id="serialize_radio" type="button" value="Radio">
-                                    <span style="color:red">(new) </span><input id="serialize_json" type="button" value="Item Data"></p>
+                                    <input id="serialize_json" type="button" value="Item Data"></p>
 
                             </td></tr></table>
                 </form>
@@ -180,8 +187,12 @@
             <div class="log">Tree Log... <a class="clear_log" style="font-size:10px" href="#" title="Clear the LOG" target="_blank">clear log</a>
                 <div></div></div>
 
+            <div style="float:left"><p>Test JavaScript code performance:<br>(see the log for output)</p>
+                <textarea class="testarea" style="width:315px;height:200px">alert('children: ' + treeApi.children(null, true, true).length);</textarea>
+                <p><input type="button" name="testarea" value="Test"></p></div>
+
             <p style="clear:both"><br><span style="color:red">Note</span>: the selected pink item does not have anything to do with the <i>selectable</i> option, it's there just to be able to 'select' the
-                entire tree (not only a item).<br>All item based functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item - when the
+                entire tree (not only a item).<br>All item based functions are made - in this demo - to run against the pink selected item (and not the <i>real</i> selected item - when/if the
                 selectable option is used).</p>
 
             <p><span style="color:blue">Note</span>: for this demo I have changed the default style from `display:none` for `.aciTreeHidden`
@@ -297,9 +308,12 @@
                         random: 11
                     }];
 
+                // the tree container
+                var theTree = $('#tree');
+
                 // init the Tree
                 function initTree(type, ui, skip) {
-                    treeApi = $('#tree').aciTree({
+                    treeApi = theTree.aciTree({
                         autoInit: false,
                         ajax: {
                             url: (type == 'huge') ? 'php/hugeTree.php?branch=' : 'php/aciTree.php?branch='/*,
@@ -365,14 +379,14 @@
                     eye.css('background-position', '0 -' + (eyes * 48) + 'px');
                 }
 
-                $('#tree').scroll(function() {
+                theTree.scroll(function() {
                     eye.css('top', $(this).scrollTop() + 'px');
                 });
 
                 var cancelUi = false, cancelUser = false;
 
                 // show tree events
-                $('#tree').on('acitree', function(event, api, item, eventName, options) {
+                theTree.on('acitree', function(event, api, item, eventName, options) {
                     if (eventName.search(/^before/) != -1) {
                         // cancel if requested
                         if ((cancelUi && (options.uid == 'ui')) || (cancelUser && (options.uid != 'ui'))) {
@@ -493,7 +507,7 @@
                 }
 
                 // refresh on item 'mouseover'
-                $('#tree').on('mouseover', '.aciTreeLi', function(e) {
+                theTree.on('mouseover', '.aciTreeLi', function(e) {
                     getDebug(e.target);
                     return false;
                 }).bind('mouseover', function(e) {
@@ -501,7 +515,7 @@
                 });
 
                 // get Tree init options
-                var options = $('#tree').aciTree('options');
+                var options = theTree.aciTree('options');
 
                 // get string value from BOOL/numeric
                 function valueBoolNum(mixed) {
@@ -514,7 +528,9 @@
                 }
 
                 // init FORM based on options
-                $('[name=branches][value=' + ($('#tree').hasClass('aciTreeNoBranches') ? 0 : 1) + ']').prop('checked', true);
+                $('[name=esize][value=' + (theTree.hasClass('aciTreeBig') ? 'big' : 'small') + ']').prop('checked', true);
+                $('[name=nodebtn][value=' + (theTree.hasClass('aciTreeArrow') ? 'arrow' : 'square') + ']').prop('checked', true);
+                $('[name=branches][value=' + (theTree.hasClass('aciTreeNoBranches') ? 0 : 1) + ']').prop('checked', true);
                 $('[name=animate][value=' + (options.show ? 1 : 0) + ']').prop('checked', true);
                 $('[name=expand][value=' + (options.expand ? 1 : 0) + ']').prop('checked', true);
                 $('[name=collapse][value=' + (options.collapse ? 1 : 0) + ']').prop('checked', true);
@@ -524,6 +540,7 @@
                 $('[name=fullRow][value=' + (options.fullRow ? 1 : 0) + ']').prop('checked', true);
                 $('[name=textSelection][value=' + (options.textSelection ? 1 : 0) + ']').prop('checked', true);
                 $('[name=sortable][value=' + (options.sortable ? 1 : 0) + ']').prop('checked', true);
+                $('[name=multiSelectable][value=' + (options.multiSelectable ? 1 : 0) + ']').prop('checked', true);
 
                 $('[name=checkbox][value=' + (options.checkbox ? 1 : 0) + ']').prop('checked', true);
                 $('[name=radio][value=' + (options.radio ? 1 : 0) + ']').prop('checked', true);
@@ -536,8 +553,8 @@
 
                 $('#setCheckbox').attr('disabled', !options.checkbox);
                 $('#setRadio').attr('disabled', !options.radio);
-                $('[name=direction][value=' + (($('#tree').attr('dir') == 'rtl') ? 0 : 1) + ']').prop('checked', true);
-                $('[name=oddeven][value=' + ($('#tree').hasClass('aciTreeColors') ? 1 : 0) + ']').prop('checked', true);
+                $('[name=direction][value=' + ((theTree.attr('dir') == 'rtl') ? 0 : 1) + ']').prop('checked', true);
+                $('[name=oddeven][value=' + (theTree.hasClass('aciTreeColors') ? 1 : 0) + ']').prop('checked', true);
                 $('[name=editable][value=' + (options.editable ? 1 : 0) + ']').prop('checked', true);
 
                 $('[name=cancel_ui][value=0]').prop('checked', true);
@@ -580,8 +597,16 @@
                     }
                 });
 
+                $('[name=esize]').click(function() {
+                    theTree.toggleClass('aciTreeBig', $(this).val() == 'big');
+                });
+
+                $('[name=nodebtn]').click(function() {
+                    theTree.toggleClass('aciTreeArrow', $(this).val() == 'arrow');
+                });
+
                 $('[name=branches]').click(function() {
-                    $('#tree').toggleClass('aciTreeNoBranches', $(this).val() == 0);
+                    theTree.toggleClass('aciTreeNoBranches', $(this).val() == 0);
                 });
 
                 $('[name=checkbox]').click(function() {
@@ -593,24 +618,24 @@
                 });
 
                 $('[name=direction]').click(function() {
-                    $('#tree').attr('dir', ($(this).val() == 1) ? 'ltr' : 'rtl');
+                    theTree.attr('dir', ($(this).val() == 1) ? 'ltr' : 'rtl');
                 });
 
                 $('[name=oddeven]').click(function() {
-                    $('#tree').toggleClass('aciTreeColors', $(this).val() == 1);
+                    theTree.toggleClass('aciTreeColors', $(this).val() == 1);
                 });
 
-                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxBreak],[name=radioChain],[name=radioBreak],[name=editable],[name=checkboxClick],[name=radioClick]').click(function() {
+                $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxBreak],[name=radioChain],[name=radioBreak],[name=editable],[name=checkboxClick],[name=radioClick],[name=multiSelectable]').click(function() {
                     var option = $(this).prop('name');
-                    $('#tree').aciTree('option', option, $(this).val() == 1);
+                    theTree.aciTree('option', option, $(this).val() == 1);
                     if (option == 'fullRow') {
-                        $('#tree').toggleClass('aciTreeFullRow', $(this).val() == 1);
+                        theTree.toggleClass('aciTreeFullRow', $(this).val() == 1);
                     }
                 });
 
                 $('[name=checkboxChain]').click(function() {
                     var option = $(this).prop('name');
-                    $('#tree').aciTree('option', option, boolNumValue($(this).val()));
+                    theTree.aciTree('option', option, boolNumValue($(this).val()));
                     $('[name=checkboxBreak]').prop('disabled', $(this).val() == 'false');
                 });
 
@@ -630,7 +655,7 @@
 
                 // update init options based on inputs
                 function updateOptions() {
-                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=checkboxBreak]:checked,[name=radioChain]:checked,[name=radioBreak]:checked,[name=editable]:checked,[name=checkboxClick]:checked,[name=radioClick]:checked').each(function() {
+                    $('[name=expand]:checked,[name=collapse]:checked,[name=empty]:checked,[name=unique]:checked,[name=selectable]:checked,[name=fullRow]:checked,[name=textSelection]:checked,[name=sortable]:checked,[name=checkbox]:checked,[name=radio]:checked,[name=checkboxBreak]:checked,[name=radioChain]:checked,[name=radioBreak]:checked,[name=editable]:checked,[name=checkboxClick]:checked,[name=radioClick]:checked,[name=multiSelectable]:checked').each(function() {
                         var option = $(this).prop('name');
                         $.fn.aciTree.defaults[option] = $(this).val() == 1;
                     });
@@ -676,7 +701,7 @@
                 });
 
                 $('#destroy').click(function() {
-                    $('#tree').aciTree('api').destroy({
+                    theTree.aciTree('api').destroy({
                         uid: 'user-defined',
                         success: function() {
                             alert('Treeview control successfully destroyed !');
@@ -715,14 +740,14 @@
 
                 // selected state for the Tree
                 $(document).on('click', '#tree', function() {
-                    $('#tree').find('.selected').removeClass('selected');
+                    theTree.find('.selected').removeClass('selected');
                     $(this).addClass('selected');
                     _g_sel = this;
                 });
 
                 // selected state for the Tree items
-                $('#tree').on('click', '.aciTreeItem', function(e) {
-                    $('#tree').removeClass('selected').find('.selected').removeClass('selected');
+                theTree.on('click', '.aciTreeItem', function(e) {
+                    theTree.removeClass('selected').find('.selected').removeClass('selected');
                     $(this).addClass('selected');
                     _g_sel = this;
                     e.stopPropagation();
@@ -732,7 +757,7 @@
 
                 // return TRUE if the treeview is selected
                 function checkIsTree() {
-                    return _g_sel && (_g_sel == $('#tree').get(0));
+                    return _g_sel && (_g_sel == theTree.get(0));
                 }
 
                 // return the selected item (if any)
@@ -1043,7 +1068,7 @@
                             uid: 'user-defined',
                             success: function(item, options) {
                                 // change the icon
-                                this.setIcon(item, {
+                                this.addIcon(item, {
                                     icon: 'file'
                                 });
                                 alert('The item [' + this.getId(item) + '] was made a file !');
@@ -1062,7 +1087,7 @@
                         treeApi.setInode(item, {
                             success: function(item, options) {
                                 // change the icon
-                                this.setIcon(item, {
+                                this.addIcon(item, {
                                     icon: 'folder'
                                 });
                                 alert('The item [' + this.getId(item) + '] was made a folder !');
@@ -1108,16 +1133,28 @@
                 $('#setIcon').change(function() {
                     var item = requireItem();
                     if (item) {
-                        treeApi.setIcon(item, {
-                            uid: 'user-defined',
-                            success: function(item, options) {
-                                alert('The icon for the item [' + this.getId(item) + '] was set !');
-                            },
-                            fail: function(item, options) {
-                                alert('Failed to set the icon for the item [' + this.getId(item) + '] !');
-                            },
-                            icon: ($(this).val() == 'remove') ? null : $(this).val()
-                        });
+                        if ($(this).val() == 'remove') {
+                            treeApi.removeIcon(item, {
+                                uid: 'user-defined',
+                                success: function(item, options) {
+                                    alert('The icon for the item [' + this.getId(item) + '] was removed !');
+                                },
+                                fail: function(item, options) {
+                                    alert('Failed to remove the icon for the item [' + this.getId(item) + '] !');
+                                }
+                            });
+                        } else {
+                            treeApi.addIcon(item, {
+                                uid: 'user-defined',
+                                success: function(item, options) {
+                                    alert('The icon for the item [' + this.getId(item) + '] was set !');
+                                },
+                                fail: function(item, options) {
+                                    alert('Failed to set the icon for the item [' + this.getId(item) + '] !');
+                                },
+                                icon: $(this).val()
+                            });
+                        }
                     }
                     $(this).val('');
                 });
@@ -1127,18 +1164,17 @@
                     var item = requireItem();
                     if (item) {
                         if ($(this).val() == 'yes') {
-                            treeApi.setCheckbox(item, {
+                            treeApi.addCheckbox(item, {
                                 uid: 'user-defined',
                                 success: function(item) {
                                     alert('The checkbox for the item [' + this.getId(item) + '] was added !');
                                 },
                                 fail: function(item) {
                                     alert('Failed to add the checkbox for the item [' + this.getId(item) + '] !');
-                                },
-                                checkbox: true
+                                }
                             });
                         } else {
-                            treeApi.setCheckbox(item, {
+                            treeApi.removeCheckbox(item, {
                                 uid: 'user-defined',
                                 success: function(item) {
                                     alert('The checkbox for the item [' + this.getId(item) + '] was removed !');
@@ -1157,18 +1193,17 @@
                     var item = requireItem();
                     if (item) {
                         if ($(this).val() == 'yes') {
-                            treeApi.setRadio(item, {
+                            treeApi.addRadio(item, {
                                 uid: 'user-defined',
                                 success: function(item) {
                                     alert('The radio-button for the item [' + this.getId(item) + '] was added !');
                                 },
                                 fail: function(item) {
                                     alert('Failed to add the radio-button for the item [' + this.getId(item) + '] !');
-                                },
-                                radio: true
+                                }
                             });
                         } else {
-                            treeApi.setRadio(item, {
+                            treeApi.removeRadio(item, {
                                 uid: 'user-defined',
                                 success: function(item) {
                                     alert('The radio-button for the item [' + this.getId(item) + '] was removed !');
@@ -1180,6 +1215,38 @@
                         }
                     }
                     $(this).val('');
+                });
+
+                // disable item
+                $('#disable').click(function() {
+                    var item = requireItem();
+                    if (item) {
+                        treeApi.disable(item, {
+                            uid: 'user-defined',
+                            success: function(item, options) {
+                                alert('The item [' + this.getId(item) + '] was disabled !');
+                            },
+                            fail: function(item, options) {
+                                alert('Failed to disable the item [' + this.getId(item) + '] !');
+                            }
+                        });
+                    }
+                });
+
+                // enable item
+                $('#enable').click(function() {
+                    var item = requireItem();
+                    if (item) {
+                        treeApi.enable(item, {
+                            uid: 'user-defined',
+                            success: function(item, options) {
+                                alert('The item [' + this.getId(item) + '] was enabled !');
+                            },
+                            fail: function(item, options) {
+                                alert('Failed to enable the item [' + this.getId(item) + '] !');
+                            }
+                        });
+                    }
                 });
 
                 // show item
@@ -1503,54 +1570,13 @@
                     if (item) {
                         treeApi.setLabel(item, {
                             uid: 'user-defined',
-                            success: function(item, options, oldText) {
+                            success: function(item, options) {
                                 alert('The item text [' + this.getId(item) + '] was set ! ');
                             },
                             fail: function(item, options) {
                                 alert('Failed to update item text for the item [' + this.getId(item) + '] !');
                             },
                             label: text
-                        });
-                    }
-                });
-
-                // update items
-
-                // update to a leaf
-                $('#update_file').click(function() {
-                    var item = requireItem();
-                    if (item) {
-                        var data = newLeaf();
-                        data.item = 'usign [update] to set the item as a file';
-                        treeApi.update(item, {
-                            uid: 'user-defined',
-                            success: function(item, options) {
-                                alert('The item was updated !');
-                            },
-                            fail: function(item, options) {
-                                alert('Failed to update the item !');
-                            },
-                            itemData: data
-                        });
-                    }
-                });
-
-                // update to a inode
-                $('#update_folder').click(function() {
-                    var item = requireItem();
-                    if (item) {
-                        var data = newInode();
-                        data.item = 'usign [update] to set the item as a folder';
-                        data.branch = [newInode(), newLeaf()];
-                        treeApi.update(item, {
-                            uid: 'user-defined',
-                            success: function(item, options) {
-                                alert('The item was updated !');
-                            },
-                            fail: function(item, options) {
-                                alert('Failed to update the item !');
-                            },
-                            itemData: data
                         });
                     }
                 });
@@ -1705,7 +1731,7 @@
                         }
                         treeApi.setIndex(item, {
                             uid: 'user-defined',
-                            success: function(item, options, oldIndex) {
+                            success: function(item, options) {
                                 alert('The item index was set !');
                             },
                             fail: function(item, options) {
@@ -1765,8 +1791,22 @@
 
                 // serialize item data
                 $('#serialize_json').click(function() {
-                    var serialized = treeApi.serialize(null, {});
+                    var serialized = treeApi.serialize(null, {
+                    });
                     alert('The serialized tree: ' + ((JSON && JSON.stringify) ? JSON.stringify(serialized) : 'JSON.stringify not supported by your browser'));
+                });
+
+                // test area
+                $('input[name=testarea]').click(function() {
+                    var code = $('.testarea').val();
+                    var start = Date.now();
+                    try {
+                        eval(code);
+                        var end = Date.now();
+                        alert((end - start) + ' msec');
+                    } catch (e) {
+                        alert(e.message);
+                    }
                 });
 
             });

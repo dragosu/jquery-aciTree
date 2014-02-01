@@ -1,9 +1,9 @@
 
 /*
- * aciTree jQuery Plugin v4.2.1
+ * aciTree jQuery Plugin v4.3.0
  * http://acoderinsights.ro
  *
- * Copyright (c) 2013 Dragos Ursu
+ * Copyright (c) 2014 Dragos Ursu
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * Require jQuery Library >= v1.9.0 http://jquery.com
@@ -14,10 +14,10 @@
  * This extension adds multiple column support to aciTree.
  *
  * The `columnData` option is used to tell what are the columns and show one or
- * more values that will be read from the `itemData`.
+ * more values that will be read from the item data object.
  *
  * Column data is an array of column definitions, each column definition is
- * one object:
+ * an object:
  *
  * {
  *   width: 100,
@@ -27,8 +27,8 @@
  *
  * where the `width` is the column width in [px], if undefined - then the value
  * from the CSS will be used; the `props` is the property name that will be
- * read from the `itemData`, if undefined or the `itemData[column.props]`
- * is undefined, then a default value will be set for the column: the `value`.
+ * read from the item data, if undefined (or the `item-data[column.props]`
+ * is undefined) then a default value will be set for the column: the `value`.
  *
  */
 
@@ -37,14 +37,14 @@
     // extra default options
 
     var options = {
-        columnData: []                  // column definitions data
+        columnData: []                  // column definitions list
     };
 
     // aciTree columns extension
     // adds item columns, set width with CSS or using the API
 
     var aciTree_column = {
-        // override _initHook
+        // override `_initHook`
         _initHook: function() {
             if (this._instance.options.columnData.length) {
                 // check column width
@@ -104,14 +104,14 @@
                 $('body').prepend(style);
             }
         },
-        // get column width by index (0 based)
+        // get column width by #0 based index
         getWidth: function(column) {
             if (column < this._instance.options.columnData.length) {
                 return this._getCss(['aciTree aciTree' + this._instance.index, 'aciTreeColumn' + column], 'width', true);
             }
             return null;
         },
-        // set column width by index (0 based)
+        // set column width by #0 based index
         setWidth: function(column, width) {
             if (column < this._instance.options.columnData.length) {
                 this._updateCss('.aciTree.aciTree' + this._instance.index + ' .aciTreeColumn' + column, 'width:' + width + 'px;');
@@ -133,15 +133,15 @@
             this._updateCss('.aciTree.aciTree' + this._instance.index + ' .aciTreeItem', 'margin-right:' + (icon + width) + 'px;');
             this._updateCss('.aciTree[dir=rtl].aciTree' + this._instance.index + ' .aciTreeItem', 'margin-right:0;margin-left:' + (icon + width) + 'px;');
         },
-        // test if column is visible by index (0 based)
+        // test if column is visible by #0 based index
         isColumn: function(column) {
             if (column < this._instance.options.columnData.length) {
                 return this._getCss(['aciTree aciTree' + this._instance.index, 'aciTreeColumn' + column], 'display') != 'none';
             }
             return false;
         },
-        // set column by index (0 based) to be visible or hidden
-        // if show is undefined then the column visibility will be toggled
+        // set column by #0 based index to be visible or hidden
+        // if `show` is undefined then the column visibility will be toggled
         toggleColumn: function(column, show) {
             if (column < this._instance.options.columnData.length) {
                 if (show === undefined) {
@@ -151,7 +151,7 @@
                 this._updateWidth();
             }
         },
-        // override _itemHook
+        // override `_itemHook`
         _itemHook: function(parent, item, itemData, level) {
             if (this._instance.options.columnData.length) {
                 var position = item.children('.aciTreeLine').find('.aciTreeEntry');
@@ -167,6 +167,9 @@
             this._super(parent, item, itemData, level);
         },
         // create column markup
+        // `itemData` item data object
+        // `columnData` column data definition
+        // `index` #0 based column index
         _createColumn: function(itemData, columnData, index) {
             var value = columnData.props && (itemData[columnData.props] !== undefined) ? itemData[columnData.props] :
                     ((columnData.value === undefined) ? '' : columnData.value);
