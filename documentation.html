@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>aciTree v4.3.0 - A treeview control with jQuery</title>
+        <title>aciTree v4.4.0 - A treeview control with jQuery</title>
         <meta name="description" content="aciTree API documentation">
         <style type="text/css">
             html {
@@ -146,7 +146,7 @@
     </head>
 
     <body>
-        <h1>aciTree API v4.3.0</h1>
+        <h1>aciTree API v4.4.0</h1>
 
         <p>
             Please note: here are listed only the public API methods, you need to
@@ -159,7 +159,8 @@
 
                     Notifies...</a><br><a title=".branch (item, callback, load) " href="#.branch">.branch -  Run a callback function for every children of item...</a><br><a title=".check (item, options) " href="#.check">.check -  Set a checkbox or radio-button in the checked state...</a><br><a title=".checkboxes (items, state) " href="#.checkboxes">.checkboxes -  Filter items and return only the items with a checkbox...</a><br><a title=".children (item, branch, hidden)" href="#.children">.children -  Returns a list of childrens from item.
 
-                </a><br><a title=".close (item, options)" href="#.close">.close -  Closes the item node and all his childrens (if requested)...</a><br><a title=".closeOthers (item, options)" href="#.closeOthers">.closeOthers -  Closes all other nodes less the item...</a><br><a title=".deselect (item, options) " href="#.deselect">.deselect -  Deselects the item.
+                </a><br><a title=".close (item, options)" href="#.close">.close -  Closes the item node and all his childrens (if requested)...</a><br><a title=".closeOthers (item, options)" href="#.closeOthers">.closeOthers -  Closes all other nodes less the item...</a><br><a title=".columnIndex (props) " href="#.columnIndex">.columnIndex -  Returns the column index for a value of props...</a><br><a title=".columns () " href="#.columns">.columns -  Returns the column count.
+                </a><br><a title=".deselect (item, options) " href="#.deselect">.deselect -  Deselects the item.
 
                     Notifies with the...</a><br><a title=".destroy (options)" href="#.destroy">.destroy -  Destroys the treeview control, .isLocked will return TRUE from the start until...</a><br><a title=".disable (item, options)" href="#.disable">.disable -  Disable the item node.
 
@@ -173,7 +174,7 @@
                 </a><br><a title=".focus (item, options) " href="#.focus">.focus -  Set focus to item.
 
                     Notifies with the...</a><br><a title=".focused () " href="#.focused">.focused -  Returns the (virtual) focused LI element.
-                </a><br><a title=".getIcon (item)" href="#.getIcon">.getIcon -  Returns the item ICON (or NULL if does not exist)...</a><br><a title=".getId (item)" href="#.getId">.getId -  Returns the item ID (or NULL if does not exists)...</a><br><a title=".getIndex (item)" href="#.getIndex">.getIndex -  Returns the index starting from 0 for the item (or NULL if does not exists)...</a><br><a title=".getLabel (item)" href="#.getLabel">.getLabel -  Returns the text value of item (or NULL if does not exists)...</a><br><a title=".getWidth (column) " href="#.getWidth">.getWidth -  Returns the column width (in pixels).
+                </a><br><a title=".getColumn (item, index) " href="#.getColumn">.getColumn -  Returns the content of the column for the item by its index...</a><br><a title=".getIcon (item)" href="#.getIcon">.getIcon -  Returns the item ICON (or NULL if does not exist)...</a><br><a title=".getId (item)" href="#.getId">.getId -  Returns the item ID (or NULL if does not exists)...</a><br><a title=".getIndex (item)" href="#.getIndex">.getIndex -  Returns the index starting from 0 for the item (or NULL if does not exists)...</a><br><a title=".getLabel (item)" href="#.getLabel">.getLabel -  Returns the text value of item (or NULL if does not exists)...</a><br><a title=".getWidth (index) " href="#.getWidth">.getWidth -  Returns the column width (in pixels).
 
                 </a><br><a title=".hasCheckbox (item) " href="#.hasCheckbox">.hasCheckbox -  Returns TRUE if the item has a checkbox.
 
@@ -192,7 +193,7 @@
 
                 </a><br><a title=".isChildren (parent, children)" href="#.isChildren">.isChildren -  Returns TRUE if children have parent as parent...</a><br><a title=".isClosed (item)" href="#.isClosed">.isClosed -  Returns TRUE if the item node is closed.
 
-                </a><br><a title=".isColumn (column) " href="#.isColumn">.isColumn -  Returns TRUE if the column is visible.
+                </a><br><a title=".isColumn (index) " href="#.isColumn">.isColumn -  Returns TRUE if the column is visible.
 
                 </a><br><a title=".isDisabled (item)" href="#.isDisabled">.isDisabled -  Returns TRUE if the item is disabled.
 
@@ -220,17 +221,19 @@
                 </a><br><a title=".path (item, reverse)" href="#.path">.path -  Returns a list of parent items till item (starting from ROOT)...</a><br><a title=".prev (item, hidden)" href="#.prev">.prev -  Returns the previous element from item (belonging to the same parent)...</a><br><a title=".prevMatch (item, search, callback) " href="#.prevMatch">.prevMatch -  Search for a match starting with the item before item...</a><br><a title=".radios (items, state) " href="#.radios">.radios -  Filter items and return only the items with a radio-button...</a><br><a title=".remove (item, options)" href="#.remove">.remove -  Remove item (including the childrens)...</a><br><a title=".removeCheckbox (item, options) " href="#.removeCheckbox">.removeCheckbox -  Remove a checkbox element from the item...</a><br><a title=".removeIcon (item, options)" href="#.removeIcon">.removeIcon -  Remove the ICON image for item...</a><br><a title=".removeRadio (item, options) " href="#.removeRadio">.removeRadio -  Remove a radio-button element from the item...</a><br><a title=".sameParent (item1, item2)" href="#.sameParent">.sameParent -  Returns TRUE if item1 and item2 have the same direct parent...</a><br><a title=".sameTopParent (item1, item2)" href="#.sameTopParent">.sameTopParent -  Returns TRUE if item1 and item2 have the same parent on level 0...</a><br><a title=".searchId (path, load, options) " href="#.searchId">.searchId -  Searches and returns the LI element with a ID...</a><br><a title=".select (item, options) " href="#.select">.select -  Selects the item.
 
                     Notifies with the...</a><br><a title=".selected () " href="#.selected">.selected -  Returns the selected LI element(s).
-                </a><br><a title=".serialize (item, what, callback) " href="#.serialize">.serialize -  Returns a serialized value depending on the what option...</a><br><a title=".setId (item, options)" href="#.setId">.setId -  Set the item ID.
+                </a><br><a title=".serialize (item, what, callback) " href="#.serialize">.serialize -  Returns a serialized value depending on the what option...</a><br><a title=".setColumn (item, options) " href="#.setColumn">.setColumn -  Set the item column content.
+
+                    Notifies...</a><br><a title=".setId (item, options)" href="#.setId">.setId -  Set the item ID.
 
                     Notifies with the...</a><br><a title=".setIndex (item, options)" href="#.setIndex">.setIndex -  Set the item index.
 
                     Notifies with the...</a><br><a title=".setInode (item, options)" href="#.setInode">.setInode -  Transforms item in a inner node...</a><br><a title=".setLabel (item, options)" href="#.setLabel">.setLabel -  Set the item text content.
 
-                    Notifies...</a><br><a title=".setLeaf (item, options)" href="#.setLeaf">.setLeaf -  Transforms item in a leaf node...</a><br><a title=".setVisible (item, options)" href="#.setVisible">.setVisible -  Brings item into the view...</a><br><a title=".setWidth (column, width) " href="#.setWidth">.setWidth -  Set the column width (in pixels).
+                    Notifies...</a><br><a title=".setLeaf (item, options)" href="#.setLeaf">.setLeaf -  Transforms item in a leaf node...</a><br><a title=".setVisible (item, options)" href="#.setVisible">.setVisible -  Brings item into the view...</a><br><a title=".setWidth (index, width) " href="#.setWidth">.setWidth -  Set the column width (in pixels).
 
                 </a><br><a title=".show (item, options)" href="#.show">.show -  Show a hidden item.
 
-                    Notifies with the...</a><br><a title=".siblings (item, hidden)" href="#.siblings">.siblings -  Returns a list of item siblings (belonging to the same parent)...</a><br><a title=".swap (options) " href="#.swap">.swap -  Exchanges two items (the items can't be children and parent)...</a><br><a title=".toggle (item, options)" href="#.toggle">.toggle -  Opens or closes the item node...</a><br><a title=".toggleColumn (column, show) " href="#.toggleColumn">.toggleColumn -  Show or hide a column.
+                    Notifies with the...</a><br><a title=".siblings (item, hidden)" href="#.siblings">.siblings -  Returns a list of item siblings (belonging to the same parent)...</a><br><a title=".swap (options) " href="#.swap">.swap -  Exchanges two items (the items can't be children and parent)...</a><br><a title=".toggle (item, options)" href="#.toggle">.toggle -  Opens or closes the item node...</a><br><a title=".toggleColumn (index, show) " href="#.toggleColumn">.toggleColumn -  Show or hide a column.
 
                 </a><br><a title=".topParent (item)" href="#.topParent">.topParent -  Returns the parent on the level 0 for item...</a><br><a title=".tristate (items) " href="#.tristate">.tristate -  Filter items and return only the tristate items...</a><br><a title=".uncheck (item, options) " href="#.uncheck">.uncheck -  Set a checkbox or radio-button in the unchecked state...</a><br><a title=".unload (item, options)" href="#.unload">.unload -  Removes all the item childrens...</a><br><a title=".unpersist () " href="#.unpersist">.unpersist -  Removes the save data (if there is any).
                 </a><br><a title=".visible (items, view)" href="#.visible">.visible -  Filter items and return only the visible items (the items with all parent...</a><br><a title=".wasInit ()" href="#.wasInit">.wasInit -  Returns TRUE if the treeview control was initialized.
@@ -476,6 +479,16 @@
                     <b>.closeOthers</b> calls <b>.close</b> to close all needed nodes.
                 </div>
 
+                <a name=".columnIndex"></a><div style="display: block;" data-ext="column extension"><span>.columnIndex (props) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Returns the column index for a value of <b>props</b>.
+                    <span class="where">
+                        where:
+                        <span>props<span> (string)</span></span> the <i>props</i> value used in <i>options.columnData</i>
+                    </span>
+                </div>
+
+                <a name=".columns"></a><div style="display: block;" data-ext="column extension"><span>.columns () <span>column extension</span></span> Returns the column count.
+                </div>
+
                 <a name=".deselect"></a><div style="display: block;" data-ext="selectable extension"><span>.deselect (item, options) <span>selectable extension</span><a title="Top" href="#top">[^]</a></span> Deselects the <b>item</b>.
                     <span class="where">
                         where:
@@ -635,6 +648,14 @@
                 <a name=".focused"></a><div style="display: block;" data-ext="selectable extension"><span>.focused () <span>selectable extension</span></span> Returns the (virtual) focused <i>LI</i> element.
                 </div>
 
+                <a name=".getColumn"></a><div style="display: block;" data-ext="column extension"><span>.getColumn (item, index) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Returns the content of the column for the <b>item</b> by its <b>index</b>.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i>
+                        <span>index<span> (numeric)</span></span> the column index (0 based)
+                    </span>
+                </div>
+
                 <a name=".getIcon"></a><div style="display: block;" data-ext="core"><span>.getIcon (item)<a title="Top" href="#top">[^]</a></span> Returns the <b>item</b> ICON (or NULL if does not exist).
                     <span class="where">
                         where:
@@ -664,10 +685,10 @@
                     </span>
                 </div>
 
-                <a name=".getWidth"></a><div style="display: block;" data-ext="column extension"><span>.getWidth (column) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Returns the column width (in pixels).
+                <a name=".getWidth"></a><div style="display: block;" data-ext="column extension"><span>.getWidth (index) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Returns the column width (in pixels).
                     <span class="where">
                         where:
-                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                        <span>index<span> (numeric)</span></span> the column index (0 based)
                     </span>
                 </div>
 
@@ -809,10 +830,10 @@
                     </span>
                 </div>
 
-                <a name=".isColumn"></a><div style="display: block;" data-ext="column extension"><span>.isColumn (column) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Returns <i>TRUE</i> if the column is visible.
+                <a name=".isColumn"></a><div style="display: block;" data-ext="column extension"><span>.isColumn (index) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Returns <i>TRUE</i> if the column is visible.
                     <span class="where">
                         where:
-                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                        <span>index<span> (numeric)</span></span> the column index (0 based)
                     </span>
                 </div>
 
@@ -1355,6 +1376,27 @@
                     If <b>callback</b> is not set then the <b>options.serialize</b> init option will be used by default.
                 </div>
 
+                <a name=".setColumn"></a><div style="display: block;" data-ext="column extension"><span>.setColumn (item, options) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Set the <b>item</b> column content.
+                    <span class="where">
+                        where:
+                        <span>item<span> jQuery object</span></span> the <i>LI</i> to be changed
+                            <span>options<span> <ul><li>object {</li><li>                                    success: function (item, options),</li><li>                                    fail: function (item, options),</li><li>                                    index: (numeric) the column index (0 based),</li><li>                                    value: (string) the new content</li><li>                                    }</li></ul></span></span> the callback function <b>success</b> is called if the operation
+                            succeeded and <b>fail</b> if failed, you can access the aciTree API with <b>this</b> keyword.
+                        <span class="where">where:
+                            <span>item<span> the <i>LI</i></span></span>
+                            <span>options<span> the initial <i>options</i> parameter</span></span>
+                        </span>
+                        The <i>options</i> object sent to <b>success</b> and <b>fail</b> functions will contain the following new properties: <br>
+                        <b>options.oldValue</b> - the old content.
+                    </span>
+                    Notifies with the <em>columnset</em> and <em>columnfail</em>
+                    events if the operation was successful or not and with the <em>wascolumn</em> event if the content was of the same value already.
+                    The operation can be canceled by returning <b>FALSE</b> from the event handler when <b>eventName</b> is equal with
+                    <em>beforecolumn</em>.
+                    <b>.setColumn</b> will set a property named <i>options.columnData[].props</i>, you must take care not to use any property name
+                    defined by default in the <i>itemData</i> object.
+                </div>
+
                 <a name=".setId"></a><div style="display: block;" data-ext="core"><span>.setId (item, options)<a title="Top" href="#top">[^]</a></span> Set the <b>item</b> ID.
                     <span class="where">
                         where:
@@ -1462,10 +1504,10 @@
                     <em>beforevisible</em>.
                 </div>
 
-                <a name=".setWidth"></a><div style="display: block;" data-ext="column extension"><span>.setWidth (column, width) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Set the column width (in pixels).
+                <a name=".setWidth"></a><div style="display: block;" data-ext="column extension"><span>.setWidth (index, width) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Set the column width (in pixels).
                     <span class="where">
                         where:
-                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                        <span>index<span> (numeric)</span></span> the column index (0 based)
                         <span>width<span> (numeric)</span></span> the new width
                     </span>
                 </div>
@@ -1524,10 +1566,10 @@
                     <em>beforetoggle</em>.
                 </div>
 
-                <a name=".toggleColumn"></a><div style="display: block;" data-ext="column extension"><span>.toggleColumn (column, show) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Show or hide a column.
+                <a name=".toggleColumn"></a><div style="display: block;" data-ext="column extension"><span>.toggleColumn (index, show) <span>column extension</span><a title="Top" href="#top">[^]</a></span> Show or hide a column.
                     <span class="where">
                         where:
-                        <span>column<span> (numeric)</span></span> the column index (0 based)
+                        <span>index<span> (numeric)</span></span> the column index (0 based)
                         <span>show<span> (boolean)</span></span> (if set) state changes to this value
                     </span>
                 </div>
@@ -1601,7 +1643,7 @@
 
             </div>
 
-        <p>aciTree jQuery Plugin v4.3.0</p>
+        <p>aciTree jQuery Plugin v4.4.0</p>
         <p>http://acoderinsights.ro</p>
 
         <p>Copyright (c) 2014 Dragos Ursu</p>
