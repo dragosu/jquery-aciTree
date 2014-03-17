@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.4.0
+ * aciTree jQuery Plugin v4.5.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -149,7 +149,7 @@
             // add edit field
             add: function(item) {
                 var line = item.addClass('aciTreeEdited').children('.aciTreeLine');
-                line.find('.aciTreeText').html('<input id="aciTree-editable-tree-item" type="text" value="" />');
+                line.find('.aciTreeText').html('<input id="aciTree-editable-tree-item" type="text" value="" style="-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;-o-user-select:text;user-select:text" />');
                 line.find('label').attr('for', 'aciTree-editable-tree-item');
                 this._editableDOM.get(item).val(this.getLabel(item));
             },

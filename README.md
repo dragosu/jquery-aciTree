@@ -13,7 +13,7 @@ Features:
   (open/selected) persistance using local storage, URL fragment support for
   item states (open/selected), item search & filter, enabled/disabled states,
   drag & drop for sorting items, each item can have its own icon image,
-  support for using image sprites exists;
+  support for using image sprites;
 
 - supports multiple data sources, each node can load his children from a
   different source, the entire tree structure can be serialized (including the
@@ -40,7 +40,7 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v4.4.0
+aciTree jQuery Plugin v4.5.0-rc.1
 http://acoderinsights.ro
 
 Copyright (c) 2014 Dragos Ursu

@@ -4,7 +4,7 @@
  * aciTree jQuery Plugin
  * http://acoderinsights.ro
  *
-*/
+ */
 
 .aciTree {
     outline: none;
@@ -317,7 +317,7 @@
 .aciTree .aciTreePlaceholder {
     height:0;
     line-height:0;
-    overflow:show;
+    overflow:visible;
     position:relative;
 }
 
@@ -532,3 +532,18 @@
     /* last item on each level */
     /*background-color:#FFCEFF;*/
 }
+
+/* uncomment below to keep the item in one line and scroll the tree horizontally when needed */
+
+/*
+
+.aciTree .aciTreeEntry {
+    overflow:visible;
+}
+
+.aciTree .aciTreeItem {
+    white-space:nowrap;
+    margin-right:12px;
+}
+
+*/

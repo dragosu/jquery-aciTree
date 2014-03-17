@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.4.0
+ * aciTree jQuery Plugin v4.5.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -99,15 +99,15 @@
         },
         // restore item states
         _persistRestore: function() {
-            var queue = this._instance.queue;
+            var queue = new this._queue(this, this._instance.options.queue);
             var opened = $.jStorage.get('aciTree_' + this._instance.options.persist + '_opened');
             if (opened instanceof Array) {
                 // open all saved items
                 for (var i in opened) {
-                    (function(id) {
+                    (function(path) {
                         // add item to queue
                         queue.push(function(complete) {
-                            this.searchId(null, null, {
+                            this.searchPath(null, {
                                 success: function(item) {
                                     this.open(item, {
                                         uid: 'ui.persist',
@@ -116,7 +116,8 @@
                                     });
                                 },
                                 fail: complete,
-                                id: id
+                                path: path.split(';'),
+                                load: true
                             });
                         });
                     })(opened[i]);
@@ -128,9 +129,9 @@
                 if (selected instanceof Array) {
                     // select all saved items
                     for (var i in selected) {
-                        (function(id) {
+                        (function(path) {
                             queue.push(function(complete) {
-                                this.searchId(null, null, {
+                                this.searchPath(null, {
                                     success: function(item) {
                                         this.select(item, {
                                             uid: 'ui.persist',
@@ -145,7 +146,7 @@
                                         });
                                     },
                                     fail: complete,
-                                    id: id
+                                    path: path.split(';')
                                 });
                             });
                         })(selected[i]);
@@ -158,9 +159,9 @@
                 if (focused instanceof Array) {
                     // focus all saved items
                     for (var i in focused) {
-                        (function(id) {
+                        (function(path) {
                             queue.push(function(complete) {
-                                this.searchId(null, null, {
+                                this.searchPath(null, {
                                     success: function(item) {
                                         this.focus(item, {
                                             uid: 'ui.persist',
@@ -174,7 +175,7 @@
                                         });
                                     },
                                     fail: complete,
-                                    id: id
+                                    path: path.split(';')
                                 });
                             });
                         })(focused[i]);
@@ -188,7 +189,9 @@
             if (this.extSelectable && this.extSelectable()) {
                 var selected = [];
                 this.selected().each(this.proxy(function(element) {
-                    selected.push(this.getId($(element)));
+                    var path = this.pathId($(element));
+                    path.push(this.getId($(element)));
+                    selected.push(path.join(';'));
                 }, true));
                 $.jStorage.set('aciTree_' + this._instance.options.persist + '_selected', selected);
             }
@@ -199,7 +202,9 @@
             if (this.extSelectable && this.extSelectable()) {
                 var focused = [];
                 this.focused().each(this.proxy(function(element) {
-                    focused.push(this.getId($(element)));
+                    var path = this.pathId($(element));
+                    path.push(this.getId($(element)));
+                    focused.push(path.join(';'));
                 }, true));
                 $.jStorage.set('aciTree_' + this._instance.options.persist + '_focused', focused);
             }
@@ -208,7 +213,9 @@
         _persistOpened: function() {
             var opened = [];
             this.inodes(this.children(null, true), true).each(this.proxy(function(element) {
-                opened.push(this.getId($(element)));
+                var path = this.pathId($(element));
+                path.push(this.getId($(element)));
+                opened.push(path.join(';'));
             }, true));
             $.jStorage.set('aciTree_' + this._instance.options.persist + '_opened', opened);
         },

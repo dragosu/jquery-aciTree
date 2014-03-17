@@ -11,6 +11,7 @@
         <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/jquery.aciPlugin.min.js"></script>
         <script type="text/javascript" src="js/jquery.aciSortable.min.js"></script>
+        <script type="text/javascript" src="js/jquery.aciTree.dom.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.core.js"></script>
         <script type="text/javascript" src="js/Xjquery.aciTree.aria.js"></script>
         <script type="text/javascript" src="js/Xjquery.aciTree.en_EN.js"></script>
@@ -21,7 +22,7 @@
         <script type="text/javascript" src="js/jquery.aciTree.column.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.editable.js"></script>
         <script type="text/javascript" src="js/jquery.aciTree.sortable.js"></script>
-        <script type="text/javascript" src="js/Xjquery.aciTree.debug.js"></script>
+        <script type="text/javascript" src="js/jstorage.min.js"></script>
     </head>
     <body>
 
@@ -147,14 +148,13 @@
                                     <input id="hideshow" type="button" value="Toggle"></p>
                                 <p>Node: <input id="open" type="button" value="Open"> <input id="close" type="button" value="Close">
                                     <input id="toggle" type="button" value="Toggle"></p>
-                                <p>Burn some CPU: <input id="addFile1k" type="button" value="Add 1k Files">
-                                    <input id="addFolder1k" type="button" value="Add 1k Folders"></p>
+                                <p>Burn some CPU: <input id="addFile10k" type="button" value="Add 10k Files">
+                                    <input id="addFolder10k" type="button" value="Add 10k Folders"></p>
                                 <p>Using 'branch': <input id="branch_open" type="button" value="Open All"> <input id="branch_close" type="button" value="Close All">
                                     <input id="branch_toggle" type="button" value="Toggle All"></p>
                                 <p>Search ID: <input type="text" name="item_id" value="/Item 1/document 1.txt" size="23"><input type="button" id="item_id_btn" value="@">
                                     <input id="set_visible" type="button" value="Set Visible"></p>
-                                <p>Search Params: <label><input type="checkbox" name="search_path" value="1"> Use Path</label>
-                                    <label><input type="checkbox" name="search_load" value="1"> Use Load</label></p>
+                                <p>Search Params: <label><input type="checkbox" name="search_load" value="1"> Use Load</label></p>
                                 <p><label>Item Content:</label>
                                     <textarea name="item_cnt">a long item text haha this is a looooong text to be set for a item<br>with a brake...<br>more lines</textarea>
                                     <input id="set_cnt" type="button" value="Set Content"></p>
@@ -341,7 +341,8 @@
                             this.setLabel(item, {
                                 label: itemData.label + ' (' + level + ')'
                             });
-                        }/*,
+                        },
+                        persist: 'mytree'/*,
                          columnData: [{
                          width: 80,
                          props: 'c1',
@@ -389,6 +390,9 @@
 
                 // show tree events
                 theTree.on('acitree', function(event, api, item, eventName, options) {
+                    if (options.uid == 'skip-log') {
+                        return;
+                    }
                     if (eventName.search(/^before/) != -1) {
                         // cancel if requested
                         if ((cancelUi && (options.uid == 'ui')) || (cancelUser && (options.uid != 'ui'))) {
@@ -866,11 +870,11 @@
                 }
 
                 // add one or more items (after or before a item)
-                function treeAddItem(item, itemData) {
+                function treeAddItem(item, itemData, skipLog) {
                     var before = $('[name=addMode]:checked').val() == 'before';
                     if (before) {
                         treeApi.before(item.first(), {
-                            uid: 'user-defined',
+                            uid: (skipLog ? 'skip-log' : 'user-defined'),
                             success: function(item) {
                                 alert('Item(s) successfully added before [' + this.getId(item) + '] !');
                                 if (!this.isVisible(item)) {
@@ -884,7 +888,7 @@
                         });
                     } else {
                         treeApi.after(item.last(), {
-                            uid: 'user-defined',
+                            uid: (skipLog ? 'skip-log' : 'user-defined'),
                             success: function(item) {
                                 alert('Item(s) successfully added after [' + this.getId(item) + '] !');
                                 if (!this.isVisible(item)) {
@@ -1345,10 +1349,10 @@
 
                 // time to burn your CPU ;))
 
-                // add 1k leaf items
-                $('#addFile1k').click(function() {
+                // add 10k leaf items
+                $('#addFile10k').click(function() {
                     var list = [];
-                    for (var i = 0; i < 1000; i++) {
+                    for (var i = 0; i < 10000; i++) {
                         list[list.length] = newLeaf();
                     }
                     if (checkIsTree()) {
@@ -1356,16 +1360,16 @@
                         var children = treeApi.children();
                         if (children.length) {
                             // already has some items on ROOT
-                            treeAddItem(children, list);
+                            treeAddItem(children, list, true);
                         } else {
                             // no items on ROOT
                             treeApi.append(null, {
-                                uid: 'user-defined',
+                                uid: 'skip-log',
                                 success: function(item, options) {
-                                    alert('The 1k file items where added to the ROOT !');
+                                    alert('The 10k file items where added to the ROOT !');
                                 },
                                 fail: function(item, options) {
-                                    alert('Failed to add the 1k files to the ROOT !');
+                                    alert('Failed to add the 10k files to the ROOT !');
                                 },
                                 itemData: list
                             });
@@ -1374,15 +1378,15 @@
                         var item = requireSelection();
                         if (item) {
                             // a item is selected
-                            treeAddItem(item, list);
+                            treeAddItem(item, list, true);
                         }
                     }
                 });
 
-                // add 1k inode items
-                $('#addFolder1k').click(function() {
+                // add 10k inode items
+                $('#addFolder10k').click(function() {
                     var list = [];
-                    for (var i = 0; i < 1000; i++) {
+                    for (var i = 0; i < 10000; i++) {
                         list[list.length] = newInode();
                     }
                     if (checkIsTree()) {
@@ -1390,16 +1394,16 @@
                         var children = treeApi.children();
                         if (children.length) {
                             // already has some items on ROOT
-                            treeAddItem(children, list);
+                            treeAddItem(children, list, true);
                         } else {
                             // no items on ROOT
                             treeApi.append(null, {
-                                uid: 'user-defined',
+                                uid: 'skip-log',
                                 success: function(item, options) {
-                                    alert('The 1k inode items where added to the ROOT !');
+                                    alert('The 10k inode items where added to the ROOT !');
                                 },
                                 fail: function(item, options) {
-                                    alert('Failed to add the 1k inodes to the ROOT !');
+                                    alert('Failed to add the 10k inodes to the ROOT !');
                                 },
                                 itemData: list
                             });
@@ -1408,7 +1412,7 @@
                         var item = requireSelection();
                         if (item) {
                             // a item is selected
-                            treeAddItem(item, list);
+                            treeAddItem(item, list, true);
                         }
                     }
                 });
@@ -1538,20 +1542,26 @@
                 // set item visible, search by ID
                 $('#set_visible').click(function() {
                     var id = $('[name=item_id]').val();
-                    var path = $('[name=search_path]').is(':checked');
                     var load = $('[name=search_load]').is(':checked');
-                    treeApi.searchId(path, load, {
+                    treeApi.search(null, {
                         uid: 'user-defined',
                         success: function(item, options) {
-                            var _this = this;
-                            var path = '[root] ';
-                            this.path(item).each(function() {
-                                path += '[' + _this.getId($(this)) + '] ';
-                            });
-                            this.setVisible(item, {
-                                uid: 'user-defined',
+                            uid: 'user-defined',
+                            this.openPath(item, {
                                 success: function(item, options) {
-                                    alert('The item with the ID [' + this.getId(item) + '] has been found !\nThe path is: ' + path);
+                                    this.setVisible(item, {
+                                        uid: 'user-defined',
+                                        success: function(item, options) {
+                                            var path = '[root] ';
+                                            this.path(item).each(this.proxy(function(element) {
+                                                path += '[' + this.getId($(element)) + '] ';
+                                            }, true));
+                                            alert('The item with the ID [' + this.getId(item) + '] has been found !\nThe path is: ' + path);
+                                        },
+                                        fail: function(item, options) {
+                                            alert('Failed to make visisble the item [' + this.getId(item) + '] !');
+                                        }
+                                    });
                                 },
                                 fail: function(item, options) {
                                     alert('Failed to make visisble the item [' + this.getId(item) + '] !');
@@ -1559,9 +1569,10 @@
                             });
                         },
                         fail: function(item, options) {
-                            alert('Failed to find the ID [' + options.id + '] !');
+                            alert('Failed to find the ID [' + options.search + '] !');
                         },
-                        id: id
+                        search: id,
+                        load: load
                     });
                 });
 
@@ -1649,7 +1660,7 @@
                     var item = requireItem();
                     if (item) {
                         var move = $('[name=move]').val();
-                        treeApi.searchId(null, null, {
+                        treeApi.search(null, {
                             uid: 'user-defined',
                             success: function(item1, options) {
                                 treeApi.moveBefore(item, {
@@ -1664,9 +1675,9 @@
                                 });
                             },
                             fail: function(item, options) {
-                                alert('The ID [' + options.id + '] has not been found !');
+                                alert('The ID [' + options.search + '] has not been found !');
                             },
-                            id: move
+                            search: move
                         });
                     }
                 });
@@ -1675,7 +1686,7 @@
                     var item = requireItem();
                     if (item) {
                         var move = $('[name=move]').val();
-                        treeApi.searchId(null, null, {
+                        treeApi.search(null, {
                             uid: 'user-defined',
                             success: function(item1, options) {
                                 treeApi.moveAfter(item, {
@@ -1690,9 +1701,9 @@
                                 });
                             },
                             fail: function(item, options) {
-                                alert('The ID [' + options.id + '] has not been found !');
+                                alert('The ID [' + options.search + '] has not been found !');
                             },
-                            id: move
+                            search: move
                         });
                     }
                 });
@@ -1701,7 +1712,7 @@
                     var item = requireItem();
                     if (item) {
                         var move = $('[name=move]').val();
-                        treeApi.searchId(null, null, {
+                        treeApi.search(null, {
                             uid: 'user-defined',
                             success: function(item1, options) {
                                 treeApi.asChild(item, {
@@ -1716,9 +1727,9 @@
                                 });
                             },
                             fail: function(item, options) {
-                                alert('The ID [' + options.id + '] has not been found !');
+                                alert('The ID [' + options.search + '] has not been found !');
                             },
-                            id: move
+                            search: move
                         });
                     }
                 });
@@ -1747,11 +1758,11 @@
                 // swap items by ID (if found)
                 $('#swap').click(function() {
                     var swap1 = $('[name=swap1]').val();
-                    treeApi.searchId(null, null, {
+                    treeApi.search(null, {
                         uid: 'user-defined',
                         success: function(item1) {
                             var swap2 = $('[name=swap2]').val();
-                            treeApi.searchId(null, null, {
+                            treeApi.search(null, {
                                 uid: 'user-defined',
                                 success: function(item2) {
                                     this.swap({
@@ -1767,15 +1778,15 @@
                                     });
                                 },
                                 fail: function(item, options) {
-                                    alert('The ID [' + options.id + '] has not been found !');
+                                    alert('The ID [' + options.search + '] has not been found !');
                                 },
-                                id: swap2
+                                search: swap2
                             });
                         },
                         fail: function(item, options) {
-                            alert('The ID [' + options.id + '] has not been found !');
+                            alert('The ID [' + options.search + '] has not been found !');
                         },
-                        id: swap1
+                        search: swap1
                     });
                 });
 

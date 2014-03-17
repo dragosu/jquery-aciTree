@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.4.0
+ * aciTree jQuery Plugin v4.5.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -22,8 +22,8 @@
     // extra default options
 
     var options = {
-        selectHash: null,        // hash key name to select a item (item ID as key value, multiple item IDs separated with a ";" if loading nodes is required)
-        openHash: null           // hash key name to open item(s) (item ID as key value, multiple item IDs separated with a ";" if loading nodes is required)
+        selectHash: null,        // hash key name to select a item (item path IDs as key value, multiple item IDs separated with a ";")
+        openHash: null           // hash key name to open item(s) (item path IDs as key value, multiple item IDs separated with a ";")
     };
 
     // aciTree hash extension
@@ -73,7 +73,7 @@
                     (function(id) {
                         // add item to queue
                         queue.push(function(complete) {
-                            this.searchId(null, null, {
+                            this.search(null, {
                                 success: function(item) {
                                     this.open(item, {
                                         uid: 'ui.hash',
@@ -82,7 +82,7 @@
                                     });
                                 },
                                 fail: complete,
-                                id: id
+                                search: id
                             });
                         });
                     })(opened[i]);
@@ -107,7 +107,7 @@
                     if (selected) {
                         // select item
                         queue.push(function(complete) {
-                            this.searchId(null, null, {
+                            this.search(null, {
                                 success: function(item) {
                                     this.select(item, {
                                         uid: 'ui.hash',
@@ -121,7 +121,7 @@
                                     });
                                 },
                                 fail: complete,
-                                id: selected
+                                search: selected
                             });
                         });
                     }

@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.4.0
+ * aciTree jQuery Plugin v4.5.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -65,7 +65,7 @@
             }
             if (!this._instance.options.textSelection) {
                 // disable text selection
-                this._selectable(this._instance.jQuery, false);
+                this._selectable(false);
             }
             this._instance.jQuery.bind('acitree' + this._private.nameSpace, function(event, api, item, eventName, options) {
                 switch (eventName) {
@@ -387,10 +387,6 @@
             if (this.extSelectable()) {
                 this._selectableDOM.select(item, itemData.selected);
             }
-            if (!this._instance.options.textSelection) {
-                // make text unselectable
-                this._selectable(item, false);
-            }
             // call the parent
             this._super(parent, item, itemData, level);
         },
@@ -414,10 +410,9 @@
             }
         },
         // make element (un)selectable
-        _selectable: function(element, state) {
-            var items = element.add(element.find('*'));
+        _selectable: function(state) {
             if (state) {
-                items.css({
+                this._instance.jQuery.css({
                     '-webkit-user-select': 'text',
                     '-moz-user-select': 'text',
                     '-ms-user-select': 'text',
@@ -426,9 +421,9 @@
                 }).attr({
                     'unselectable': null,
                     'onselectstart': null
-                }).unbind('selectstart' + this._private.nameSpace);
+                }).unbind('selectstart' + this._private.nameSpace + ' mousedown' + this._private.nameSpace);
             } else {
-                items.css({
+                this._instance.jQuery.css({
                     '-webkit-user-select': 'none',
                     '-moz-user-select': '-moz-none',
                     '-ms-user-select': 'none',
@@ -437,30 +432,36 @@
                 }).attr({
                     'unselectable': 'on',
                     'onselectstart': 'return false'
-                }).bind('selectstart' + this._private.nameSpace, function() {
-                    return false;
+                }).bind('selectstart' + this._private.nameSpace + ' mousedown' + this._private.nameSpace, function(e) {
+                    if (!$(e.target).is('input,textarea')) {
+                        return false;
+                    }
                 });
             }
         },
         // get first visible item
         _first: function() {
-            return this._instance.jQuery.find('.aciTreeVisible:first');
+            return $(domApi.first(this._instance.jQuery[0], function(node) {
+                return this.hasClass(node, 'aciTreeVisible') ? true : null;
+            }));
         },
         // get last visible item
         _last: function() {
-            return this._instance.jQuery.find('.aciTreeVisible:last');
+            return $(domApi.last(this._instance.jQuery[0], function(node) {
+                return this.hasClass(node, 'aciTreeVisible') ? true : null;
+            }));
         },
         // get previous visible starting with item
         _prev: function(item) {
-            var visible = this._instance.jQuery.find('.aciTreeVisible');
-            var index = window.Math.max(visible.index(item) - 1, 0);
-            return visible.eq(index);
+            return $(domApi.prevAll(item[0], function(node) {
+                return this.hasClass(node, 'aciTreeVisible') ? true : null;
+            }));
         },
         // get next visible starting with item
         _next: function(item) {
-            var visible = this._instance.jQuery.find('.aciTreeVisible');
-            var index = window.Math.min(visible.index(item) + 1, visible.length - 1);
-            return visible.eq(index);
+            return $(domApi.nextAll(item[0], function(node) {
+                return this.hasClass(node, 'aciTreeVisible') ? true : null;
+            }));
         },
         // get item height
         _height: function(item) {
@@ -677,7 +678,7 @@
                     this._fullRow(value);
                 }
                 if ((option == 'textSelection') && (value != this._instance.options.textSelection)) {
-                    this._selectable(this._instance.jQuery, value);
+                    this._selectable(value);
                 }
             }
             // call the parent
@@ -689,7 +690,7 @@
                 this._instance.jQuery.removeAttr('tabindex');
             }
             if (!this._instance.options.textSelection) {
-                this._selectable(this._instance.jQuery, true);
+                this._selectable(true);
             }
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeLine,.aciTreeItem').off(this._private.nameSpace, '.aciTreeItem');
@@ -721,5 +722,8 @@
 
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
+
+    // for internal access
+    var domApi = aciPluginClass.plugins.aciTree_dom;
 
 })(jQuery, this);

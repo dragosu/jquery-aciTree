@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.4.0
+ * aciTree jQuery Plugin v4.5.0-rc.1
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -402,6 +402,111 @@
                 }
             }
         },
+        // search nodes by ID or custom property starting from item
+        // `options.search` is the value to be searched
+        // `options.load` if TRUE will try to load nodes
+        // `options.callback` function (item, search) return TRUE for the custom match
+        // `options.results` will keep the search results
+        search: function(item, options) {
+            var results = [];
+            options = this._options(options);
+            var task = new this._task(new this._queue(this, this._instance.options.queue), function(complete) {
+                // run this at the end
+                if (results.length) {
+                    options.results = $(results);
+                    this._success($(results[0]), options);
+                } else {
+                    this._fail(item, options);
+                }
+                complete();
+            });
+            var children = this.proxy(function(item) {
+                this.children(item, false, true).each(this.proxy(function(element) {
+                    if (options.callback) {
+                        // custom search
+                        var match = options.callback.call(this, $(element), options.search);
+                        if (match) {
+                            results.push(element);
+                        } else if (match === null) {
+                            // skip childrens
+                            return;
+                        }
+                    } else if (this.getId($(element)) == options.search) {
+                        // default ID match
+                        results.push(element);
+                    }
+                    if (this.isInode($(element))) {
+                        // process children
+                        task.push(function(complete) {
+                            search($(element));
+                            complete();
+                        });
+                    }
+                }, true));
+            });
+            var search = this.proxy(function(item) {
+                if (this.wasLoad(item)) {
+                    // process children
+                    task.push(function(complete) {
+                        children(item);
+                        complete();
+                    });
+                } else if (options.load) {
+                    task.push(function(complete) {
+                        // load the item first
+                        this.ajaxLoad(item, {
+                            success: function() {
+                                children(item);
+                                complete();
+                            },
+                            fail: complete
+                        });
+                    });
+                }
+            });
+            // run the search
+            task.push(function(complete) {
+                search(item);
+                complete();
+            });
+        },
+        // search node by a list of IDs starting from item
+        // `options.path` is a list of IDs to be searched - the path to the node
+        // `options.load` if TRUE will try to load nodes
+        searchPath: function(item, options) {
+            options = this._options(options);
+            var path = options.path;
+            var search = this.proxy(function(item, id) {
+                this.search(item, {
+                    success: function(item) {
+                        if (path.length) {
+                            search(item, path.shift());
+                        } else {
+                            this._success(item, options);
+                        }
+                    },
+                    fail: function() {
+                        this._fail(item, options);
+                    },
+                    search: id,
+                    load: options.load,
+                    callback: function(item, search) {
+                        // prevent drill-down
+                        return (this.getId(item) == search) ? true : null;
+                    }
+                });
+            });
+            search(item, path.shift());
+        },
+        // get item path IDs starting from the top parent (ROOT)
+        // when `reverse` is TRUE returns the IDs in reverse order
+        pathId: function(item, reverse) {
+            var path = this.path(item, reverse), id = [];
+            path.each(this.proxy(function(element) {
+                id.push(this.getId($(element)));
+            }, true));
+            return id;
+        },
         // escape string and return RegExp
         _regexp: function(search) {
             return new window.RegExp(window.String(search).replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1').replace(/\x08/g, '\\x08'), 'i');
@@ -421,13 +526,14 @@
                 var regexp = this._regexp(search);
                 var first = null;
                 this._instance.filter.init();
-                var task = new this._task(this._instance.filter, function() {
+                var task = new this._task(this._instance.filter, function(complete) {
                     // run this at the end
                     this._instance.filter.destroy();
                     options.first = first;
                     this._setOddEven();
                     this._trigger(item, 'filtered', options);
                     this._success(item, options);
+                    complete();
                 });
                 // process children
                 var process = this.proxy(function(parent) {
@@ -567,8 +673,9 @@
         prevMatch: function(item, search, callback) {
             var regexp = this._regexp(search);
             this._instance.filter.init();
-            var task = new this._task(this._instance.filter, function() {
+            var task = new this._task(this._instance.filter, function(complete) {
                 this._instance.filter.destroy();
+                complete();
             });
             var process = function(item) {
                 task.push(function(complete) {
@@ -593,8 +700,9 @@
         nextMatch: function(item, search, callback) {
             var regexp = this._regexp(search);
             this._instance.filter.init();
-            var task = new this._task(this._instance.filter, function() {
+            var task = new this._task(this._instance.filter, function(complete) {
                 this._instance.filter.destroy();
+                complete();
             });
             var process = function(item) {
                 task.push(function(complete) {
