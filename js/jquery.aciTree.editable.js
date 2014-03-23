@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.1
+ * aciTree jQuery Plugin v4.5.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -99,15 +99,15 @@
                 // key handling
                 switch (e.which) {
                     case 13: // enter
-                        this.endEdit();
                         this.itemFrom(e.target).focus();
+                        this.endEdit();
                         e.stopPropagation();
                         break;
                     case 27: // escape
+                        this.itemFrom(e.target).focus();
                         this.endEdit({
                             save: false
                         });
-                        this.itemFrom(e.target).focus();
                         e.stopPropagation();
                         // prevent default action on ESC
                         e.preventDefault();

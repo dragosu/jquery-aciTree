@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.1
+ * aciTree jQuery Plugin v4.5.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -337,6 +337,60 @@ aciPluginClass.plugins.aciTree_dom = {
         }
         return children;
     },
+    // get a children from the node
+    // `node` must be valid DOM node
+    // `callback` can return FALSE to skip a node or NULL to stop the search
+    // can return NULL
+    childrenTill: function(node, callback) {
+        var levels = [], match, next, skip;
+        var firstChild = node.firstChild;
+        if (firstChild) {
+            while (true) {
+                skip = false;
+                do {
+                    match = callback.call(this, firstChild);
+                    if (match) {
+                        return firstChild;
+                    } else if (match === null) {
+                        return null;
+                    }
+                    next = firstChild.firstChild;
+                    if (next) {
+                        levels.push(firstChild);
+                        firstChild = next;
+                        skip = true;
+                        break;
+                    }
+                } while (firstChild = firstChild.nextSibling);
+                if (!skip) {
+                    while (firstChild = levels.pop()) {
+                        firstChild = firstChild.nextSibling;
+                        if (firstChild) {
+                            break;
+                        }
+                    }
+                    if (!firstChild) {
+                        break;
+                    }
+                }
+            }
+        }
+        return null;
+    },
+    // get a children from the node having a class
+    // `node` must be valid DOM node
+    // `className` String or Array to check for
+    // can return NULL
+    childrenByClass: function(node, className) {
+        if (node.getElementsByClassName) {
+            var list = node.getElementsByClassName(className instanceof Array ? className.join(' ') : className);
+            return list ? list[0] : null;
+        } else {
+            return this.childrenTill(node, function(node) {
+                return this.hasClass(node, className);
+            });
+        }
+    },
     // get the parent LI from the children LI
     // `node` must be valid LI DOM node
     // can return NULL
@@ -349,16 +403,40 @@ aciPluginClass.plugins.aciTree_dom = {
     },
     // get the parent LI from any children
     // `node` must be valid children of a LI DOM node
-    // `container` must be valid DOM node used to stop the search
     // can return NULL
-    parentFrom: function(node, container) {
+    parentFrom: function(node) {
         while (node.nodeName != 'LI') {
             node = node.parentNode;
-            if (!node || (node === container)) {
+            if (!node) {
                 return null;
             }
         }
         return node;
+    },
+    // get a parent from the node
+    // `node` must be valid DOM node
+    // `callback` can return FALSE to skip a node or NULL to stop the search
+    // can return NULL
+    parentTill: function(node, callback) {
+        var match;
+        while (node = node.parentNode) {
+            match = callback.call(this, node);
+            if (match) {
+                return node;
+            } else if (match === null) {
+                return null;
+            }
+        }
+        return null;
+    },
+    // get a parent from the node having a class
+    // `node` must be valid DOM node
+    // `className` String or Array to check for
+    // can return NULL
+    parentByClass: function(node, className) {
+        return this.parentTill(node, function(node) {
+            return this.hasClass(node, className);
+        });
     },
     // test if node has class(es)
     // `className` String or Array to check for

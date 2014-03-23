@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.1
+ * aciTree jQuery Plugin v4.5.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -421,7 +421,7 @@
                 }).attr({
                     'unselectable': null,
                     'onselectstart': null
-                }).unbind('selectstart' + this._private.nameSpace + ' mousedown' + this._private.nameSpace);
+                }).unbind('selectstart' + this._private.nameSpace);
             } else {
                 this._instance.jQuery.css({
                     '-webkit-user-select': 'none',
@@ -432,7 +432,7 @@
                 }).attr({
                     'unselectable': 'on',
                     'onselectstart': 'return false'
-                }).bind('selectstart' + this._private.nameSpace + ' mousedown' + this._private.nameSpace, function(e) {
+                }).bind('selectstart' + this._private.nameSpace, function(e) {
                     if (!$(e.target).is('input,textarea')) {
                         return false;
                     }

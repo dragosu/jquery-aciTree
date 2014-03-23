@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.1
+ * aciTree jQuery Plugin v4.5.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -99,7 +99,7 @@
             if (this.extCheckbox()) {
                 // support `radio` extension
                 var radio = this.extRadio && this.hasRadio(item);
-                if (!radio && (itemData.checkbox || (itemData.checkbox === undefined))) {
+                if (!radio && (itemData.checkbox || ((itemData.checkbox === undefined) && (!this.extRadio || !this.extRadio())))) {
                     this._checkboxDOM.add(item, itemData);
                 }
             }

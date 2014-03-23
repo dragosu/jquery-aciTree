@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.1
+ * aciTree jQuery Plugin v4.5.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -98,7 +98,7 @@
             }
         },
         // restore item states
-        _persistRestore: function() {
+        _persistRestoreX: function() {
             var queue = new this._queue(this, this._instance.options.queue);
             var opened = $.jStorage.get('aciTree_' + this._instance.options.persist + '_opened');
             if (opened instanceof Array) {
@@ -135,10 +135,7 @@
                                     success: function(item) {
                                         this.select(item, {
                                             uid: 'ui.persist',
-                                            success: function(item) {
-                                                this.setVisible(item, {
-                                                    center: true
-                                                });
+                                            success: function() {
                                                 complete();
                                             },
                                             fail: complete,
@@ -183,14 +180,100 @@
                 }
             }
         },
+        _persistRestore: function() {
+            var queue = new this._queue(this, this._instance.options.queue);
+            var task = new this._task(queue, function(complete) {
+                // support `selectable` extension
+                if (this.extSelectable && this.extSelectable()) {
+                    var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
+                    if (selected instanceof Array) {
+                        // select all saved items
+                        for (var i in selected) {
+                            (function(path) {
+                                queue.push(function(complete) {
+                                    this.searchPath(null, {
+                                        success: function(item) {
+                                            this.select(item, {
+                                                uid: 'ui.persist',
+                                                success: function() {
+                                                    complete();
+                                                },
+                                                fail: complete,
+                                                focus: false
+                                            });
+                                        },
+                                        fail: complete,
+                                        path: path.split(';')
+                                    });
+                                });
+                            })(selected[i]);
+                            if (!this._instance.options.multiSelectable) {
+                                break;
+                            }
+                        }
+                    }
+                    var focused = $.jStorage.get('aciTree_' + this._instance.options.persist + '_focused');
+                    if (focused instanceof Array) {
+                        // focus all saved items
+                        for (var i in focused) {
+                            (function(path) {
+                                queue.push(function(complete) {
+                                    this.searchPath(null, {
+                                        success: function(item) {
+                                            this.focus(item, {
+                                                uid: 'ui.persist',
+                                                success: function(item) {
+                                                    this.setVisible(item, {
+                                                        center: true
+                                                    });
+                                                    complete();
+                                                },
+                                                fail: complete
+                                            });
+                                        },
+                                        fail: complete,
+                                        path: path.split(';')
+                                    });
+                                });
+                            })(focused[i]);
+                        }
+                    }
+                }
+                complete();
+            });
+            var opened = $.jStorage.get('aciTree_' + this._instance.options.persist + '_opened');
+            if (opened instanceof Array) {
+                // open all saved items
+                for (var i in opened) {
+                    (function(path) {
+                        // add item to queue
+                        task.push(function(complete) {
+                            this.searchPath(null, {
+                                success: function(item) {
+                                    this.open(item, {
+                                        uid: 'ui.persist',
+                                        success: complete,
+                                        fail: complete
+                                    });
+                                },
+                                fail: complete,
+                                path: path.split(';'),
+                                load: true
+                            });
+                        });
+                    })(opened[i]);
+                }
+            }
+        },
         // persist selected items
         _persistSelected: function() {
             // support `selectable` extension
             if (this.extSelectable && this.extSelectable()) {
                 var selected = [];
                 this.selected().each(this.proxy(function(element) {
-                    var path = this.pathId($(element));
-                    path.push(this.getId($(element)));
+                    var item = $(element);
+                    var path = this.pathId(item);
+                    path.push(this.getId(item));
                     selected.push(path.join(';'));
                 }, true));
                 $.jStorage.set('aciTree_' + this._instance.options.persist + '_selected', selected);
@@ -202,8 +285,9 @@
             if (this.extSelectable && this.extSelectable()) {
                 var focused = [];
                 this.focused().each(this.proxy(function(element) {
-                    var path = this.pathId($(element));
-                    path.push(this.getId($(element)));
+                    var item = $(element);
+                    var path = this.pathId(item);
+                    path.push(this.getId(item));
                     focused.push(path.join(';'));
                 }, true));
                 $.jStorage.set('aciTree_' + this._instance.options.persist + '_focused', focused);
@@ -213,9 +297,12 @@
         _persistOpened: function() {
             var opened = [];
             this.inodes(this.children(null, true), true).each(this.proxy(function(element) {
-                var path = this.pathId($(element));
-                path.push(this.getId($(element)));
-                opened.push(path.join(';'));
+                var item = $(element);
+                if (this.isOpenPath(item)) {
+                    var path = this.pathId(item);
+                    path.push(this.getId(item));
+                    opened.push(path.join(';'));
+                }
             }, true));
             $.jStorage.set('aciTree_' + this._instance.options.persist + '_opened', opened);
         },

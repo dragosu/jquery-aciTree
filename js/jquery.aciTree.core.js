@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.1
+ * aciTree jQuery Plugin v4.5.0-rc.2
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -198,18 +198,18 @@
                 }
             })).on('mouseenter' + this._instance.nameSpace + ' mouseleave' + this._instance.nameSpace, '.aciTreePush', function(e) {
                 // handle the aciTreeHover class
-                var element = $(e.target);
-                if (!element.hasClass('aciTreePush')) {
-                    element = element.parents('.aciTreePush:first');
+                var element = e.target;
+                if (!domApi.hasClass(element, 'aciTreePush')) {
+                    element = domApi.parentByClass(element, 'aciTreePush');
                 }
-                element.toggleClass('aciTreeHover', e.type == 'mouseenter');
+                domApi.toggleClass(element, 'aciTreeHover', e.type == 'mouseenter');
             }).on('mouseenter' + this._instance.nameSpace + ' mouseleave' + this._instance.nameSpace, '.aciTreeLine', function(e) {
                 // handle the aciTreeHover class
-                var element = $(e.target);
-                if (!element.hasClass('aciTreeLine')) {
-                    element = element.parents('.aciTreeLine:first');
+                var element = e.target;
+                if (!domApi.hasClass(element, 'aciTreeLine')) {
+                    element = domApi.parentByClass(element, 'aciTreeLine');
                 }
-                element.toggleClass('aciTreeHover', e.type == 'mouseenter');
+                domApi.toggleClass(element, 'aciTreeHover', e.type == 'mouseenter');
             });
             this._initHook();
             // call on success
@@ -334,7 +334,7 @@
                     return;
                 }
                 var callback, async = false;
-                if (load == 0) {
+                if (load < options.async * 2) {
                     // get the next synchronous callback
                     callback = fifo.shift();
                 }
@@ -1118,8 +1118,11 @@
         // when `reverse` is TRUE returns the path in reverse order
         path: function(item, reverse) {
             if (item) {
-                var path = item.parentsUntil(this._instance.jQuery, '.aciTreeLi');
-                return reverse ? path : $(path.get().reverse());
+                var parent = item[0], list = [];
+                while (parent = domApi.parent(parent)) {
+                    list.push(parent);
+                }
+                return reverse ? $(list) : $(list.reverse());
             }
             return $([]);
         },
@@ -1128,10 +1131,10 @@
         isVisible: function(item, center) {
             if (item && this.isOpenPath(item)) {
                 // the item path need to be open
-                var rect = this._instance.jQuery.get(0).getBoundingClientRect();
-                var size = item.children('.aciTreeLine').find('.aciTreeItem');
-                var test = size.get(0).getBoundingClientRect();
-                var height = size.outerHeight(true);
+                var rect = this._instance.jQuery[0].getBoundingClientRect();
+                var size = domApi.childrenByClass(item[0], 'aciTreeItem');
+                var test = size.getBoundingClientRect();
+                var height = $(size).outerHeight(true);
                 var offset = center ? this._instance.jQuery.innerHeight() / 2 : 0;
                 if ((test.bottom - height < rect.top + offset) || (test.top + height > rect.bottom - offset)) {
                     // is out of view
@@ -1166,7 +1169,7 @@
         // test if path to item is open
         isOpenPath: function(item) {
             var parent = this.parent(item);
-            return parent.length ? parent.hasClass('aciTreeVisible') : true;
+            return parent.length ? this.isOpen(parent) && domApi.hasClass(parent[0], 'aciTreeVisible') : true;
         },
         // get animation speed vs. offset size
         // `speed` is the raw speed
@@ -1212,10 +1215,10 @@
                 }
                 var process = function() {
                     // compute position with getBoundingClientRect
-                    var rect = this._instance.jQuery.get(0).getBoundingClientRect();
-                    var size = item.children('.aciTreeLine').find('.aciTreeItem');
-                    var test = size.get(0).getBoundingClientRect();
-                    var height = size.outerHeight(true);
+                    var rect = this._instance.jQuery[0].getBoundingClientRect();
+                    var size = domApi.childrenByClass(item[0], 'aciTreeItem');
+                    var test = size.getBoundingClientRect();
+                    var height = $(size).outerHeight(true);
                     var offset = options.center ? this._instance.jQuery.innerHeight() / 2 : 0;
                     if (test.bottom - height < rect.top + offset) {
                         // item somewhere before the first visible
@@ -1276,7 +1279,7 @@
         },
         // get item parent
         parent: function(item) {
-            return item ? item.parent().parent('.aciTreeLi') : $([]);
+            return item ? $(domApi.parent(item[0])) : $([]);
         },
         // get item top (ROOT) parent
         topParent: function(item) {
@@ -1307,7 +1310,7 @@
             var process = this.proxy(function(node, itemList) {
                 if (node) {
                     // set it as a inode
-                    node.addClass('aciTreeInode').removeClass('aciTreeInodeMaybe');
+                    domApi.addRemoveClass(node[0], 'aciTreeInode', 'aciTreeInodeMaybe');
                 }
                 // use .append to add new items
                 this.append(node, this._inner(options, {
@@ -1340,7 +1343,7 @@
             if (!parent) {
                 parent = this._instance.jQuery;
             }
-            return parent.children('.aciTreeUl').children('.aciTreeFirst,.aciTreeLast');
+            return $(domApi.withAnyClass(domApi.children(parent[0]), ['aciTreeFirst', 'aciTreeLast']));
         },
         // update first/last items
         _setFirstLast: function(parent, clear) {
@@ -1353,35 +1356,54 @@
         // update odd/even state
         _setOddEven: function(items) {
             // consider only visible items
-            var visible = this._instance.jQuery.find('.aciTreeVisible');
-            var index = 0;
-            if (items) {
-                // search the item to start with (by index)
-                items.each(function() {
-                    var found = visible.index(this);
-                    if (found != -1) {
-                        index = window.Math.min(found, index);
-                    }
-                });
-                index = window.Math.max(index - 1, 0);
+            var visible;
+            if (this._instance.jQuery[0].getElementsByClassName) {
+                visible = this._instance.jQuery[0].getElementsByClassName('aciTreeVisible');
+                visible = visible ? window.Array.prototype.slice.call(visible) : [];
+            } else {
+                visible = $(domApi.children(this._instance.jQuery[0], true, function(node) {
+                    return this.hasClass(node, 'aciTreeVisible') ? true : null;
+                }));
             }
             var odd = true;
-            if (index > 0) {
-                // determine with what to start with (odd/even)
-                var first = visible.eq(index);
-                if (first.hasClass('aciTreOdd')) {
-                    odd = false;
+            if (visible.length) {
+                var index = 0;
+                if (items) {
+                    // search the item to start with (by index)
+                    items.each(function() {
+                        if (visible.indexOf) {
+                            var found = visible.indexOf(this);
+                            if (found != -1) {
+                                index = window.Math.min(found, index);
+                            }
+                        } else {
+                            for (var i = 0; i < visible.length; i++) {
+                                if (visible[i] === this) {
+                                    index = window.Math.min(i, index);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                    index = window.Math.max(index - 1, 0);
                 }
-                // process only after index
-                visible = visible.filter(':gt(' + index + ')');
+                if (index > 0) {
+                    // determine with what to start with (odd/even)
+                    var first = visible[index];
+                    if (domApi.hasClass(first, 'aciTreOdd')) {
+                        odd = false;
+                    }
+                    // process only after index
+                    visible = visible.slice(index + 1);
+                }
             }
-            this._coreDOM.oddEven(visible, odd);
+            this._coreDOM.oddEven($(visible), odd);
         },
         // update odd/even state for direct children
         _setOddEvenChildren: function(item) {
-            var odd = item.hasClass('aciTreeOdd');
+            var odd = domApi.hasClass(item[0], 'aciTreeOdd');
             var children = this.children(item);
-            this._coreDOM.oddEven(children, odd);
+            this._coreDOM.oddEven(children, !odd);
         },
         // process item before inserting into the DOM
         _itemHook: function(parent, item, itemData, level) {
@@ -1529,19 +1551,23 @@
                 item = this._instance.jQuery;
             }
             // ensure we have a UL in place
-            var container = item.children('.aciTreeUl');
-            if (!container.length) {
-                container = $('<ul class="aciTreeUl" role="group" style="display:none"></ul>');
-                item.append(container);
+            var ul = domApi.container(item[0]);
+            if (!ul) {
+                var ul = window.document.createElement('UL');
+                ul.setAttribute('role', 'group');
+                ul.className = 'aciTreeUl';
+                ul.style.display = 'none';
+                item[0].appendChild(ul);
             }
-            return container;
+            return $(ul);
         },
         // remove children container
         _removeContainer: function(item) {
             if (!item) {
                 item = this._instance.jQuery;
             }
-            item.children('.aciTreeUl').remove();
+            var ul = domApi.container(item[0]);
+            ul.parentNode.removeChild(ul);
         },
         // append one or more items to item
         // `options.itemData` can be a item object or array of item objects
@@ -1689,10 +1715,10 @@
         itemFrom: function(element) {
             if (element) {
                 var item = $(element);
-                if (item.get(0) == this._instance.jQuery.get(0)) {
+                if (item[0] === this._instance.jQuery[0]) {
                     return $([]);
                 } else {
-                    return item.closest('.aciTreeLi');
+                    return $(domApi.parentFrom(item[0]));
                 }
             }
             return $([]);
@@ -1708,14 +1734,17 @@
         // filter only the visible items (items with all parents opened)
         // if `view` is TRUE then only the items in view are returned
         visible: function(items, view) {
-            items = items.filter('.aciTreeVisible');
+            var list = domApi.withClass(items.toArray(), 'aciTreeVisible');
             if (view) {
-                var visible = $.grep(items.get(), this.proxy(function(item) {
-                    return this.isVisible($(item));
-                }));
-                items = $(visible);
+                var filter = [];
+                for (var i = 0; i < list.length; i++) {
+                    if (this.isVisible($(list[i]))) {
+                        filter.push(list[i]);
+                    }
+                }
+                return $(filter);
             }
-            return items;
+            return $(list);
         },
         // filter only inner nodes from items
         // if `state` is set then filter only open/closed ones
@@ -1743,13 +1772,10 @@
         },
         // test if item was loaded
         wasLoad: function(item) {
-            if (!item) {
-                return this._instance.jQuery.children('.aciTreeUl').length > 0;
+            if (item) {
+                return domApi.container(item[0]) !== null;
             }
-            if (this.isInode(item)) {
-                return item.children('.aciTreeUl').length > 0;
-            }
-            return true;
+            return domApi.container(this._instance.jQuery[0]) !== null;
         },
         // set item as inner node
         setInode: function(item, options) {
@@ -2265,7 +2291,7 @@
         // test if item is busy/loading
         isBusy: function(item) {
             if (item) {
-                return item.hasClass('aciTreeLoad');
+                return domApi.hasClass(item[0], 'aciTreeLoad');
             } else {
                 return this._instance.queue.busy();
             }
@@ -2273,12 +2299,12 @@
         // set loading state
         _loading: function(item, state) {
             if (item) {
+                domApi.toggleClass(item[0], 'aciTreeLoad', state);
                 if (state) {
-                    item.attr('aria-busy', true);
+                    item[0].setAttribute('aria-busy', true);
                 } else {
-                    item.removeAttr('aria-busy');
+                    item[0].removeAttribute('aria-busy');
                 }
-                item.toggleClass('aciTreeLoad', state);
             } else if (state) {
                 this._loader(state);
             }
