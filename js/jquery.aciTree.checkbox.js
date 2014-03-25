@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.2
+ * aciTree jQuery Plugin v4.5.0-rc.3
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -313,8 +313,8 @@
         },
         // check checkbox
         check: function(item, options) {
-            options = this._options(options, 'checked', 'checkfail', 'waschecked', item);
-            if (this.extCheckbox() && this.hasCheckbox(item)) {
+            if (this.extCheckbox && this.hasCheckbox(item)) {
+                options = this._options(options, 'checked', 'checkfail', 'waschecked', item);
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforecheck', options)) {
                     this._fail(item, options);
@@ -336,14 +336,15 @@
                     // call the parent
                     this._super(item, options);
                 } else {
+                    this._trigger(item, 'checkfail', options);
                     this._fail(item, options);
                 }
             }
         },
         // uncheck checkbox
         uncheck: function(item, options) {
-            options = this._options(options, 'unchecked', 'uncheckfail', 'notchecked', item);
-            if (this.extCheckbox() && this.hasCheckbox(item)) {
+            if (this.extCheckbox && this.hasCheckbox(item)) {
+                options = this._options(options, 'unchecked', 'uncheckfail', 'notchecked', item);
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforeuncheck', options)) {
                     this._fail(item, options);
@@ -365,6 +366,7 @@
                     // call the parent
                     this._super(item, options);
                 } else {
+                    this._trigger(item, 'uncheckfail', options);
                     this._fail(item, options);
                 }
             }

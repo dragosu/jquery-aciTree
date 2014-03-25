@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.2
+ * aciTree jQuery Plugin v4.5.0-rc.3
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -788,7 +788,7 @@
                 }
                 // first check each children
                 var cancel = false;
-                var children = this.children(item, true);
+                var children = this.children(item, true, true);
                 children.each(this.proxy(function(element) {
                     var item = $(element);
                     if (this.isInode(item)) {
@@ -864,42 +864,45 @@
         },
         // remove item
         remove: function(item, options) {
-            options = this._options(options, function() {
-                if (this.isOpenPath(item)) {
-                    // if the parents are opened (visible) update the item states
-                    domApi.removeClass(item[0], 'aciTreeVisible');
-                    this._setOddEven(item);
-                }
-                this._trigger(item, 'removed', options);
-            }, 'removefail', null, item);
             if (this.isItem(item)) {
-                // a way to cancel the operation
-                if (!this._trigger(item, 'beforeremove', options)) {
-                    this._fail(item, options);
-                    return;
-                }
-                if (this.isInode(item) && this.wasLoad(item)) {
-                    // unload the inode then remove
-                    this.unload(item, this._inner(options, {
-                        success: function() {
-                            this._success(item, options);
-                            this._removeItem(item);
-                        },
-                        fail: options.fail
-                    }));
-                } else if (this.hasSiblings(item, true)) {
-                    // just remove the item
-                    this._success(item, options);
-                    this._removeItem(item);
+                if (this.hasSiblings(item)) {
+                    options = this._options(options, function() {
+                        if (this.isOpenPath(item)) {
+                            // if the parents are opened (visible) update the item states
+                            domApi.removeClass(item[0], 'aciTreeVisible');
+                            this._setOddEven(item);
+                        }
+                        this._trigger(item, 'removed', options);
+                    }, 'removefail', null, item);
+                    // a way to cancel the operation
+                    if (!this._trigger(item, 'beforeremove', options)) {
+                        this._fail(item, options);
+                        return;
+                    }
+                    if (this.wasLoad(item)) {
+                        // unload the inode then remove
+                        this.unload(item, this._inner(options, {
+                            success: function() {
+                                this._success(item, options);
+                                this._removeItem(item);
+                            },
+                            fail: options.fail
+                        }));
+                    } else {
+                        // just remove the item
+                        this._success(item, options);
+                        this._removeItem(item);
+                    }
                 } else {
-                    // no siblings, unload the parent
                     var parent = this.parent(item);
-                    this.unload(parent.length ? parent : null, this._inner(options, {
-                        success: options.success,
-                        fail: options.fail
-                    }));
+                    if (parent.length) {
+                        this.setLeaf(parent, options);
+                    } else {
+                        this.unload(null, options);
+                    }
                 }
             } else {
+                this._trigger(item, 'removefail', options)
                 this._fail(item, options);
             }
         },
@@ -1350,8 +1353,10 @@
             if (clear) {
                 domApi.removeListClass(clear.toArray(), ['aciTreeFirst', 'aciTreeLast']);
             }
-            domApi.addClass(this.first(parent)[0], 'aciTreeFirst');
-            domApi.addClass(this.last(parent)[0], 'aciTreeLast');
+            if (this.hasChildren(parent)) {
+                domApi.addClass(this.first(parent)[0], 'aciTreeFirst');
+                domApi.addClass(this.last(parent)[0], 'aciTreeLast');
+            }
         },
         // update odd/even state
         _setOddEven: function(items) {

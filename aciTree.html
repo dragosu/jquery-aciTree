@@ -1123,13 +1123,14 @@
                         var item = requireSelection();
                         if (item) {
                             // a item is selected, remove it
+                            var id = treeApi.getId(item);
                             treeApi.remove(item, {
                                 uid: 'user-defined',
-                                success: function(item) {
-                                    alert('The item [' + this.getId(item) + '] was removed !');
+                                success: function() {
+                                    alert('The item [' + id + '] was removed !');
                                 },
-                                fail: function(item) {
-                                    alert('Failed to remove the item [' + this.getId(item) + '] !');
+                                fail: function() {
+                                    alert('Failed to remove the item [' + id + '] !');
                                 }
                             });
                         }

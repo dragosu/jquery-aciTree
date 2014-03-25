@@ -40,7 +40,7 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v4.5.0-rc.2
+aciTree jQuery Plugin v4.5.0-rc.3
 http://acoderinsights.ro
 
 Copyright (c) 2014 Dragos Ursu
