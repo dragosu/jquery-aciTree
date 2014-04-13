@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -170,7 +170,7 @@
         },
         // test if item is edited
         isEdited: function(item) {
-            return item && item.hasClass('aciTreeEdited');
+            return item && domApi.hasClass(item[0], 'aciTreeEdited');
         },
         // set focus to the input
         _focusEdit: function(item) {
@@ -287,5 +287,8 @@
 
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
+
+    // for internal access
+    var domApi = aciPluginClass.plugins.aciTree_dom;
 
 })(jQuery, this);

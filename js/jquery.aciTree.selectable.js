@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -89,7 +89,7 @@
                 window.clearTimeout(this._private.blurTimeout);
                 if (!this.hasFocus()) {
                     this._instance.focus = true;
-                    this._instance.jQuery.addClass('aciTreeFocus');
+                    domApi.addClass(this._instance.jQuery[0], 'aciTreeFocus');
                     this._trigger(null, 'focused');
                 }
             })).bind('focusout' + this._private.nameSpace, this.proxy(function() {
@@ -98,7 +98,7 @@
                 this._private.blurTimeout = window.setTimeout(this.proxy(function() {
                     if (this.hasFocus()) {
                         this._instance.focus = false;
-                        this._instance.jQuery.removeClass('aciTreeFocus');
+                        domApi.removeClass(this._instance.jQuery[0], 'aciTreeFocus');
                         this._trigger(null, 'blurred');
                     }
                 }), 10);
@@ -384,8 +384,8 @@
         },
         // override `_itemHook`
         _itemHook: function(parent, item, itemData, level) {
-            if (this.extSelectable()) {
-                this._selectableDOM.select(item, itemData.selected);
+            if (this.extSelectable() && itemData.selected) {
+                this._selectableDOM.select(item, true);
             }
             // call the parent
             this._super(parent, item, itemData, level);
@@ -395,17 +395,22 @@
             // (de)select one or more items
             select: function(items, state) {
                 if (state) {
-                    items.addClass('aciTreeSelected').attr('aria-selected', true);
+                    domApi.addListClass(items.toArray(), 'aciTreeSelected', function(node) {
+                        node.setAttribute('aria-selected', true);
+                    });
                 } else {
-                    items.removeClass('aciTreeSelected').attr('aria-selected', false);
+                    domApi.removeListClass(items.toArray(), 'aciTreeSelected', function(node) {
+                        node.setAttribute('aria-selected', false);
+                    });
                 }
             },
             // focus one item, unfocus one or more items
             focus: function(items, state) {
                 if (state) {
-                    items.addClass('aciTreeFocus').focus();
+                    domApi.addClass(items[0], 'aciTreeFocus');
+                    items[0].focus();
                 } else {
-                    items.removeClass('aciTreeFocus');
+                    domApi.removeListClass(items.toArray(), 'aciTreeFocus');
                 }
             }
         },
@@ -463,38 +468,37 @@
                 return this.hasClass(node, 'aciTreeVisible') ? true : null;
             }));
         },
-        // get item height
-        _height: function(item) {
-            var size = item.children('.aciTreeLine').find('.aciTreeItem');
-            return size.outerHeight(true);
-        },
         // get previous page starting with item
         _prevPage: function(item) {
-            var visible = this._instance.jQuery.find('.aciTreeVisible');
             var space = this._instance.jQuery.height();
-            var now = this._height(item);
-            var prev = item;
-            var index = visible.index(item);
-            while ((now < space) && (index > 0)) {
-                index--;
-                prev = visible.eq(index);
-                now += this._height(prev);
+            var now = item[0].firstChild.offsetHeight;
+            var prev = item, last = $();
+            while (now < space) {
+                prev = this._prev(prev);
+                if (prev[0]) {
+                    now += prev[0].firstChild.offsetHeight;
+                    last = prev;
+                } else {
+                    break;
+                }
             }
-            return prev;
+            return last;
         },
         // get next page starting with item
         _nextPage: function(item) {
-            var visible = this._instance.jQuery.find('.aciTreeVisible');
             var space = this._instance.jQuery.height();
-            var now = this._height(item);
-            var next = item;
-            var index = visible.index(item);
-            while ((now < space) && (index < visible.length - 1)) {
-                index++;
-                next = visible.eq(index);
-                now += this._height(next);
+            var now = item[0].firstChild.offsetHeight;
+            var next = item, last = $();
+            while (now < space) {
+                next = this._next(next);
+                if (next[0]) {
+                    now += next[0].firstChild.offsetHeight;
+                    last = next;
+                } else {
+                    break;
+                }
             }
-            return next;
+            return last;
         },
         // select one item
         _selectOne: function(item) {
@@ -647,7 +651,7 @@
         },
         // test if item is selected
         isSelected: function(item) {
-            return item && item.hasClass('aciTreeSelected');
+            return item && domApi.hasClass(item[0], 'aciTreeSelected');
         },
         // return the focused item
         focused: function() {
@@ -655,7 +659,7 @@
         },
         // test if item is focused
         isFocused: function(item) {
-            return item && item.hasClass('aciTreeFocus');
+            return item && domApi.hasClass(item[0], 'aciTreeFocus');
         },
         // test if selectable is enabled
         extSelectable: function() {

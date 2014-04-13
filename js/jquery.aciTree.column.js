@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -178,12 +178,11 @@
         // override `_itemHook`
         _itemHook: function(parent, item, itemData, level) {
             if (this.columns()) {
-                var position = item.children('.aciTreeLine').find('.aciTreeEntry');
-                var data, column;
+                var position = domApi.childrenByClass(item[0].firstChild, 'aciTreeEntry'), data, column;
                 for (var i in this._instance.options.columnData) {
                     data = this._instance.options.columnData[i];
                     column = this._createColumn(itemData, data, i);
-                    position.prepend(column);
+                    position.insertBefore(column, position.firstChild);
                 }
             }
             // call the parent
@@ -196,7 +195,10 @@
         _createColumn: function(itemData, columnData, index) {
             var value = columnData.props && (itemData[columnData.props] !== undefined) ? itemData[columnData.props] :
                     ((columnData.value === undefined) ? '' : columnData.value);
-            return $('<div class="aciTreeColumn aciTreeColumn' + index + '">' + (value.length ? value : '&nbsp;') + '</div>');
+            var column = window.document.createElement('DIV');
+            column.className = 'aciTreeColumn aciTreeColumn' + index;
+            column.innerHTML = value.length ? value : '&nbsp;';
+            return column;
         },
         // set column content
         // `options.index` the #0 based column index
@@ -241,5 +243,8 @@
 
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
+
+    // for internal access
+    var domApi = aciPluginClass.plugins.aciTree_dom;
 
 })(jQuery, this);

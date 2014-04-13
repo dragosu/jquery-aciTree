@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -110,23 +110,35 @@
         _checkboxDOM: {
             // add item checkbox
             add: function(item, itemData) {
-                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeCheckbox' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck" />');
+                domApi.addClass(item[0], itemData.checked ? ['aciTreeCheckbox', 'aciTreeChecked'] : 'aciTreeCheckbox');
+                var text = domApi.childrenByClass(item[0].firstChild, 'aciTreeText');
+                var parent = text.parentNode;
+                var label = window.document.createElement('LABEL');
+                var check = window.document.createElement('SPAN');
+                check.className = 'aciTreeCheck';
+                label.appendChild(check);
+                label.appendChild(text);
+                parent.appendChild(label);
+                item[0].setAttribute('aria-checked', !!itemData.checked);
             },
             // remove item checkbox
             remove: function(item) {
-                var label = item.removeAttr('aria-checked').removeClass('aciTreeCheckbox aciTreeChecked aciTreeTristate').children('.aciTreeLine').find('label');
-                if (label.length) {
-                    label.find('*').not('.aciTreeText').remove();
-                    label.find('.aciTreeText').unwrap();
-                }
+                domApi.removeClass(item[0], ['aciTreeCheckbox', 'aciTreeChecked', 'aciTreeTristate']);
+                var text = domApi.childrenByClass(item[0].firstChild, 'aciTreeText');
+                var label = text.parentNode;
+                var parent = label.parentNode;
+                parent.replaceChild(text, label)
+                item[0].removeAttribute('aria-checked');
             },
             // (un)check items
             check: function(items, state) {
-                items.attr('aria-checked', state).toggleClass('aciTreeChecked', state);
+                domApi.toggleListClass(items.toArray(), 'aciTreeChecked', state, function(node) {
+                    node.setAttribute('aria-checked', state);
+                });
             },
             // (un)set tristate items
             tristate: function(items, state) {
-                items.toggleClass('aciTreeTristate', state);
+                domApi.toggleListClass(items.toArray(), 'aciTreeTristate', state);
             }
         },
         // update items on load, starting from the loaded node
@@ -246,7 +258,7 @@
         },
         // test if item have a checkbox
         hasCheckbox: function(item) {
-            return item && item.hasClass('aciTreeCheckbox');
+            return item && domApi.hasClass(item[0], 'aciTreeCheckbox');
         },
         // add checkbox
         addCheckbox: function(item, options) {
@@ -302,7 +314,7 @@
         // test if it's checked
         isChecked: function(item) {
             if (this.hasCheckbox(item)) {
-                return item.hasClass('aciTreeChecked');
+                return domApi.hasClass(item[0], 'aciTreeChecked');
             }
             // support `radio` extension
             if (this._super) {
@@ -373,11 +385,10 @@
         },
         // filter items with checkbox by state (if set)
         checkboxes: function(items, state) {
-            var list = items.filter('.aciTreeCheckbox');
             if (state !== undefined) {
-                return state ? list.filter('.aciTreeChecked') : list.not('.aciTreeChecked');
+                return $(domApi.withClass(items.toArray(), state ? ['aciTreeCheckbox', 'aciTreeChecked'] : 'aciTreeCheckbox', state ? null : 'aciTreeChecked'));
             }
-            return list;
+            return $(domApi.withClass(items.toArray(), 'aciTreeCheckbox'));
         },
         // override `_serialize`
         _serialize: function(item, callback) {
@@ -414,11 +425,11 @@
         },
         // test if item is in tristate
         isTristate: function(item) {
-            return item && item.hasClass('aciTreeTristate');
+            return item && domApi.hasClass(item[0], 'aciTreeTristate');
         },
         // filter tristate items
         tristate: function(items) {
-            return items.filter('.aciTreeTristate');
+            return $(domApi.withClass(items.toArray(), 'aciTreeTristate'));
         },
         // test if checkbox is enabled
         extCheckbox: function() {
@@ -465,5 +476,8 @@
 
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
+
+    // for internal access
+    var domApi = aciPluginClass.plugins.aciTree_dom;
 
 })(jQuery, this);

@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -104,19 +104,31 @@
         _radioDOM: {
             // add item radio
             add: function(item, itemData) {
-                item.attr('aria-checked', !!itemData.checked).addClass('aciTreeRadio' + (itemData.checked ? ' aciTreeChecked' : '')).children('.aciTreeLine').find('.aciTreeText').wrap('<label></label>').before('<span class="aciTreeCheck" />');
+                domApi.addClass(item[0], itemData.checked ? ['aciTreeRadio', 'aciTreeChecked'] : 'aciTreeRadio');
+                var text = domApi.childrenByClass(item[0].firstChild, 'aciTreeText');
+                var parent = text.parentNode;
+                var label = window.document.createElement('LABEL');
+                var check = window.document.createElement('SPAN');
+                check.className = 'aciTreeCheck';
+                label.appendChild(check);
+                label.appendChild(text);
+                parent.appendChild(label);
+                item[0].setAttribute('aria-checked', !!itemData.checked);
             },
             // remove item radio
             remove: function(item) {
-                var label = item.removeAttr('aria-checked').removeClass('aciTreeRadio aciTreeChecked').children('.aciTreeLine').find('label');
-                if (label.length) {
-                    label.find('*').not('.aciTreeText').remove();
-                    label.find('.aciTreeText').unwrap();
-                }
+                domApi.removeClass(item[0], ['aciTreeRadio', 'aciTreeChecked']);
+                var text = domApi.childrenByClass(item[0].firstChild, 'aciTreeText');
+                var label = text.parentNode;
+                var parent = label.parentNode;
+                parent.replaceChild(text, label)
+                item[0].removeAttribute('aria-checked');
             },
             // (un)check items
             check: function(items, state) {
-                items.attr('aria-checked', state).toggleClass('aciTreeChecked', state);
+                domApi.toggleListClass(items.toArray(), 'aciTreeChecked', state, function(node) {
+                    node.setAttribute('aria-checked', state);
+                });
             }
         },
         // update item on load
@@ -242,7 +254,7 @@
         },
         // test if item have a radio
         hasRadio: function(item) {
-            return item && item.hasClass('aciTreeRadio');
+            return item && domApi.hasClass(item[0], 'aciTreeRadio');
         },
         // add radio button
         addRadio: function(item, options) {
@@ -298,7 +310,7 @@
         // test if it's checked
         isChecked: function(item) {
             if (this.hasRadio(item)) {
-                return item.hasClass('aciTreeChecked');
+                return domApi.hasClass(item[0], 'aciTreeChecked');
             }
             // support `checkbox` extension
             if (this._super) {
@@ -369,11 +381,10 @@
         },
         // filter items with radio by state (if set)
         radios: function(items, state) {
-            var list = items.filter('.aciTreeRadio');
             if (state !== undefined) {
-                return state ? list.filter('.aciTreeChecked') : list.not('.aciTreeChecked');
+                return $(domApi.withClass(items.toArray(), state ? ['aciTreeRadio', 'aciTreeChecked'] : 'aciTreeRadio', state ? null : 'aciTreeChecked'));
             }
-            return list;
+            return $(domApi.withClass(items.toArray(), 'aciTreeRadio'));
         },
         // override `_serialize`
         _serialize: function(item, callback) {
@@ -453,5 +464,8 @@
 
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
+
+    // for internal access
+    var domApi = aciPluginClass.plugins.aciTree_dom;
 
 })(jQuery, this);

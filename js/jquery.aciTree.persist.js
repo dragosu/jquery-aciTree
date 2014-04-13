@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -98,88 +98,6 @@
             }
         },
         // restore item states
-        _persistRestoreX: function() {
-            var queue = new this._queue(this, this._instance.options.queue);
-            var opened = $.jStorage.get('aciTree_' + this._instance.options.persist + '_opened');
-            if (opened instanceof Array) {
-                // open all saved items
-                for (var i in opened) {
-                    (function(path) {
-                        // add item to queue
-                        queue.push(function(complete) {
-                            this.searchPath(null, {
-                                success: function(item) {
-                                    this.open(item, {
-                                        uid: 'ui.persist',
-                                        success: complete,
-                                        fail: complete
-                                    });
-                                },
-                                fail: complete,
-                                path: path.split(';'),
-                                load: true
-                            });
-                        });
-                    })(opened[i]);
-                }
-            }
-            // support `selectable` extension
-            if (this.extSelectable && this.extSelectable()) {
-                var selected = $.jStorage.get('aciTree_' + this._instance.options.persist + '_selected');
-                if (selected instanceof Array) {
-                    // select all saved items
-                    for (var i in selected) {
-                        (function(path) {
-                            queue.push(function(complete) {
-                                this.searchPath(null, {
-                                    success: function(item) {
-                                        this.select(item, {
-                                            uid: 'ui.persist',
-                                            success: function() {
-                                                complete();
-                                            },
-                                            fail: complete,
-                                            focus: false
-                                        });
-                                    },
-                                    fail: complete,
-                                    path: path.split(';')
-                                });
-                            });
-                        })(selected[i]);
-                        if (!this._instance.options.multiSelectable) {
-                            break;
-                        }
-                    }
-                }
-                var focused = $.jStorage.get('aciTree_' + this._instance.options.persist + '_focused');
-                if (focused instanceof Array) {
-                    // focus all saved items
-                    for (var i in focused) {
-                        (function(path) {
-                            queue.push(function(complete) {
-                                this.searchPath(null, {
-                                    success: function(item) {
-                                        this.focus(item, {
-                                            uid: 'ui.persist',
-                                            success: function(item) {
-                                                this.setVisible(item, {
-                                                    center: true
-                                                });
-                                                complete();
-                                            },
-                                            fail: complete
-                                        });
-                                    },
-                                    fail: complete,
-                                    path: path.split(';')
-                                });
-                            });
-                        })(focused[i]);
-                    }
-                }
-            }
-        },
         _persistRestore: function() {
             var queue = new this._queue(this, this._instance.options.queue);
             var task = new this._task(queue, function(complete) {

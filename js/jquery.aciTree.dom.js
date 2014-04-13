@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.3
+ * aciTree jQuery Plugin v4.5.0-rc.4
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -461,7 +461,7 @@ aciPluginClass.plugins.aciTree_dom = {
                 }
             }
         } else {
-            if (oldClass.indexOf(' ' + className + ' ') == -1) {
+            if (className && oldClass.indexOf(' ' + className + ' ') == -1) {
                 return false;
             }
         }
@@ -502,7 +502,7 @@ aciPluginClass.plugins.aciTree_dom = {
                 }
             }
         } else {
-            if (oldClass.indexOf(' ' + className + ' ') != -1) {
+            if (className && oldClass.indexOf(' ' + className + ' ') != -1) {
                 return true;
             }
         }
