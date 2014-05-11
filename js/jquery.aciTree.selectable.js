@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.4
+ * aciTree jQuery Plugin v4.5.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -32,7 +32,7 @@
         selectable: true,               // if TRUE then one item can be selected (and the tree navigation with the keyboard will be enabled)
         multiSelectable: false,         // if TRUE then multiple items can be selected at a time
         // the 'tabIndex' attribute need to be >= 0 set on the tree container (by default will be set to 0)
-        fullRow: false,                 // if TRUE then the selection will be made on the entire row (the CSS need to reflect this)
+        fullRow: false,                 // if TRUE then the selection will be made on the entire row (the CSS should reflect this)
         textSelection: false            // if FALSE then the item text can't be selected
     };
 
@@ -320,6 +320,11 @@
                     return false;
                 }
             }));
+            if (state) {
+                domApi.addClass(this._instance.jQuery[0], 'aciTreeFullRow');
+            } else {
+                domApi.removeClass(this._instance.jQuery[0], 'aciTreeFullRow');
+            }
         },
         // change selection mode
         _multiSelectable: function(state) {
@@ -334,12 +339,12 @@
         // process `shift` key selection
         _shiftSelect: function(item) {
             var spinPoint = this._private.spinPoint;
-            if (!spinPoint || !$.contains(this._instance.jQuery.get(0), spinPoint.get(0)) || !this.isOpenPath(spinPoint)) {
-                var spinPoint = this.focused();
+            if (!spinPoint || !$.contains(this._instance.jQuery[0], spinPoint[0]) || !this.isOpenPath(spinPoint)) {
+                spinPoint = this.focused();
             }
             if (spinPoint.length) {
                 // select a range of items
-                var select = [item.get(0)], start = spinPoint.get(0), found = false, stop = item.get(0);
+                var select = [item[0]], start = spinPoint[0], found = false, stop = item[0];
                 var visible = this.visible(this.children(null, true));
                 visible.each(this.proxy(function(element) {
                     // find what items to select
@@ -396,11 +401,11 @@
             select: function(items, state) {
                 if (state) {
                     domApi.addListClass(items.toArray(), 'aciTreeSelected', function(node) {
-                        node.setAttribute('aria-selected', true);
+                        node.firstChild.setAttribute('aria-selected', true);
                     });
                 } else {
                     domApi.removeListClass(items.toArray(), 'aciTreeSelected', function(node) {
-                        node.setAttribute('aria-selected', false);
+                        node.firstChild.setAttribute('aria-selected', false);
                     });
                 }
             },
@@ -408,7 +413,7 @@
             focus: function(items, state) {
                 if (state) {
                     domApi.addClass(items[0], 'aciTreeFocus');
-                    items[0].focus();
+                    items[0].firstChild.focus();
                 } else {
                     domApi.removeListClass(items.toArray(), 'aciTreeFocus');
                 }
@@ -698,7 +703,8 @@
             }
             this._instance.jQuery.unbind(this._private.nameSpace);
             this._instance.jQuery.off(this._private.nameSpace, '.aciTreeLine,.aciTreeItem').off(this._private.nameSpace, '.aciTreeItem');
-            this._instance.jQuery.removeClass('aciTreeFocus').removeAttr('aria-multiselectable');
+            domApi.removeClass(this._instance.jQuery[0], ['aciTreeFocus', 'aciTreeFullRow']);
+            this._instance.jQuery.removeAttr('aria-multiselectable');
             this._instance.focus = false;
             this._private.spinPoint = null;
             if (!destroy) {

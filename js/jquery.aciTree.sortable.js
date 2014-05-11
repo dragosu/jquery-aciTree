@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.4
+ * aciTree jQuery Plugin v4.5.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -216,7 +216,7 @@
                         // the helper is inserted in the DOM
                         var top = $(window).scrollTop();
                         var left = $(window).scrollLeft();
-                        var rect = item.get(0).getBoundingClientRect();
+                        var rect = item[0].getBoundingClientRect();
                         // animate helper to item position
                         helper.animate({
                             top: rect.top + top,
@@ -290,7 +290,7 @@
                 return false;
             }
             var test = this.itemFrom(hover);
-            if (items.is(test) || items.has(test.get(0)).length) {
+            if (items.is(test) || items.has(test[0]).length) {
                 return false;
             }
             if (!isContainer) {

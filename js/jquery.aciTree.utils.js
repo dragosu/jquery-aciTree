@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.4
+ * aciTree jQuery Plugin v4.5.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -91,7 +91,7 @@
             options = this._options(options, null, 'swapfail', null, null);
             var item1 = options.item1;
             var item2 = options.item2;
-            if (this.isItem(item1) && this.isItem(item2) && !this.isChildren(item1, item2) && !this.isChildren(item2, item1) && (item1.get(0) != item2.get(0))) {
+            if (this.isItem(item1) && this.isItem(item2) && !this.isChildren(item1, item2) && !this.isChildren(item2, item1) && (item1[0] != item2[0])) {
                 // a way to cancel the operation
                 if (!this._trigger(null, 'beforeswap', options)) {
                     this._fail(null, options);
@@ -99,7 +99,7 @@
                 }
                 var prev = this.prev(item1);
                 if (prev.length) {
-                    if (item2.get(0) == prev.get(0)) {
+                    if (item2[0] == prev[0]) {
                         item2.before(item1);
                     } else {
                         item1.insertAfter(item2);
@@ -108,7 +108,7 @@
                 } else {
                     var next = this.next(item1);
                     if (next.length) {
-                        if (item2.get(0) == next.get(0)) {
+                        if (item2[0] == next[0]) {
                             item2.after(item1);
                         } else {
                             item1.insertAfter(item2);
@@ -138,16 +138,23 @@
         },
         // update item level
         _updateItemLevel: function(item, fromLevel, toLevel) {
-            item.removeClass('aciTreeLevel' + fromLevel).addClass('aciTreeLevel' + toLevel);
-            var entry = item.children('.aciTreeLine').find('.aciTreeEntry');
+            domApi.addRemoveClass(item[0], 'aciTreeLevel' + toLevel, 'aciTreeLevel' + fromLevel);
+            var line = item[0].firstChild;
+            line.setAttribute('aria-level', toLevel + 1);
+            var entry = domApi.childrenByClass(line, 'aciTreeEntry');
             if (fromLevel < toLevel) {
+                line = entry.parentNode;
+                var branch;
                 for (var i = fromLevel; i < toLevel; i++) {
-                    entry.wrap('<div class="aciTreeBranch aciTreeLevel' + i + '"></div>');
+                    branch = window.document.createElement('DIV');
+                    line.appendChild(branch);
+                    branch.className = 'aciTreeBranch aciTreeLevel' + i;
+                    line = branch;
                 }
-            } else if (fromLevel > toLevel) {
-                for (var i = toLevel; i < fromLevel; i++) {
-                    entry.unwrap();
-                }
+                line.appendChild(entry);
+            } else {
+                line.removeChild(line.firstChild);
+                line.appendChild(entry);
             }
         },
         // update child level
@@ -200,13 +207,13 @@
         moveBefore: function(item, options) {
             options = this._options(options, null, 'movefail', 'wasbefore', item);
             var before = options.before;
-            if (this.isItem(item) && this.isItem(before) && !this.isChildren(item, before) && (item.get(0) != before.get(0))) {
+            if (this.isItem(item) && this.isItem(before) && !this.isChildren(item, before) && (item[0] != before[0])) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforemove', options)) {
                     this._fail(item, options);
                     return;
                 }
-                if (this.prev(before, true).get(0) == item.get(0)) {
+                if (this.prev(before, true)[0] == item[0]) {
                     this._notify(item, options);
                 } else {
                     var parent = this.parent(item);
@@ -237,13 +244,13 @@
         moveAfter: function(item, options) {
             options = this._options(options, null, 'movefail', 'wasafter', item);
             var after = options.after;
-            if (this.isItem(item) && this.isItem(after) && !this.isChildren(item, after) && (item.get(0) != after.get(0))) {
+            if (this.isItem(item) && this.isItem(after) && !this.isChildren(item, after) && (item[0] != after[0])) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforemove', options)) {
                     this._fail(item, options);
                     return;
                 }
-                if (this.next(after, true).get(0) == item.get(0)) {
+                if (this.next(after, true)[0] == item[0]) {
                     this._notify(item, options);
                 } else {
                     var parent = this.parent(item);
@@ -273,7 +280,7 @@
         asChild: function(item, options) {
             options = this._options(options, null, 'childfail', null, item);
             var parent = options.parent;
-            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildren(parent, true) && (item.get(0) != parent.get(0))) {
+            if (this.isItem(item) && this.isItem(parent) && !this.isChildren(item, parent) && !this.hasChildren(parent, true) && (item[0] != parent[0])) {
                 // a way to cancel the operation
                 if (!this._trigger(item, 'beforechild', options)) {
                     this._fail(item, options);
@@ -546,9 +553,9 @@
                                 first = item;
                             }
                             found = true;
-                            item.removeClass('aciTreeHidden');
+                            domApi.removeClass(item[0], 'aciTreeHidden');
                         } else {
-                            item.removeClass('aciTreeVisible').addClass('aciTreeHidden');
+                            domApi.addRemoveClass(item[0], 'aciTreeHidden', 'aciTreeVisible');
                         }
                         if (this.isInode(item)) {
                             // continue with the children
@@ -730,5 +737,8 @@
 
     // add extra default options
     aciPluginClass.defaults('aciTree', options);
+
+    // for internal access
+    var domApi = aciPluginClass.plugins.aciTree_dom;
 
 })(jQuery, this);

@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.4
+ * aciTree jQuery Plugin v4.5.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -174,7 +174,7 @@
         },
         // set focus to the input
         _focusEdit: function(item) {
-            var field = this._editableDOM.get(item).focus().trigger('click').get(0);
+            var field = this._editableDOM.get(item).focus().trigger('click')[0];
             if (field) {
                 if (typeof field.selectionStart == 'number') {
                     field.selectionStart = field.selectionEnd = field.value.length;
@@ -203,7 +203,7 @@
                 }
                 var edited = this.edited();
                 if (edited.length) {
-                    if (edited.get(0) == item.get(0)) {
+                    if (edited[0] == item[0]) {
                         this._notify(item, options);
                         return;
                     } else {

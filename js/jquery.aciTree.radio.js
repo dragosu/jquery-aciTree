@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.4
+ * aciTree jQuery Plugin v4.5.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -113,7 +113,7 @@
                 label.appendChild(check);
                 label.appendChild(text);
                 parent.appendChild(label);
-                item[0].setAttribute('aria-checked', !!itemData.checked);
+                item[0].firstChild.setAttribute('aria-checked', !!itemData.checked);
             },
             // remove item radio
             remove: function(item) {
@@ -122,12 +122,12 @@
                 var label = text.parentNode;
                 var parent = label.parentNode;
                 parent.replaceChild(text, label)
-                item[0].removeAttribute('aria-checked');
+                item[0].firstChild.removeAttribute('aria-checked');
             },
             // (un)check items
             check: function(items, state) {
                 domApi.toggleListClass(items.toArray(), 'aciTreeChecked', state, function(node) {
-                    node.setAttribute('aria-checked', state);
+                    node.firstChild.setAttribute('aria-checked', state);
                 });
             }
         },

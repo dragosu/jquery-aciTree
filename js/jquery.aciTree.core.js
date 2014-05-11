@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.4
+ * aciTree jQuery Plugin v4.5.0-rc.5
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -291,19 +291,19 @@
             // set as leaf node
             leaf: function(items) {
                 domApi.addRemoveListClass(items.toArray(), 'aciTreeLeaf', ['aciTreeInode', 'aciTreeInodeMaybe', 'aciTreeOpen'], function(node) {
-                    node.removeAttribute('aria-expanded');
+                    node.firstChild.removeAttribute('aria-expanded');
                 });
             },
             // set as inner node
             inode: function(items, branch) {
                 domApi.addRemoveListClass(items.toArray(), branch ? 'aciTreeInode' : 'aciTreeInodeMaybe', 'aciTreeLeaf', function(node) {
-                    node.setAttribute('aria-expanded', false);
+                    node.firstChild.setAttribute('aria-expanded', false);
                 });
             },
             // set as open/closed
             toggle: function(items, state) {
                 domApi.toggleListClass(items.toArray(), 'aciTreeOpen', state, function(node) {
-                    node.setAttribute('aria-expanded', state);
+                    node.firstChild.setAttribute('aria-expanded', state);
                 });
             },
             // set odd/even classes
@@ -1238,7 +1238,7 @@
                                 })
                             });
                         } else {
-                            this._instance.jQuery.stop(true).get(0).scrollTop = this._instance.jQuery.scrollTop() - diff;
+                            this._instance.jQuery.stop(true)[0].scrollTop = this._instance.jQuery.scrollTop() - diff;
                             this._success(item, options);
                         }
                     } else if (test.top + height > rect.bottom - offset) {
@@ -1256,7 +1256,7 @@
                                 })
                             });
                         } else {
-                            this._instance.jQuery.stop(true).get(0).scrollTop = this._instance.jQuery.scrollTop() + diff;
+                            this._instance.jQuery.stop(true)[0].scrollTop = this._instance.jQuery.scrollTop() + diff;
                             this._success(item, options);
                         }
                     } else {
@@ -1422,7 +1422,8 @@
         _createItem: function(itemData, level) {
             if (this._private.itemClone[level]) {
                 var li = this._private.itemClone[level].cloneNode(true);
-                var icon = li.firstChild;
+                var line = li.firstChild;
+                var icon = line;
                 for (var i = 0; i < level; i++) {
                     icon = icon.firstChild;
                 }
@@ -1430,11 +1431,12 @@
                 var text = icon.nextSibling;
             } else {
                 var li = window.document.createElement('LI');
-                li.setAttribute('tabindex', -1);
-                li.setAttribute('role', 'treeitem');
-                li.setAttribute('aria-selected', false);
+                li.setAttribute('role', 'presentation');
                 var line = window.document.createElement('DIV');
                 li.appendChild(line);
+                line.setAttribute('tabindex', -1);
+                line.setAttribute('role', 'treeitem');
+                line.setAttribute('aria-selected', false);
                 line.className = 'aciTreeLine';
                 var last = line, branch;
                 for (var i = 0; i < level; i++) {
@@ -1464,7 +1466,10 @@
                 this._private.itemClone[level] = li.cloneNode(true);
             }
             li.className = 'aciTreeLi' + (itemData.inode || (itemData.inode === null) ? (itemData.inode || (itemData.branch && itemData.branch.length) ? ' aciTreeInode' : ' aciTreeInodeMaybe') : ' aciTreeLeaf') + ' aciTreeLevel' + level + (itemData.disabled ? ' aciTreeDisabled' : '');
-            li.setAttribute('aria-level', level + 1);
+            line.setAttribute('aria-level', level + 1);
+            if (itemData.inode || (itemData.inode === null)) {
+                line.setAttribute('aria-expanded', false);
+            }
             if (itemData.icon) {
                 if (itemData.icon instanceof Array) {
                     icon.className = 'aciTreeIcon ' + itemData.icon[0];
@@ -2227,7 +2232,7 @@
                     }
                     var parent = this.parent(item);
                     // update item states
-                    this._setFirstLast(parent.length ? parent : null, item.add([siblings.get(0), siblings.get(-1)]));
+                    this._setFirstLast(parent.length ? parent : null, item.add([siblings[0], siblings.get(-1)]));
                     this._setOddEven(parent);
                     this._success(item, options);
                 }
@@ -2327,9 +2332,9 @@
             if (item) {
                 domApi.toggleClass(item[0], 'aciTreeLoad', state);
                 if (state) {
-                    item[0].setAttribute('aria-busy', true);
+                    item[0].firstChild.setAttribute('aria-busy', true);
                 } else {
-                    item[0].removeAttribute('aria-busy');
+                    item[0].firstChild.removeAttribute('aria-busy');
                 }
             } else if (state) {
                 this._loader(state);
@@ -2369,7 +2374,7 @@
             if (item1 && item2) {
                 var parent1 = this.parent(item1);
                 var parent2 = this.parent(item2);
-                return (!parent1.length && !parent2.length) || (parent1.get(0) == parent2.get(0));
+                return (!parent1.length && !parent2.length) || (parent1[0] == parent2[0]);
             }
             return false;
         },
@@ -2378,7 +2383,7 @@
             if (item1 && item2) {
                 var parent1 = this.topParent(item1);
                 var parent2 = this.topParent(item2);
-                return (!parent1.length && !parent2.length) || (parent1.get(0) == parent2.get(0));
+                return (!parent1.length && !parent2.length) || (parent1[0] == parent2[0]);
             }
             return false;
         },

@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="robots" content="index, follow">
-        <title>aciTree demo - A treeview control with jQuery</title>
+        <title>aciTree demo - A javascript treeview control with jQuery</title>
         <meta name="description" content="A demo to show you how aciTree can be used, check the plugin page to see all the functions exposed by the API">
         <meta name="keywords" content="aciTree, treeview, control, tree view, javascript, jQuery">
         <link rel="stylesheet" type="text/css" href="css/aciTree.css" media="all">
@@ -29,30 +29,41 @@
 
         <div>
 
-            <p>Here you have a simple implementation of a file system tree with the most features available to be changed at the runtime from the interface.
-                You can find a simple PHP implementation in the download but any server-side language can be used because aciTree needs the data in JSON
-                format and it's using AJAX to load the children of a inner node (once they are needed).</p>
+            <p>Here you have a simple implementation of a file system treeview with the most features available to be changed at the runtime from the interface
+                (see the treeview/right form elements on the bottom of the page).</p>
+
+            <p>You can find a simple PHP implementation in the download (source code) but any server-side language can be used. aciTree needs the data in JSON
+                format and it's using AJAX to load the children of a inner node (once required).</p>
 
             <p>Note: I recommend checking the code from the other demos as this page can be complex for someone new to aciTree. Also, do not forget to check the API docs
-                before you try using the methods and also check online on the plugin page for extra info (like init options and using the events).</p>
+                before you try using the methods and also check online on the plugin page for extra info (like the plugin init options and how to use the events).</p>
 
-            <p><b>Start <a href="sample/index.html" target="_blank" title="aciTree usage samples"><span style="color:red">here</span></a> first if you are new to aciTree</b> (check <b>using the API</b> demos for a detailed introduction to aciTree)</p>
+            <a href="/en/aciTree-tree-view-with-jQuery" title="Back to home page">Back to home page</a>
 
-            <p>See a checkbox tree demo <a href="aciTree-checkbox.html" target="_blank" title="aciTree with checkboxes">here</a></p>
-            <p>See a radio-button tree demo <a href="aciTree-radio.html" target="_blank" title="aciTree with radio-buttons">here</a></p>
-            <p>See a multiple column tree demo <a href="/demo/aciTree.html" target="_blank" title="aciTree with columns">here</a></p>
-            <p>See how you can change the column width and toggle columns <a href="/demo/aciTree-column-width.html" target="_blank" title="aciTree with column width">here</a></p>
-            <p>Save/restore items state (open/closed/selected) using local storage demo <a href="/demo/aciTree_persist.html" target="_blank" title="aciTree with local storage">here</a></p>
-            <p>Select/open items based on the variables stored in the URL fragment demo <a href="/demo/aciTree_hash.html" target="_blank" title="aciTree with aciFragment">here</a></p>
-            <p>See how you can use the drag & drop events to sort the tree items and limit the draggable items / drop targets <a href="aciTree-drag-drop.html" target="_blank" title="aciTree drag & drop">here</a></p>
-            <p>See how you can add a tooltip for each tree item <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree tooltips">here</a></p>
-            <p>See how you can use a custom tree data structure <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree custom data">here</a></p>
-            <p>(<span style="color:red">new</span>) See a demo with a custom/multiple data sources <a href="/demo/aciTree-data-source.html" target="_blank" title="aciTree full size">here</a></p>
-            <p>See how you can use a custom filter/search <a href="/demo/aciTree-filter-search.html" target="_blank" title="aciTree filter & search">here</a></p>
-            <p>See a demo with a full-sized tree container <a href="/demo/aciTree-full-size.html" target="_blank" title="aciTree full size">here</a></p>
+            <h2>Available aciTree treeview demos</h2>
+
+            <ul style="list-style-type:none;padding:0;line-height:30px">
+                <li>New to aciTree? try <a href="sample/index.html" target="_blank" title="aciTree treeview API usage samples">aciTree treeview API usage samples</a></li>
+                <li>using aciTree treeview with <a href="aciTree-checkbox.html" target="_blank" title="aciTree treeview with checkboxes">checkboxes</a></li>
+                <li>using aciTree treeview with <a href="aciTree-radio.html" target="_blank" title="aciTree treeview with radio-buttons">radio-buttons</a></li>
+                <li>aciTree treeview with <a href="/demo/aciTree.html" target="_blank" title="aciTree treeview with columns">multiple columns</a></li>
+                <li>updating aciTree treeview <a href="/demo/aciTree-column-width.html" target="_blank" title="aciTree treeview column width">columns width</a></li>
+                <li>save/restore aciTree treeview item states using <a href="/demo/aciTree_persist.html" target="_blank" title="aciTree treeview item states with local storage">local storage</a></li>
+                <li>aciTree treeview and <a href="/demo/aciTree_hash.html" target="_blank" title="aciTree treeview with aciFragment">URL fragments</a></li>
+                <li>aciTree treeview with <a href="aciTree-drag-drop.html" target="_blank" title="aciTree treeview DND sorting">drag & drop</a></li>
+                <li>using aciTree treeview with <a href="/demo/aciTree-tooltip.html" target="_blank" title="aciTree treeview with jQuery UI tooltips">jQuery UI tooltips</a></li>
+                <li>using aciTree treeview with <a href="/demo/aciTree-ui-dialog.html" target="_blank" title="aciTree treeview with jQuery UI dialogs">jQuery UI dialogs</a></li>
+                <li>using aciTree treeview with <a href="/demo/aciTree-ui-tabs.html" target="_blank" title="aciTree treeview with jQuery UI tabs">jQuery UI tabs</a></li>
+                <li>aciTree treeview with <a href="/demo/aciTree-custom-data.html" target="_blank" title="aciTree treeview custom data format">custom data format</a></li>
+                <li>aciTree treeview with <a href="/demo/aciTree-data-source.html" target="_blank" title="aciTree treeview multiple data sources">multiple data sources</a></li>
+                <li>aciTree treeview client-side <a href="/demo/aciTree-filter-search.html" target="_blank" title="aciTree treeview filter & search">filter & search</a></li>
+                <li>aciTree treeview and <a href="/demo/aciTree-full-size.html" target="_blank" title="aciTree treeview full size">full window width</a></li>
+
+                <li>(<span style="color:red">new</span>) aciTree treeview with a <a href="/demo/aciTree-context-menu.html" target="_blank" title="aciTree treeview context menu">context menu</a></li>
+            </ul>
 
             <p>Note: in the demo below - the node loading it's made with a delay so you can see the loading animation.
-                If you want you can remove the delay from the <i>PHP</i> script ...</p>
+                If you want you can remove the delay from the included <i>PHP</i> script.</p>
 
             <p id="info">Hover over a tree item to show his info (using the aciTree API) ...</p>
 
@@ -76,7 +87,7 @@
                                     <label><input type="radio" name="empty" value="0"> No</label></p>
                                 <p>Selectable: <label><input type="radio" name="selectable" value="1"> Yes</label>
                                     <label><input type="radio" name="selectable" value="0"> No</label></p>
-                                <p><span style="color:red">(new) </span>Multi-Selectable <label><input type="radio" name="multiSelectable" value="1"> Yes</label>
+                                <p>Multi-Selectable <label><input type="radio" name="multiSelectable" value="1"> Yes</label>
                                     <label><input type="radio" name="multiSelectable" value="0"> No</label></p>
                                 <p>Full Row: <label><input type="radio" name="fullRow" value="1"> Yes</label>
                                     <label><input type="radio" name="fullRow" value="0"> No</label></p>
@@ -124,11 +135,13 @@
                                     <input id="setFolder" type="button" value="Set as Folder">
                                     <input id="remove" type="button" value="Remove"></p>
                             </td><td>
-                                <p><span style="color:red">(new) </span>Size: <label><input type="radio" name="esize" value="small"> Smaller</label>
+                                <!--<input id="reloadJs" type="button" value="Reload JS">-->
+
+                                <p>Size: <label><input type="radio" name="esize" value="small"> Smaller</label>
                                     <label><input type="radio" name="esize" value="big"> Bigger</label></p>
-                                <p><span style="color:red">(new) </span>Node Button: <label><input type="radio" name="nodebtn" value="square"> Square</label>
+                                <p>Node Button: <label><input type="radio" name="nodebtn" value="square"> Square</label>
                                     <label><input type="radio" name="nodebtn" value="arrow"> Arrow</label></p>
-                                <p><span style="color:green">(update) </span>Show Branches: <label><input type="radio" name="branches" value="1"> Yes</label>
+                                <p>Show Branches: <label><input type="radio" name="branches" value="1"> Yes</label>
                                     <label><input type="radio" name="branches" value="0"> No</label></p>
 
                                 <p>Direction: <label><input type="radio" name="direction" value="1"> LTR</label>
@@ -143,7 +156,7 @@
                                 <p>Set Radio: <select id="setRadio"><option value="">-- choose --</option>
                                         <option value="yes">Yes</option><option value="No">No</option></select></p>
 
-                                <p>Item: <span style="color:red">(new) </span><input id="disable" type="button" value="Disable">
+                                <p>Item: <input id="disable" type="button" value="Disable">
                                     <input id="enable" type="button" value="Enable">
                                     (<span style="color:blue">note</span>) <input id="hide" type="button" value="Hide"> <input id="show" type="button" value="Show">
                                     <input id="hideshow" type="button" value="Toggle"></p>
@@ -391,6 +404,7 @@
 
                 // show tree events
                 theTree.on('acitree', function(event, api, item, eventName, options) {
+                    return;
                     if (options.uid == 'skip-log') {
                         return;
                     }
@@ -534,6 +548,16 @@
                     return (string == 'true') ? true : ((string == 'false') ? false : parseInt(string));
                 }
 
+                $('#reloadJs').click(function() {
+                    var script = $('script');
+                    script.detach().each(function() {
+                        var src = $(this).attr('src');
+                        if (src) {
+                            $('head').append('<' + 'script type="text/javascript" src="' + src + '"><' + '/script' + '>');
+                        }
+                    });
+                });
+
                 // init FORM based on options
                 $('[name=esize][value=' + (theTree.hasClass('aciTreeBig') ? 'big' : 'small') + ']').prop('checked', true);
                 $('[name=nodebtn][value=' + (theTree.hasClass('aciTreeArrow') ? 'arrow' : 'square') + ']').prop('checked', true);
@@ -635,9 +659,6 @@
                 $('[name=expand],[name=collapse],[name=empty],[name=unique],[name=selectable],[name=fullRow],[name=textSelection],[name=sortable],[name=checkbox],[name=radio],[name=checkboxBreak],[name=radioChain],[name=radioBreak],[name=editable],[name=checkboxClick],[name=radioClick],[name=multiSelectable]').click(function() {
                     var option = $(this).prop('name');
                     theTree.aciTree('option', option, $(this).val() == 1);
-                    if (option == 'fullRow') {
-                        theTree.toggleClass('aciTreeFullRow', $(this).val() == 1);
-                    }
                 });
 
                 $('[name=checkboxChain]').click(function() {
@@ -764,7 +785,7 @@
 
                 // return TRUE if the treeview is selected
                 function checkIsTree() {
-                    return _g_sel && (_g_sel == theTree.get(0));
+                    return _g_sel && (_g_sel == theTree[0]);
                 }
 
                 // return the selected item (if any)
@@ -1549,7 +1570,7 @@
                         uid: 'user-defined',
                         success: function(item, options) {
                             uid: 'user-defined',
-                            this.openPath(item, {
+                                    this.openPath(item, {
                                 success: function(item, options) {
                                     this.setVisible(item, {
                                         uid: 'user-defined',
