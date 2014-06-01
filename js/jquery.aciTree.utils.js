@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.5
+ * aciTree jQuery Plugin v4.5.0-rc.6
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -153,19 +153,21 @@
                 }
                 line.appendChild(entry);
             } else {
-                line.removeChild(line.firstChild);
-                line.appendChild(entry);
+                var branch = entry;
+                for (var i = toLevel; i <= fromLevel; i++) {
+                    branch = branch.parentNode;
+                }
+                branch.removeChild(branch.firstChild);
+                branch.appendChild(entry);
             }
         },
         // update child level
         _updateChildLevel: function(item, fromLevel, toLevel) {
-            this.children(item).each(this.proxy(function(element) {
+            this.children(item, false, true).each(this.proxy(function(element) {
                 var item = $(element);
                 this._updateItemLevel(item, fromLevel, toLevel);
                 if (this.isInode(item)) {
-                    this.children(item).each(this.proxy(function(element) {
-                        this._updateChildLevel($(element), fromLevel + 1, toLevel + 1);
-                    }, true));
+                    this._updateChildLevel(item, fromLevel + 1, toLevel + 1);
                 }
             }, true));
         },

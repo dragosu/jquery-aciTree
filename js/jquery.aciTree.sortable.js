@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.5
+ * aciTree jQuery Plugin v4.5.0-rc.6
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -30,15 +30,19 @@
         },
         // called by the `aciSortable` inside the `valid` callback
         sortValid: function(item, hover, before, isContainer, placeholder, helper) {
+            var move = this.getLabel(item);
+            if (this._private.dragDrop.length > 1) {
+                move += ' and #' + (this._private.dragDrop.length - 1) + ' more';
+            }
             if (isContainer) {
-                helper.html('move ' + this.getLabel(item) + ' to ' + this.getLabel(this.itemFrom(hover)));
+                helper.html('move ' + move + ' to ' + this.getLabel(this.itemFrom(hover)));
                 placeholder.removeClass('aciTreeAfter aciTreeBefore');
             } else if (before !== null) {
                 if (before) {
-                    helper.html('move ' + this.getLabel(item) + ' before ' + this.getLabel(hover));
+                    helper.html('move ' + move + ' before ' + this.getLabel(hover));
                     placeholder.removeClass('aciTreeAfter').addClass('aciTreeBefore');
                 } else {
-                    helper.html('move ' + this.getLabel(item) + ' after ' + this.getLabel(hover));
+                    helper.html('move ' + move + ' after ' + this.getLabel(hover));
                     placeholder.removeClass('aciTreeBefore').addClass('aciTreeAfter');
                 }
             }
