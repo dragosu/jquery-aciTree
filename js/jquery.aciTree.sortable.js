@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.6
+ * aciTree jQuery Plugin v4.5.0-rc.7
  * http://acoderinsights.ro
  *
  * Copyright (c) 2014 Dragos Ursu
@@ -25,7 +25,11 @@
         // called by the `aciSortable` inside the `drag` callback
         sortDrag: function(item, placeholder, isValid, helper) {
             if (!isValid) {
-                helper.html(this.getLabel(item));
+                var move = this.getLabel(item);
+                if (this._private.dragDrop && (this._private.dragDrop.length > 1)) {
+                    move += ' and #' + (this._private.dragDrop.length - 1) + ' more';
+                }
+                helper.html(move);
             }
         },
         // called by the `aciSortable` inside the `valid` callback
@@ -119,20 +123,10 @@
                     if (!this._trigger(item, 'checkdrop', options)) {
                         return false;
                     }
-                    if (!isContainer && this.isInode(hover)) {
-                        if (!this.isOpen(hover) && !hover.data('opening' + this._private.nameSpace)) {
-                            this._private.openTimeout = window.setTimeout(this.proxy(function() {
-                                hover.data('opening' + this._private.nameSpace, true);
-                                this.open(hover, {
-                                    success: function(item) {
-                                        item.removeData('opening' + this._private.nameSpace);
-                                    },
-                                    fail: function(item) {
-                                        item.removeData('opening' + this._private.nameSpace);
-                                    }
-                                });
-                            }), this._instance.options.sortDelay);
-                        }
+                    if (this.isInode(hover) && !this.isOpen(hover)) {
+                        this._private.openTimeout = window.setTimeout(this.proxy(function() {
+                            this.open(hover);
+                        }), this._instance.options.sortDelay);
                     }
                     if (this._instance.options.sortValid) {
                         this._instance.options.sortValid.apply(this, arguments);
