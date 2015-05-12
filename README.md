@@ -40,10 +40,10 @@ $(function(){
 
 });
 
-aciTree jQuery Plugin v4.5.0-rc.7
+aciTree jQuery Plugin v4.5.0-rc.8
 http://acoderinsights.ro
 
-Copyright (c) 2014 Dragos Ursu
+Copyright (c) 2015 Dragos Ursu
 Dual licensed under the MIT or GPL Version 2 licenses.
 
 Require jQuery Library >= v1.9.0 http://jquery.com
