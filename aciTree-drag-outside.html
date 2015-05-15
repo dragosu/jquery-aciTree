@@ -47,10 +47,10 @@
 
             <script class="code" type="text/javascript">
 
-                $(function() {
+                $(function () {
 
                     // listen for the events
-                    $('#tree1').on('acitree', function(event, api, item, eventName, options) {
+                    $('#tree1').on('acitree', function (event, api, item, eventName, options) {
                         switch (eventName) {
                             case 'beforedrag':
                                 if (!api.isLeaf(item)) {
@@ -74,16 +74,17 @@
                         ajax: {
                             url: 'json/checkbox-radio-button.json'
                         },
-                        sortable: true
+                        sortable: true,
+                        // connect with the drop targets
+                        sortOptions: {
+                            connectDrop: '.drop'
+                        }
                     });
-
-                    // connect with the drop targets
-                    $('#tree1').aciSortable('option', 'connectDrop', '.drop');
 
                     // init the drop targets
                     $('.drop').aciSortable({
                         dropPosition: 1,
-                        valid: function(item, hover, before, isContainer, placeholder, helper) {
+                        valid: function (item, hover, before, isContainer, placeholder, helper) {
                             var tree = $('#tree1').aciTree('api');
                             if (tree.isItem(item)) {
                                 var parent = tree.parent(item);
@@ -103,7 +104,7 @@
                             }
                             return false;
                         },
-                        end: function(item, hover, placeholder, helper) {
+                        end: function (item, hover, placeholder, helper) {
                             if (placeholder.parent().length) {
                                 var tree = $('#tree1').aciTree('api');
                                 if (tree.isItem(item)) {
@@ -134,10 +135,10 @@
 
             <script type="text/javascript">
 
-                $(function() {
+                $(function () {
 
                     // write to log
-                    $('[id^=tree]').on('acitree', function(event, api, item, eventName, options) {
+                    $('[id^=tree]').on('acitree', function (event, api, item, eventName, options) {
                         var log = $(this).next('.log').find('div');
                         if (api.isItem(item)) {
                             log.prepend('<p>' + eventName + ' [' + api.getId(item) + ']</p>');
@@ -146,7 +147,7 @@
                         }
                     });
 
-                    $('.clear_log').click(function() {
+                    $('.clear_log').click(function () {
                         $(this).closest('.log').find('div').html('');
                         return false;
                     });
@@ -159,9 +160,9 @@
 
         <script type="text/javascript">
 
-            $(function() {
+            $(function () {
 
-                $('script.code').each(function() {
+                $('script.code').each(function () {
                     $(this).before('<div style="clear:both;margin:10px 0 10px 0"><pre style="padding:20px;border:1px dashed #000;background:#f6f6f6;display:inline-block;"></pre></div>');
                     $(this).prev('div').find('pre').text($(this).html());
                 });

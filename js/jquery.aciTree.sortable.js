@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.8
+ * aciTree jQuery Plugin v4.5.0-rc.9
  * http://acoderinsights.ro
  *
  * Copyright (c) 2015 Dragos Ursu
@@ -50,7 +50,9 @@
                     placeholder.removeClass('aciTreeBefore').addClass('aciTreeAfter');
                 }
             }
-        }
+        },
+        // the `aciSortable` options
+        sortOptions: {}
     };
 
     // aciTree sortable extension
@@ -60,14 +62,16 @@
             // add extra data
             $.extend(this._private, {
                 openTimeout: null,
-                dragDrop: null // the items used in drag & drop
+                dragDrop: null, // the items used in drag & drop
+                // store `aciSortable` api
+                sortableApi: null
             });
             // call the parent
             this._super();
         },
         // init sortable
         _sortableInit: function () {
-            this._instance.jQuery.aciSortable({
+            this._instance.jQuery.aciSortable($.extend({
                 container: '.aciTreeUl',
                 item: '.aciTreeLi',
                 child: 50,
@@ -203,6 +207,13 @@
                                 }
                             }
                         }
+                        // support `selectable` extension
+                        if (this.extSelectable && this.extSelectable()) {
+                            var focused = this.focused();
+                            if (focused.length) {
+                                focused[0].firstChild.focus();
+                            }
+                        }
                     } else {
                         this._fail(item, options);
                     }
@@ -227,7 +238,15 @@
                     }
                     this._instance.jQuery.removeClass('aciTreeDragDrop');
                 })
-            });
+            }, this._instance.options.sortOptions));
+            this._private.sortableApi = this._instance.jQuery.aciSortable('api');
+            this._instance.jQuery.bind('keydown' + this._private.nameSpace, this.proxy(function (e) {
+                switch (e.which) {
+                    case 27: // escape
+                        this._private.sortableApi.cancel();
+                        break;
+                }
+            }));
         },
         // override `_initHook`
         _initHook: function () {
@@ -317,6 +336,7 @@
         // done sortable
         _sortableDone: function () {
             this._instance.jQuery.unbind(this._private.nameSpace);
+            this._private.sortableApi = null;
             this._instance.jQuery.aciSortable('destroy');
         },
         // override `_destroyHook`

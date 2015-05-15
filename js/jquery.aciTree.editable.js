@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.8
+ * aciTree jQuery Plugin v4.5.0-rc.9
  * http://acoderinsights.ro
  *
  * Copyright (c) 2015 Dragos Ursu
