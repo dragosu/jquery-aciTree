@@ -1,6 +1,6 @@
 
 /*
- * aciTree jQuery Plugin v4.5.0-rc.9
+ * aciTree jQuery Plugin v4.5.0-rc.10
  * http://acoderinsights.ro
  *
  * Copyright (c) 2015 Dragos Ursu
@@ -87,9 +87,12 @@
                     if (!this._initDrag(item)) {
                         return false;
                     }
+                    var options = {
+                        items: this._private.dragDrop
+                    };
                     // a way to cancel the operation
-                    if (!this._trigger(item, 'beforedrag')) {
-                        this._trigger(item, 'dragfail');
+                    if (!this._trigger(item, 'beforedrag', options)) {
+                        this._trigger(item, 'dragfail', options);
                         return false;
                     }
                     return true;
@@ -119,6 +122,7 @@
                         }), this._instance.options.sortDelay);
                     }
                     var options = this._options({
+                        items: this._private.dragDrop,
                         hover: hover,
                         before: before,
                         isContainer: isContainer,
@@ -146,6 +150,7 @@
                 end: this.proxy(function (item, hover, placeholder, helper) {
                     window.clearTimeout(this._private.openTimeout);
                     var options = {
+                        items: this._private.dragDrop,
                         placeholder: placeholder,
                         helper: helper
                     };
